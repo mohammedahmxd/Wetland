@@ -64,6 +64,8 @@ jobs:
           REPORT_RENDER_TESTS: "true"
       - run: npm test
         working-directory: packages/mcp-runtime
+      - run: npm test
+        working-directory: packages/mcp-skills
       - run: node --test scripts/framework.test.mjs
       - run: node --test deploy/tests/*.test.mjs
       - run: npm test
