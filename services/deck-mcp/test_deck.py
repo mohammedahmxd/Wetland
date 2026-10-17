@@ -43,19 +43,19 @@ def fake_brand():
 class RenderTests(unittest.TestCase):
     def test_marketplace_brief_builds(self):
         spec = validate_brief(BRIEF)
-        self.assertEqual(len(spec["slides"]), 8)
+        self.assertEqual(len(spec["slides"]), 10)
         self.assertIn("build the deck", spec["slides"][0]["headline"])
         import tempfile
 
         with tempfile.TemporaryDirectory() as directory:
             destination = Path(directory) / "deck.pptx"
             meta = build_pptx(BRIEF, fake_brand(), destination)
-            self.assertEqual(meta["slides"], 8)
+            self.assertEqual(meta["slides"], 10)
             self.assertGreater(destination.stat().st_size, 5000)
             from pptx import Presentation
 
             presentation = Presentation(destination)
-            self.assertEqual(len(presentation.slides), 8)
+            self.assertEqual(len(presentation.slides), 10)
             text = "\n".join(
                 shape.text_frame.text
                 for slide in presentation.slides

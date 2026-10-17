@@ -73,8 +73,8 @@ def validate_brief(brief):
                 if not isinstance(card, dict):
                     raise BriefError(f"Slide {index} item must be an object")
                 status = card.get("status")
-                if status not in {"Live", "Concept"}:
-                    raise BriefError(f"Slide {index} status must be Live or Concept")
+                if status not in {"Live", "Live example", "Concept"}:
+                    raise BriefError(f"Slide {index} status must be Live, Live example or Concept")
                 item["items"].append(
                     {
                         "name": _need(card.get("name"), "item name", 40),
@@ -241,15 +241,15 @@ def _paint_catalogue(slide, spec, brand, colors, footer, number, total):
         x = left + col * (width + gap)
         y = 1.85 + row * (height + 0.16)
         _rect(slide, x, y, width, height, white, radius=0.08)
-        if item["status"] == "Live":
+        if item["status"] in {"Live", "Live example"}:
             _rect(slide, x + 0.14, y + 0.28, 0.07, height - 0.56, blue)
-        pill_fill = lime if item["status"] == "Live" else _rgb("#E7EEF6")
+        pill_fill = lime if item["status"] in {"Live", "Live example"} else _rgb("#E7EEF6")
         pill = _rect(slide, x + 0.22, y + 0.2, 1.32, 0.32, pill_fill, radius=0.4)
         frame = pill.text_frame
         frame.word_wrap = False
         frame.paragraphs[0].alignment = PP_ALIGN.CENTER
         frame._txBody.bodyPr.set("anchor", "ctr")
-        _run(frame.paragraphs[0], item["status"].upper(), 10, ink if item["status"] == "Live" else muted, BODY, True)
+        _run(frame.paragraphs[0], item["status"].upper(), 10, ink if item["status"] in {"Live", "Live example"} else muted, BODY, True)
         _text(slide, x + 0.22, y + 0.68, width - 0.38, 0.85, item["name"], 15, ink, HEAD, spacing=0.95)
         _text(slide, x + 0.22, y + 1.58, width - 0.38, 0.36, item["meta"], 11, muted, BODY)
     _footer(slide, colors, footer, number, total)

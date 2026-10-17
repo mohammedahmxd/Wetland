@@ -19,57 +19,79 @@
       "kicker": "THE MARKETPLACE",
       "headline": "Find a capability. Open the approved agent.",
       "bullets": [
-        "Browse Wetland by task and try the synthetic Growth demo.",
+        "Browse Wetland by task and try Growth or a synthetic capability example.",
         "Open the approved Copilot agent after IT configures its MCP connections.",
         "Copy the example prompt. Pasting an MCP URL alone does not connect Copilot.",
         "Review the report, source and definition before sharing."
       ]
     },
     {
+      "layout": "bullets",
+      "kicker": "LIVE REFERENCE AND REPORTING",
+      "headline": "Brand guidance and Growth reporting",
+      "bullets": [
+        "Brand provides the shared colours, fonts, logos and document guidance.",
+        "Growth uses synthetic donation history: Q3 has 120 new donors against a target of 150.",
+        "Growth must retrieve Brand guidance before releasing its PDF and HTML reports.",
+        "These services demonstrate the workflow; real donor data is not connected."
+      ]
+    },
+    {
       "layout": "catalogue",
-      "kicker": "ON THE SHELF",
-      "headline": "Brand and Growth are live demos",
+      "kicker": "LIVE SYNTHETIC CAPABILITY EXAMPLES",
+      "headline": "Eight scoped examples, one MCP service",
       "items": [
         {
-          "name": "Brand & design system",
-          "meta": "Knowledge & brand",
-          "status": "Live"
-        },
-        {
-          "name": "Growth KPI reporting",
-          "meta": "Synthetic donor reporting",
-          "status": "Live"
+          "name": "Grant applications",
+          "meta": "Synthetic application outline",
+          "status": "Live example"
         },
         {
           "name": "Programme reporting",
-          "meta": "International Programmes",
-          "status": "Concept"
+          "meta": "Synthetic progress analysis",
+          "status": "Live example"
         },
         {
-          "name": "Supporter care",
-          "meta": "Supporter Care",
-          "status": "Concept"
+          "name": "Governance and approvals",
+          "meta": "Advisory release checks",
+          "status": "Live example"
         },
         {
-          "name": "Water point insights",
-          "meta": "Programme & MERL",
-          "status": "Concept"
+          "name": "Tool maintenance",
+          "meta": "Synthetic maintenance triage",
+          "status": "Live example"
         },
         {
-          "name": "Fundraising intelligence",
-          "meta": "Fundraising",
-          "status": "Concept"
+          "name": "Staff onboarding",
+          "meta": "Synthetic onboarding plan",
+          "status": "Live example"
         },
         {
-          "name": "Grant reconciliation",
-          "meta": "Grants Finance",
-          "status": "Concept"
+          "name": "Communications",
+          "meta": "Synthetic campaign outline",
+          "status": "Live example"
         },
         {
-          "name": "Policy & evidence library",
-          "meta": "Policy & Advocacy",
-          "status": "Concept"
+          "name": "Developer standards",
+          "meta": "Advisory development checks",
+          "status": "Live example"
+        },
+        {
+          "name": "Organisational learning",
+          "meta": "Synthetic learning retrieval",
+          "status": "Live example"
         }
+      ]
+    },
+    {
+      "layout": "bullets",
+      "kicker": "CONNECTING THE EXAMPLES",
+      "headline": "Choose a scoped endpoint or connect all eight",
+      "bullets": [
+        "One hosted Examples MCP: each /mcp/<scope> exposes one capability; /mcp exposes all eight.",
+        "The examples return synthetic evidence, outlines and advisory checks.",
+        "They cannot grant approvals, change systems or generate finished branded reports.",
+        "IT must configure the Copilot connection; pasting the URL into a prompt does not connect tools."
       ]
     },
     {
@@ -109,7 +131,7 @@
       "bullets": [
         "Numbers for a funder, the board, or the public still need a person.",
         "Material AI use is disclosed, including in funder text.",
-        "A concept card is not a connection to donor or programme data.",
+        "Synthetic examples are not connections to donor or programme systems.",
         "A refusal is the boundary working, not a broken tool."
       ]
     },
@@ -117,7 +139,7 @@
       "layout": "close",
       "kicker": "NEXT DECK, SAME PATH",
       "headline": "Find the tool. Ask for the deck.",
-      "body": "Try Growth and Brand live. Deck generation runs locally; a published Copilot agent still requires tenant setup.",
+      "body": "Try the live demos in Wetland. Deck generation runs locally; a published Copilot agent still requires tenant setup.",
       "link": "https://wetland-ai-workspace-462504004653.northamerica-northeast2.run.app"
     }
   ]
