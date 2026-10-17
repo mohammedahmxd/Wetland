@@ -31,7 +31,7 @@ The target is an explicit donor-count planning input. It is not a campaign's mon
 
 This is a configurable **Raiser’s Edge-style export pack**, not a claim that Blackbaud produces these exact filenames/headers by default. NXT list exports, database-view exports and Query outputs vary. Payment outcome history and merge mappings require separately verified sources; accounting post status cannot substitute for them. The small names and contacts are deliberately synthetic and omit unnecessary donor contact information. The fixture models 500 canonical identities plus one known duplicate; repeated, split and historic gifts, older prospects converting, returning donors, commitments, declines, full refunds, recognition-only records and a future conversion.
 
-This is not statistically representative fundraising data: amounts and allocation proportions are deliberately simple so the demo can be independently reconciled. The earlier `synthetic-data/synthetic_data_kpi_analysis.csv` stays unchanged.
+This is not statistically representative fundraising data: amounts vary deterministically from $10 to $500, while allocation proportions remain deliberately simple so the demo can be independently reconciled. The earlier `synthetic-data/synthetic_data_kpi_analysis.csv` stays unchanged.
 
 ### Blackbaud research references
 

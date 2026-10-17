@@ -9,12 +9,13 @@ def person(i,created):
  cid=f'C{i:05}'
  people.append([str(i),cid,f'Synthetic Donor {i:03}', 'Organization' if i%20==0 else 'Individual',created,'Yes' if i%3 else 'No','No'])
  return str(i)
-def gift(cid,day,kind='Cash',status='Received',amount=5000):
+def gift(cid,day,kind='Cash',status='Received',amount=None):
+ if amount is None: amount=[1000,1500,2000,2500,5000,7500,10000,15000,25000,50000][(int(cid)*7+len(gifts))%10]
  parent=''
  if kind in ['Pay-Cash','Recurring Gift Pay-Cash']:
-  parent=gift(cid,day,'Pledge' if kind=='Pay-Cash' else 'Recurring Gift')
+  parent=gift(cid,day,'Pledge' if kind=='Pay-Cash' else 'Recurring Gift',amount=amount)
  gid=str(10000+len(gifts)); n=len(gifts)
- gifts.append([gid,f'G{gid}',cid,day,kind,f'{amount/100:.2f}','CAD','Not posted' if n%7==0 else 'Posted','' if n%7==0 else day,'Credit card',parent])
+ gifts.append([gid,f'G{gid}',cid,day,kind,f'{amount/100:.2f}','CAD','Not posted' if n%7==0 else 'Posted','' if n%7==0 else day,['Credit card','Direct debit','Cheque'][n%3],parent])
  splits.extend([[f'{gid}-1',gid,'CMP-GROWTH','F-WATER','A-DIGITAL',f'{amount*0.6/100:.2f}'],[f'{gid}-2',gid,'CMP-GROWTH','F-HYGIENE','A-DIGITAL',f'{amount*0.4/100:.2f}']])
  if kind not in ['Pledge','Recurring Gift']:
   payments.append([f'P{gid}',gid,day,status,f'{amount/100:.2f}'])
@@ -35,7 +36,7 @@ for i in range(461,501):
  if i<=470: gift(cid,'2026-08-02','Pledge')
  elif i<=480: gift(cid,'2026-08-02',status='Declined')
  elif i<=490:
-  gid=gift(cid,'2026-08-02');payments.append([f'R{gid}',gid,'2026-09-01','Refunded','50.00'])
+  gid=gift(cid,'2026-08-02');payments.append([f'R{gid}',gid,'2026-09-01','Refunded',payments[-1][-1]])
  else: soft.append([f'SC{i}','10000',cid,'50.00'])
 # Later conversion, excluded from Q3 but visible in Q4.
 gift('461','2026-10-05','Pay-Cash')

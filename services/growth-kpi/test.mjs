@@ -25,10 +25,10 @@ test('Refund cutoff, partial refunds and pending outcomes',async()=>{
  const d=await loadDataset();const receipt=d.tables['payment_events.csv'].find(e=>e.Outcome==='Received'&&d.tables['gifts.csv'].some(g=>g['System record ID']===e['Gift System record ID']&&g['Constituent System record ID']==='341'));
  const second=d.tables['gifts.csv'].filter(g=>g['Constituent System record ID']==='341').at(-1);
  d.tables['payment_events.csv'].find(e=>e['Gift System record ID']===second['System record ID']).Outcome='Pending';
- const refund={'Event ID':'test-refund','Gift System record ID':receipt['Gift System record ID'],'Event date':'2026-09-30',Outcome:'Refunded',Amount:'50.00'};
+ const refund={'Event ID':'test-refund','Gift System record ID':receipt['Gift System record ID'],'Event date':'2026-09-30',Outcome:'Refunded',Amount:receipt.Amount};
  d.tables['payment_events.csv'].push(refund);assert.equal(calculate(d,args).actual,119);
- refund.Amount='10.00';assert.equal(calculate(d,args).actual,120);
- refund.Amount='50.00';refund['Event date']='2026-10-01';assert.equal(calculate(d,args).actual,120);
+ refund.Amount=(Number(receipt.Amount)/2).toFixed(2);assert.equal(calculate(d,args).actual,120);
+ refund.Amount=receipt.Amount;refund['Event date']='2026-10-01';assert.equal(calculate(d,args).actual,120);
 });
 test('Fail closed on incomplete history, bad dates, unknown donors and merge cycles',async()=>{
  const d=await loadDataset();d.manifest.complete_lifetime_history=false;assert.throws(()=>calculate(d,args),/lifetime/);d.manifest.complete_lifetime_history=true;
