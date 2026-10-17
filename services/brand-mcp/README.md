@@ -62,7 +62,7 @@ npm run demo:auth
 | Email | `flow-demo@wateraidflow.org` |
 | Password | `local-development-only` |
 
-The command prints a sign-in URL. Use that email and password on the page. The password is for the local emulator only.
+The command prints a sign-in URL. Use that email and password on the page. The password is for local development. The same verified user also exists in the Firebase project `wateraid-flow`. Browser sign-in against that project still needs a web API key from a Firebase web app.
 
 `services/brand-mcp/firebase.json` enables Google sign-in for the Firebase project. Authorized domains are hosting names, not the email allowlist. After choosing the Firebase project, deploy that configuration from this directory:
 

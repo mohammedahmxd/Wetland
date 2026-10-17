@@ -45,13 +45,13 @@ The local server was started with `npm run demo:auth`. Its health check reported
 
 ## Connection to `wateraid-flow`
 
-The running server is not connected to the Firebase project `wateraid-flow`.
+`m1lakdawala@torontomu.ca` can now see `wateraid-flow`. The account has Firebase Authentication Admin and Browser access. It does not have Firebase Admin, so creating a web app and an API key is still denied.
 
-- There is no `.firebaserc` in the repo.
-- The local process uses the emulator project `demo-wateraid-flow`.
-- `firebase login --no-localhost` succeeded as `m1lakdawala@torontomu.ca`.
-- That account can see only the Firebase project `fir-demo-project`.
-- Listing apps for `wateraid-flow` returned: Firebase project `462504004653` not found.
-- The directory `services/brand-mcp` is recorded locally as active project `wateraid-flow`, but there is no web API key or app config from that project.
+Authentication is initialized on `wateraid-flow`:
 
-To finish the connection, add `m1lakdawala@torontomu.ca` to the `wateraid-flow` Firebase project, or sign in with a Google account that already has access.
+- Email and password sign-in is enabled.
+- Authorized domains include `localhost`, `wateraid-flow.firebaseapp.com`, `wateraid-flow.web.app`, and the brand hub Cloud Run host.
+- The verified test user `flow-demo@wateraidflow.org` exists in that project. The local password is `local-development-only`.
+- `services/brand-mcp/.firebaserc` selects `wateraid-flow`.
+
+The local server is still the Auth emulator. The browser sign-in page needs a Firebase web API key, and this account cannot create the web app that issues that key. Grant `roles/firebase.admin` (Firebase Admin) to this account to finish that step.
