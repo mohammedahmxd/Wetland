@@ -1,0 +1,64 @@
+name: Verify and deploy Wetland
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: wetland-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: wetland
+          POSTGRES_PASSWORD: ci-test-only
+          POSTGRES_DB: wetland_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U wetland"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm test
+        working-directory: dashboard
+      - run: npm ci --ignore-scripts
+        working-directory: backend
+      - run: npm run build
+        working-directory: backend
+      - run: npm test
+        working-directory: backend
+        env:
+          DATABASE_URL: postgres://wetland:ci-test-only@localhost:5432/wetland_ci
+  deploy-sandbox:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
+        with:
+          workload_identity_provider: projects/462504004653/locations/global/workloadIdentityPools/wetland-github/providers/wetland-repo
+          service_account: wetland-github-deploy@wateraid-flow.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
+      - name: Build and deploy public sandbox
+        run: gcloud builds submit . --project=wateraid-flow --region=northamerica-northeast2 --config=deploy/cloudbuild.yaml --suppress-logs

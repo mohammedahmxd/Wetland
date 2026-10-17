@@ -1,0 +1,35 @@
+steps:
+  - id: dashboard-tests
+    name: node:22-alpine
+    dir: dashboard
+    entrypoint: npm
+    args: ['test']
+  - id: build-dashboard
+    name: gcr.io/cloud-builders/docker
+    args: ['build', '-t', 'northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-ai-workspace:$BUILD_ID', 'dashboard']
+  - id: push-dashboard
+    name: gcr.io/cloud-builders/docker
+    args: ['push', 'northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-ai-workspace:$BUILD_ID']
+  - id: deploy-sandbox
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - wetland-ai-workspace
+      - --project=wateraid-flow
+      - --region=northamerica-northeast2
+      - --image=northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-ai-workspace:$BUILD_ID
+      - --service-account=wetland-workspace@wateraid-flow.iam.gserviceaccount.com
+      - --port=8080
+      - --min-instances=0
+      - --max-instances=2
+      - --memory=256Mi
+      - --cpu=1
+      - --quiet
+images:
+  - northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-ai-workspace:$BUILD_ID
+serviceAccount: projects/wateraid-flow/serviceAccounts/wateraid-build@wateraid-flow.iam.gserviceaccount.com
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 900s

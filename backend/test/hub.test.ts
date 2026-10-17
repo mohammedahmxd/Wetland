@@ -1,0 +1,38 @@
+import {test,before,after}from'node:test';
+import assert from'node:assert/strict';
+import{randomUUID}from'node:crypto';
+process.env.AUTH_MODE='demo';process.env.DEMO_AUTH_ENABLED='true';
+if(!process.env.DATABASE_URL)throw Error('Disposable test database required');
+const{pool}=await import('../src/db.js'),{migrate}=await import('../src/migrate.js'),{createApp}=await import('../src/app.js');
+const app=createApp(),org=randomUUID(),other=randomUUID(),base='/api/orgs/'+org+'/hub';
+before(async()=>{await migrate();for(const id of[org,other]){await pool.query('INSERT INTO organizations VALUES($1,$2)',[id,'Hub test']);for(const role of['staff','contributor','maintainer','approver'])await pool.query('INSERT INTO members VALUES($1,$2,$3)',[id,'demo-'+role,role]);}});
+after(async()=>{await app.close();await pool.end()});
+async function call(method:any,path:string,role='maintainer',body?:any){let r=await app.inject({method,url:path,headers:{authorization:'Bearer demo-'+role},payload:body});return{status:r.statusCode,body:r.json()}}
+test('Hub enforces isolation, immutable versions, exact evaluation and CAS activation',async()=>{
+ const r=await call('POST',base+'/resources','maintainer',{kind:'document',name:'Reporting guidance'});assert.equal(r.status,201);
+ assert.equal((await call('GET',base+'/resources','contributor')).status,403);
+ assert.equal((await call('GET','/api/orgs/'+other+'/hub/resources/'+r.body.id)).status,404);
+ const rp=base+'/resources/'+r.body.id;
+ let v=await call('POST',rp+'/versions','maintainer',{expectedRevision:1,payload:{heading:'Report',body:'Retain sources'}});assert.equal(v.status,201);
+ assert.equal((await call('POST',rp+'/versions','maintainer',{expectedRevision:1,payload:{heading:'Stale',body:'Old'}})).status,409);
+ await assert.rejects(pool.query('UPDATE hub_versions SET digest=$1 WHERE id=$2',['tampered',v.body.id]),/immutable/);
+ assert.equal((await call('POST',rp+'/activate','maintainer',{versionId:v.body.id,expectedActiveVersionId:null,reason:'Skip review'})).status,409);
+ let e=await call('POST',base+'/versions/'+v.body.id+'/evaluate');assert.equal(e.body.passed,true);
+ let a=await call('POST',base+'/versions/'+v.body.id+'/approve','approver',{evaluationId:e.body.id,rationale:'Checked guidance'});assert.equal(a.status,201);
+ let results=await Promise.all([1,2].map(()=>call('POST',rp+'/activate','maintainer',{versionId:v.body.id,expectedActiveVersionId:null,reason:'Publish'})));
+ assert.deepEqual(results.map(x=>x.status).sort(),[201,409]);
+ const tool=await call('POST',base+'/resources','maintainer',{kind:'tool',name:'draft_report'});
+ const bad=await call('POST',base+'/resources/'+tool.body.id+'/versions','maintainer',{expectedRevision:1,payload:{name:'draft_report',description:'Report draft',implementation:'extractive-report-v1',includeGaps:false,documentVersionId:v.body.id}});
+ assert.equal(bad.status,201);
+ const fail=await call('POST',base+'/versions/'+bad.body.id+'/evaluate');assert.equal(fail.body.passed,false);
+ assert.equal((await call('POST',base+'/versions/'+bad.body.id+'/approve','approver',{evaluationId:fail.body.id,rationale:'Bypass'})).status,409);
+ const v2=await call('POST',rp+'/versions','maintainer',{expectedRevision:3,payload:{heading:'Report 2',body:'New guidance'}});
+ assert.equal(v2.status,201);
+ const ev2=await call('POST',base+'/versions/'+v2.body.id+'/evaluate');
+ assert.equal((await call('POST',base+'/versions/'+v2.body.id+'/approve','approver',{evaluationId:e.body.id,rationale:'Wrong evidence'})).status,409);
+ await call('POST',base+'/versions/'+v2.body.id+'/approve','approver',{evaluationId:ev2.body.id,rationale:'Approved new guidance'});
+ await call('POST',rp+'/activate','maintainer',{versionId:v2.body.id,expectedActiveVersionId:v.body.id,reason:'Upgrade'});
+ const saved=(await pool.query('SELECT dependency_version_id FROM hub_versions WHERE id=$1',[bad.body.id])).rows[0];
+ assert.equal(saved.dependency_version_id,v.body.id);
+ const rollback=await call('POST',rp+'/activate','maintainer',{versionId:v.body.id,expectedActiveVersionId:v2.body.id,reason:'Roll back'});assert.equal(rollback.status,201);
+});

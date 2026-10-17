@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import{seedHub,saveDocument,publishDocument,saveTool,testTool,submitTool,releaseTool,runConfigured,rollbackTool}from'./public/hub-model.js';
+let h=seedHub(),t=h.tools[0],d=h.documents[0];
+saveDocument(h,d.id,{heading:'New weekly heading',body:'New reviewed guidance'},1);
+assert.throws(()=>saveDocument(h,d.id,{heading:'Stale',body:'Stale'},1));
+assert.equal(runConfigured(h,t.published).heading,'Programme update');
+publishDocument(h,d.id);assert.equal(d.publishedVersion,2);
+assert.equal(runConfigured(h,t.published).documentVersion,1);
+saveTool(h,t.id,{description:'A new candidate',documentId:d.id,includeGaps:false},1);
+assert.equal(testTool(h,t.id).passed,false);assert.throws(()=>submitTool(h,t.id));
+saveTool(h,t.id,{description:'A passing candidate',documentId:d.id,includeGaps:true},2);
+assert.equal(testTool(h,t.id).passed,true);let r=submitTool(h,t.id);
+assert.throws(()=>releaseTool(h,r.id,'staff'));
+saveTool(h,t.id,{description:'Changed after evaluation',documentId:d.id,includeGaps:true},3);
+assert.throws(()=>releaseTool(h,r.id,'reviewer'));assert.throws(()=>submitTool(h,t.id));
+testTool(h,t.id);r=submitTool(h,t.id);releaseTool(h,r.id,'reviewer');assert.equal(t.publishedVersion,2);assert.equal(runConfigured(h,t.published).heading,'New weekly heading');
+rollbackTool(h,t.id,'reviewer');assert.equal(t.publishedVersion,3);assert.equal(runConfigured(h,t.published).heading,'Programme update');
+console.log('PASS: document revisions, pinned dependencies, failed evaluations, stale-candidate rejection, reviewer gating, publish and rollback.');
