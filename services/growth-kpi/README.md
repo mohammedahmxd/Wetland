@@ -85,3 +85,13 @@ Use `npm run studio` to edit guidance, report title, default target and metadata
 ## Branded documents
 
 Use `calculate_growth` for numeric results or `generate_growth_report` for Brand-dependent PDF/HTML reports. The latter needs `PUBLIC_BASE_URL` and a reachable `BRAND_MCP_URL` (defaults to the existing public Brand service). The Docker image includes Python/Poppler. Local render tests require ReportLab, pypdf, Pillow and pdftoppm; set `REPORT_PYTHON` to your Python binary and `REPORT_RENDER_TESTS=true`. See [deployment handoff](../../docs/COPILOT-GCP.md).
+
+## Reviewed skills and guided execution
+
+The original five Growth tools remain available. `find_skills` and `get_skill` return repository-reviewed instructions with version, digest and source. Skill text is guidance; it cannot grant permissions or skip server checks.
+
+`start_workflow` accepts start/end dates and a target, or returns a missing-input list. Use its token with `get_workflow_step` and `advance_workflow`. The server controls the stages: calculate; retrieve Brand and validate the report; revalidate the same artifact and release links. Client-supplied approval flags, evidence or step selectors are not accepted. Brand failures or changed data/artifacts block release. This is synthetic, read-only execution: valid continuation tokens can be replayed until expiry, with no promise of exactly-once delivery.
+
+HTTP startup requires `MCP_WORKFLOW_SECRET` containing at least 32 bytes. Supply the same secret through Secret Manager to every instance; rotation invalidates outstanding tokens. Tokens bind the skill version/digest, context, stage and authenticated tenant/user. Public synthetic callers share a demo subject. Local stdio uses an ephemeral process key when no secret is configured. Signed workflow tokens are integrity-protected, not encrypted; never put donor records or secrets in workflow inputs.
+
+The presenter includes a guided workflow panel that makes actual MCP calls and shows the current step, missing inputs and skill version. It is not a Copilot tenant integration. Protected report delivery still requires the Microsoft handoff described in `docs/COPILOT-GCP.md`.

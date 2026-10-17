@@ -18,9 +18,11 @@ Status: 17 October 2026. This separates working demonstration capabilities from 
 - Complete integration review, CI and release verification of the combined changes.
 - Eight scoped synthetic MCP examples are deployed and verified. They are not live CRM/programme integrations.
 
-## Next authoring feature
+## Skill delivery
 
-- Markdown skill packs: upload as drafts, preview metadata and instructions, validate declared tool dependencies, test, review, publish a pinned version and support rollback. Expose instructions as MCP resources/prompts with an explicit compatible-agent retrieval path. Uploading instructions must not grant permissions or execute code. This is proposed, not implemented.
+- Markdown skill catalogue, local upload/edit/test/apply authoring, scoped retrieval tools and signed server-checked read-only workflows implemented. Growth enforces Brand-dependent report validation before workflow link release. See [skill delivery](SKILL-DELIVERY.md).
+- Microsoft-host behavior still requires tenant acceptance. Durable write/approval workflows and shared web-based publishing are not implemented.
+- Automatic GitHub deployment currently needs staging-bucket permission repair: [issue14](https://github.com/mohammedahmxd/Wetland/issues/14). Direct deployment through the existing authorized build account works.
 
 ## External setup and remaining engineering
 

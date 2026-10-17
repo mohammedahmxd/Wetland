@@ -43,7 +43,7 @@ test('CSV supports BOM, CRLF, commas, quotes and multiline values',()=>{
 });
 test('Real MCP client can discover tools and request a report',async()=>{
  const client=new Client({name:'growth-test',version:'1.0.0'});const transport=new StdioClientTransport({command:process.execPath,args:[fileURLToPath(new URL('./server.mjs',import.meta.url))]});
- try{await client.connect(transport);assert.equal((await client.listTools()).tools.length,5);
+ try{await client.connect(transport);assert.equal((await client.listTools()).tools.length,10);
  const out=await client.callTool({name:'calculate_growth',arguments:args});assert.ok(!out.isError);assert.equal(JSON.parse(out.content[0].text).actual,120);
  const bad=await client.callTool({name:'calculate_growth',arguments:{...args,start:'invalid'}});assert.ok(bad.isError);
  }finally{await client.close();}
