@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {plan,checkService} from '../release.mjs';
-import {decodeRpc,validateGrowth} from '../check-services.mjs';
+import {decodeRpc,validateGrowth,assertToolList,validateExample,exampleContracts} from '../check-services.mjs';
 const service='wetland-growth-kpi-demo';
 const image=`northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/${service}@sha256:${'a'.repeat(64)}`;
 test('Release rejects mutable tags, foreign service images and unknown flags',()=>{
@@ -21,4 +21,17 @@ test('Smoke checks detect transport, tool and calculation failures',()=>{
  assert.throws(()=>decodeRpc(JSON.stringify({id:1,result:{isError:true}})));
  assert.throws(()=>validateGrowth({structuredContent:{actual:119}}));
  assert.throws(()=>decodeRpc('invalid response'));
+});
+
+test('Examples checks enforce all eight scopes, exact discovery and synthetic evidence',()=>{
+ assert.equal(exampleContracts.length,8);
+ assert.equal(new Set(exampleContracts.map(x=>x.scope)).size,8);
+ assertToolList({tools:[{name:'one'}]},['one']);
+ assert.throws(()=>assertToolList({tools:[{name:'one'},{name:'two'}]},['one']));
+ assert.throws(()=>validateExample({structuredContent:{tool:'example',classification:'private',packageDigest:'hash',sources:[{uri:'wetland://example',text:'fixture'}]}},'example'));
+ const data={tool:'check_release_readiness',classification:'synthetic',packageDigest:'hash',sources:[{uri:'wetland://example',text:'fixture'}],approvalGranted:false};
+ validateExample({structuredContent:data},data.tool);
+ assert.throws(()=>validateExample({structuredContent:{...data,approvalGranted:true}},data.tool));
+ const p=plan(['deploy','wetland-examples-mcp','northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-examples-mcp@sha256:'+'b'.repeat(64)]);
+ assert.equal(p.apply,false);
 });

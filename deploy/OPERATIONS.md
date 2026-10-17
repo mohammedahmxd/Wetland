@@ -37,6 +37,9 @@ gcloud builds submit . --project=wateraid-flow --region=northamerica-northeast2 
 ```
 
 For Brand use `_PACKAGE=brand-mcp,_SERVICE=wateraid-brand-hub`.
+For the synthetic examples service use `_PACKAGE=examples-hub,_SERVICE=wetland-examples-mcp`.
+The examples release allowlist does not create the service; its first deployment
+needs a separately reviewed runtime identity and explicit synthetic authentication mode.
 The build tests the service/runtime and includes renderer validation dependencies.
 Resolve the build's image tag to its Artifact Registry `sha256` digest. Keep that
 immutable image reference in the release record; do not release a mutable `latest` tag.
@@ -65,7 +68,10 @@ node deploy/check-services.mjs --reports
 The dashboard check verifies its HTML page because `/healthz` is reserved by Cloud
 Run and the dashboard has no `/api/health`. MCP checks verify JSON `/api/health`,
 required tool discovery, Brand guidance retrieval and the 120-donor synthetic Q3
-calculation. `--reports` additionally generates a report, requires Brand evidence and
+calculation. The examples check requires exactly eight combined tools and checks
+each scoped endpoint exposes and executes only its approved tool, returns cited
+synthetic evidence, and rejects direct calls to another capability.
+`--reports` additionally generates a report, requires Brand evidence and
 fetches a PDF. It validates content type/signature, not every visual layout rule.
 The renderer's own tests remain the layout/content validation gate. These fixed
 checks target public demos; they are not an authenticated production smoke suite.
@@ -145,3 +151,5 @@ migrations, roll back app code first if compatible, and use a reviewed forward r
 or tested database restoration procedure for schema/data incidents. No database,
 backup policy, real user membership or Microsoft tenant integration is provisioned
 by this operations change.
+
+The examples smoke target is `https://wetland-examples-mcp-462504004653.northamerica-northeast2.run.app`. It will fail until that service is deployed; adding a target is not proof of deployment.
