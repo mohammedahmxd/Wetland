@@ -1,0 +1,16 @@
+{
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "WaterAid Flow",
+        "supportEmail": "support@wateraidflow.org",
+        "authorizedRedirectUris": ["http://localhost"]
+      }
+    },
+    "authorizedDomains": [
+      "localhost",
+      "wateraidflow.org",
+      "wateraid-brand-hub-462504004653.northamerica-northeast2.run.app"
+    ]
+  }
+}

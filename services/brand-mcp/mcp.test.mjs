@@ -4,7 +4,9 @@ import {once} from 'node:events';
 import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 const base='http://127.0.0.1:8796';
-const child=spawn(process.execPath,['server.mjs'],{env:{...process.env,PORT:'8796',PUBLIC_BASE_URL:base},stdio:['ignore','pipe','inherit']});
+const env={...process.env,PORT:'8796',PUBLIC_BASE_URL:base};
+for (const key of ['AUTH_PROFILE','AUTH_EMAIL_DOMAINS','AUTH_TEST_MODE','AUTH_SIGNING_SECRET','FIREBASE_PROJECT_ID','FIREBASE_API_KEY','FIREBASE_AUTH_DOMAIN']) delete env[key];
+const child=spawn(process.execPath,['server.mjs'],{env,stdio:['ignore','pipe','inherit']});
 const client=new Client({name:'brand-hub-smoke-test',version:'1.0.0'});
 try{
  await Promise.race([once(child.stdout,'data'),once(child,'exit').then(()=>{throw Error('Server exited');}),new Promise((_,reject)=>setTimeout(()=>reject(Error('Startup timeout')),5000).unref())]);
