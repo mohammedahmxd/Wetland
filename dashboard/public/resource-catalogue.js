@@ -96,7 +96,10 @@ export function catalogueDepartments(catalogue){return catalogue.departments??(c
 
 function renumber(groups){groups.forEach((d,index)=>{d.number=String(index+1).padStart(2,'0');});}
 
-export function saveDepartment(catalogue,input,id){
+export function requireCatalogueStaff(role){if(role!=='staff')throw Error('Only staff can manage MCPs and departments.');}
+
+export function saveDepartment(catalogue,input,id,role){
+  requireCatalogueStaff(role);
   const groups=catalogueDepartments(catalogue),current=id?groups.find(d=>d.id===id):null;
   if(id&&!current)throw Error('This department no longer exists.');
   const title=String(input.title||'').trim(),description=String(input.description||'').trim();
@@ -110,7 +113,8 @@ export function saveDepartment(catalogue,input,id){
   return result;
 }
 
-export function deleteDepartment(catalogue,id,destination){
+export function deleteDepartment(catalogue,id,destination,role){
+  requireCatalogueStaff(role);
   const groups=catalogueDepartments(catalogue),department=groups.find(d=>d.id===id);
   if(!department)throw Error('This department no longer exists.');
   const entries=[...catalogue.items,...catalogue.deleted.map(e=>e.resource)].filter(r=>r.department===id);
@@ -127,7 +131,8 @@ function webUrl(value,label){
   return value.trim();
 }
 
-export function saveResource(catalogue,input,id){
+export function saveResource(catalogue,input,id,role){
+  requireCatalogueStaff(role);
   const current=id?catalogue.items.find(r=>r.id===id):null;
   if(id&&!current)throw Error('This MCP no longer exists. Reopen the library.');
   const result={id:current?.id||crypto.randomUUID()};
@@ -154,7 +159,8 @@ export function saveResource(catalogue,input,id){
   return result;
 }
 
-export function deleteResource(catalogue,id){
+export function deleteResource(catalogue,id,role){
+  requireCatalogueStaff(role);
   const index=catalogue.items.findIndex(r=>r.id===id);
   if(index<0)throw Error('This MCP has already been deleted.');
   const [resource]=catalogue.items.splice(index,1);
@@ -162,7 +168,8 @@ export function deleteResource(catalogue,id){
   return resource;
 }
 
-export function restoreResource(catalogue,id){
+export function restoreResource(catalogue,id,role){
+  requireCatalogueStaff(role);
   const index=catalogue.deleted.findIndex(r=>r.resource.id===id);
   if(index<0)throw Error('This MCP is no longer in deleted entries.');
   if(catalogue.items.some(r=>r.id===id))throw Error('An MCP with this ID already exists.');

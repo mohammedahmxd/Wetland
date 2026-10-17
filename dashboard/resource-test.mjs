@@ -1,5 +1,11 @@
 import assert from 'node:assert/strict';
-import {resources,departments,matchingResources,connectionConfig,BRAND_ENDPOINT,seedCatalogue,saveResource,deleteResource,restoreResource,catalogueDepartments,saveDepartment,deleteDepartment} from './public/resource-catalogue.js';
+import {resources,departments,matchingResources,connectionConfig,BRAND_ENDPOINT,seedCatalogue,saveResource as writeResource,deleteResource as removeResource,restoreResource as recoverResource,catalogueDepartments,saveDepartment as writeDepartment,deleteDepartment as removeDepartment} from './public/resource-catalogue.js';
+const saveResource=(c,input,id)=>writeResource(c,input,id,'staff');
+const deleteResource=(c,id)=>removeResource(c,id,'staff');
+const restoreResource=(c,id)=>recoverResource(c,id,'staff');
+const saveDepartment=(c,input,id)=>writeDepartment(c,input,id,'staff');
+const deleteDepartment=(c,id,destination)=>removeDepartment(c,id,destination,'staff');
+
 assert.equal(new Set(resources.map(r=>r.id)).size,resources.length);
 assert.equal(resources.filter(r=>r.status==='Available').length,1);
 for(const r of resources){
@@ -65,3 +71,15 @@ assert.equal(first.number,'01');deleteDepartment(empty,first.id);assert.equal(em
 assert.equal(JSON.parse(JSON.stringify(legacy)).departments.length,4);
 assert.equal(departments[0].title,'Fundraising & donor relations');
 console.log('PASS: department migration, CRUD, ordering, renamed search and safe reassignment of active/deleted MCPs.');
+
+for(const role of ['contributor','reviewer',undefined]){
+ const state=seedCatalogue(),before=JSON.stringify(state);
+ assert.throws(()=>writeResource(state,input,undefined,role),/Only staff/);
+ assert.throws(()=>writeResource(state,input,'donor-crm',role),/Only staff/);
+ assert.throws(()=>removeResource(state,'donor-crm',role),/Only staff/);
+ assert.throws(()=>recoverResource(state,'donor-crm',role),/Only staff/);
+ assert.throws(()=>writeDepartment(state,{title:'Blocked',position:1},undefined,role),/Only staff/);
+ assert.throws(()=>removeDepartment(state,'fundraising','it',role),/Only staff/);
+ assert.equal(JSON.stringify(state),before);
+}
+console.log('PASS: non-staff and missing roles cannot mutate catalogue data.');

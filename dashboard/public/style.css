@@ -266,3 +266,4 @@ dialog:has(.resource-manager) .modal-head{position:sticky;top:0;background:white
 .library-confirm-actions .btn{font-size:13px}
 @media(max-width:450px){.library-confirm-content{padding:24px}.library-confirm-actions .btn{flex:1}}
 @media(prefers-reduced-motion:reduce){.library-confirm-dialog[open]{animation:none}}
+.resource-readonly{display:inline-flex;align-items:center;padding:9px 12px;border-radius:6px;background:var(--cream);color:var(--muted);font-size:12px;line-height:1.6}
