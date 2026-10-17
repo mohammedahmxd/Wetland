@@ -83,3 +83,7 @@ gcloud builds submit . --project=YOUR_PROJECT --region=YOUR_REGION \
 ## Shared dashboard boundary
 
 This change does not expose authoring writes on the public dashboard or deploy the existing authenticated backend. Its organization-scoped immutable resource/version API remains the foundation for a future hosted editor. Connecting it to package builds requires configured identity, a private database, repository authorization, a build worker, and a signed release/evaluation record tied to the exact commit/image. Those integrations are deliberately not represented by sandbox role switches or local test markers. Until configured, the real collaborative path is GitHub branches, CI and review.
+
+## Microsoft Copilot deployment
+
+Install runtime dependencies first: `npm ci --ignore-scripts --prefix packages/mcp-runtime`. See [Copilot + GCP](COPILOT-GCP.md) for Entra delegated-token validation, demo mode and deployment. Starter HTTP servers use the same optional Entra adapter.

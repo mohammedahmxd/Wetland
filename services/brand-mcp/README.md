@@ -21,7 +21,43 @@ PUBLIC_BASE_URL=http://localhost:8080 npm start
 
 ## MCP contract
 
-Five tools: `get_brand_system`, `list_assets`, `get_asset`, `get_ui_guidance`, and `get_document_guidance`. Four resources expose brand tokens, asset catalogue, brand brief and document profile. The stateless endpoint accepts POST requests; an ordinary browser GET returns 405. The server has no authentication and serves public reference content only. Origin checking is not authorization.
+Five tools: `get_brand_system`, `list_assets`, `get_asset`, `get_ui_guidance`, and `get_document_guidance`. Four resources expose brand tokens, asset catalogue, brand brief and document profile. The stateless endpoint accepts POST requests; an ordinary browser GET returns 405. With no auth environment variables the server stays public and serves reference content only. Origin checking is not authorization.
+
+## Firebase sign-in
+
+MCP access can require a verified Google account through Firebase Authentication. The website and health check stay public. Only `/mcp` requires a bearer token, and only after an audience is selected.
+
+Switch the admitted mailboxes with one variable:
+
+| `AUTH_PROFILE` | Who can sign in |
+| --- | --- |
+| `demo` | verified `@wateraidflow.org` Google accounts |
+| `production` | verified `@wateraid.org` Google accounts |
+
+Leave `AUTH_PROFILE` unset to keep the public reference endpoint. Setting it fails closed unless Firebase and the signing secret are configured. `AUTH_EMAIL_DOMAINS` can name an explicit list on its own; when it is set together with `AUTH_PROFILE`, the list must match that profile. A token from the other audience is rejected immediately after the switch, including tokens that were already issued.
+
+Required when auth is on:
+
+```sh
+AUTH_PROFILE=demo
+FIREBASE_PROJECT_ID=your-firebase-project
+FIREBASE_API_KEY=your-web-api-key
+FIREBASE_AUTH_DOMAIN=your-firebase-project.firebaseapp.com
+AUTH_SIGNING_SECRET=a-random-string-of-at-least-32-characters
+PUBLIC_BASE_URL=https://your-host
+```
+
+`AUTH_PROFILE=production` is the same set of variables with the production audience. The Google sign-in page asks for the active domain, and the server checks `email` and `email_verified` on the Firebase ID token. The hosted-domain hint is not the security check.
+
+Clients that understand remote MCP OAuth can use the same `/mcp` URL. The server publishes protected-resource and authorization-server metadata, then runs an authorization-code flow with PKCE. The browser step is `Continue with Google` on `/oauth/authorize`. Loopback redirect URLs (`http://127.0.0.1` and `http://localhost`) are accepted so desktop agents can finish the flow. `AUTH_TEST_MODE=true` signs local Firebase-shaped tokens for automated tests and refuses to start under `NODE_ENV=production`, Cloud Run, or AWS.
+
+`services/brand-mcp/firebase.json` enables Google sign-in for the Firebase project. Authorized domains are hosting names, not the email allowlist. After choosing the Firebase project, deploy that configuration from this directory:
+
+```sh
+npx -y firebase-tools@latest deploy --only auth
+```
+
+The Google OAuth client has to be able to sign in the Workspace you are admitting. An internal client owned by `wateraidflow.org` will not accept `wateraid.org` users until that client is moved or replaced. Authorization codes are remembered in process memory for one minute; use a single instance until codes are stored in a shared database. Refresh tokens are stateless and last 12 hours.
 
 ## Edit the shared knowledge
 

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.mjs",
     "check": "node --check server.mjs && node --check mcp.mjs && node --check dist/app.js",
-    "test": "node mcp.test.mjs",
+    "test": "node mcp.test.mjs && node auth.test.mjs",
     "studio": "node ../../scripts/mcp-studio.mjs .",
     "start:http": "node server.mjs --http"
   },
@@ -16,6 +16,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
     "zod": "4.6.7",
-    "@wetland/mcp-runtime": "file:../../packages/mcp-runtime"
+    "@wetland/mcp-runtime": "file:../../packages/mcp-runtime",
+    "jose": "6.2.12"
   }
 }

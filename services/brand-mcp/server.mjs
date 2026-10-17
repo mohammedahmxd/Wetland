@@ -1,6 +1,10 @@
+import {loadMcpAuth} from './mcp-auth.mjs';
 import {startHttp,readPackage} from '@wetland/mcp-runtime';
 import {handleMcp} from './mcp.mjs';
 import {fileURLToPath} from 'node:url';
 const pkg=await readPackage(new URL('./',import.meta.url));
-const server=startHttp({handler:handleMcp,manifest:pkg.manifest,staticRoot:fileURLToPath(new URL('./dist',import.meta.url))});
+const firebase=loadMcpAuth(process.env);
+if(firebase&&process.env.MCP_AUTH_MODE==='entra')throw Error('Select either Firebase or Entra authentication');
+const beforeRequest=async(req,res,pathname)=>{if(!firebase)return false;if(await firebase.handle(req,res,pathname))return true;if(pathname==='/mcp')return !(await firebase.allow(req,res));return false;};
+const server=startHttp({handler:handleMcp,beforeRequest,healthDetails:firebase?{auth:{mode:"firebase",profile:firebase.profile,emailDomains:firebase.domains}}:{},manifest:pkg.manifest,staticRoot:fileURLToPath(new URL('./dist',import.meta.url))});
 server.on('listening',()=>console.log('Brand hub listening'));

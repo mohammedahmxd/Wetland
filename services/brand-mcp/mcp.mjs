@@ -3,7 +3,7 @@ import path from 'node:path';
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {z} from 'zod';
-import {readPackage,registerPackageResources,createMcpHandler} from '@wetland/mcp-runtime';
+import {readPackage,registerPackageResources,authorizationFromEnv,createMcpHandler} from '@wetland/mcp-runtime';
 export const publicBase = new URL(process.env.PUBLIC_BASE_URL || 'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app');
 if(!['http:','https:'].includes(publicBase.protocol)) throw new Error('PUBLIC_BASE_URL must be HTTP(S)');
 const root=path.resolve('dist');
@@ -38,4 +38,4 @@ export async function createBrandServer(){
  registerPackageResources(server,pkg);
  return server;
 }
-export const handleMcp=createMcpHandler({createServer:createBrandServer,Transport:StreamableHTTPServerTransport,publicBaseUrl:publicBase.href,dataClassification:'public-reference'});
+export const handleMcp=createMcpHandler({authorize:authorizationFromEnv(),createServer:createBrandServer,Transport:StreamableHTTPServerTransport,publicBaseUrl:publicBase.href,dataClassification:'public-reference'});

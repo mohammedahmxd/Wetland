@@ -21,7 +21,9 @@ The **control plane** is a separately deployable stateless API with PostgreSQL a
 Current code runs only bundled deterministic implementations. No contributor code is executed. Future external tools should run in isolated workers with no control-plane credentials, bounded runtime/memory, restricted network access and versioned artifacts. Queue long evaluations with deduplication, bounded retries and dead-letter handling.
 
 ## MCP delivery boundary
-The intended authenticated Streamable HTTP adapter must call the same domain authorization and version-resolution services as the UI API. Do not create a separate permission system. Implement OAuth client discovery/authorization compatible with the selected agents; do not publish a shared privileged token. Tool discovery must expose only caller-permitted published versions. MCP transport has not been implemented in this change.
+The intended authenticated Streamable HTTP adapter must call the same domain authorization and version-resolution services as the UI API. Do not create a separate permission system. Implement OAuth client discovery/authorization compatible with the selected agents; do not publish a shared privileged token. Tool discovery must expose only caller-permitted published versions. MCP transport has not been implemented on the control plane in this change.
+
+The public brand MCP can require Firebase Google sign-in without changing the control plane. `AUTH_PROFILE=demo` admits verified `wateraidflow.org` mailboxes. `AUTH_PROFILE=production` admits verified `wateraid.org` mailboxes. Unset, the brand endpoint stays public.
 
 ## Production gates
 1. Select Entra or Google identity configuration and supported agents; provision verified subject memberships.

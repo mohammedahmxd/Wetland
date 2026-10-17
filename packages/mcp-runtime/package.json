@@ -1,1 +1,15 @@
-{"name":"@wetland/mcp-runtime","version":"0.1.0","type":"module","exports":"./index.mjs","engines":{"node":">=22"},"scripts":{"test":"node --test test.mjs"}}
+{
+  "name": "@wetland/mcp-runtime",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": "./index.mjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test.mjs entra.test.mjs"
+  },
+  "dependencies": {
+    "jose": "6.1.3"
+  }
+}

@@ -38,6 +38,8 @@ jobs:
             services/brand-mcp/package-lock.json
             services/growth-kpi/package-lock.json
       - run: npm ci --ignore-scripts
+        working-directory: packages/mcp-runtime
+      - run: npm ci --ignore-scripts
         working-directory: services/brand-mcp
       - run: npm run check
         working-directory: services/brand-mcp

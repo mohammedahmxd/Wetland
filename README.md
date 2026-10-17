@@ -63,3 +63,7 @@ The separate brand MCP endpoint is https://wateraid-brand-hub-462504004653.north
 ## Build and edit MCPs
 
 See [MCP framework](docs/MCP-FRAMEWORK.md) for the shared runtime, knowledge/reporting starters, local editing studio, candidate tests and release workflow. Run `node scripts/create-mcp.mjs knowledge my-guidance` to scaffold a capability, or `npm run studio` inside Growth or Brand to edit a tested draft.
+
+## Copilot on GCP
+
+See [deployment and Microsoft setup](docs/COPILOT-GCP.md) for the real MCP presenter demo, Entra configuration, Cloud Run build recipes and tenant acceptance checks. The presenter uses synthetic data; Microsoft tenant sign-in is configured separately.
