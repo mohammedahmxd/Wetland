@@ -30,7 +30,7 @@ The browser task-pane URL alone cannot read an Excel workbook. It must run insid
 5. Inspect the returned definition, period, data evidence and actual/target comparison. For the unchanged fixture and period, the expected result is **120 new donors, 80% attainment and a gap of 30**. These are acceptance expectations, not values prefilled in this workbook.
 6. If generating a finished PDF/HTML report, require the Brand-aware report tool and inspect its returned provenance and validation. An Excel summary is not automatically a Brand-approved document.
 
-Outside Excel, the task pane offers **Read selected CSV locally** as a browser-only demonstration. It accepts the CSV and can exercise the MCP workflow, but cannot write a result worksheet to Excel. The `.xlsx` route requires Excel itself.
+Outside Excel, select **Load demo data**, then **Verify data and run the MCP workflow** for the browser demonstration. No file download or upload is required. **Read selected CSV locally** remains available for the supplied CSV. It accepts the CSV and can exercise the MCP workflow, but cannot write a result worksheet to Excel. The `.xlsx` route requires Excel itself.
 
 For another run, reactivate **Gift export** rather than the generated results sheet. Keep the original source sheet unchanged. Save the `.xlsx` after the live workflow has written its results.
 
