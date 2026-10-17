@@ -15,11 +15,10 @@ export function createResourceLibrary(c) {
   const actionMenu=r=>!canManage()?'':'<details class="resource-action-menu"><summary aria-label="Actions for '+esc(r.title)+'"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></summary><div class="resource-action-popover">'+action(actionIcon('edit')+'Edit MCP','edit',r.id,'resource-menu-item')+action(actionIcon('delete')+'Delete MCP','delete',r.id,'resource-menu-item resource-menu-delete')+'</div></details>';
 
   function card(r) {
-    return `<article class="resource-card" data-resource-id="${esc(r.id)}">
+    return `<article class="resource-card" data-resource-id="${esc(r.id)}" tabindex="0" aria-label="Open details for ${esc(r.title)}">
       <div class="resource-card-top"><span class="resource-kind">${available(r)?'MCP RESOURCE':'CAPABILITY CONCEPT'}</span><div class="resource-card-tools">${statusLabel(r)}${actionMenu(r)}</div></div>
       <h3>${esc(r.title)}</h3><p>${esc(r.description)}</p>
       <div class="resource-endpoint"><span>${available(r)?esc(r.transport||'Streamable HTTP'):'Connection pending'}</span>${r.endpoint?'<code>'+esc(r.endpoint)+'</code>':'<small>Endpoint not provisioned</small>'}</div>
-      ${action('View details & agent prompt <span aria-hidden="true">↗</span>','details',r.id,'resource-open')}
       <div class="resource-methods" aria-label="${available(r)?'Available tools':'Proposed tools'}">${r.methods.slice(0,2).map(m=>'<code>'+esc(m)+'</code>').join('')}${r.methods.length>2?'<span>+'+(r.methods.length-2)+' tools</span>':''}</div>
     </article>`;
   }
@@ -175,6 +174,9 @@ export function createResourceLibrary(c) {
     if(form.dataset.libraryForm==='department-delete'){persist();return;}
     try{const preview=structuredClone(catalogue());if(form.dataset.libraryForm==='department')saveDepartment(preview,input,form.dataset.id||undefined,c.state().role);else saveResource(preview,input,form.dataset.id||undefined,c.state().role);}catch(error){showError(error);return;}
     confirmAction({title:form.dataset.id?'Save your changes?':'Add this entry?',message:'Are you sure? This will save your '+(form.dataset.libraryForm==='department'?'department':'MCP')+' details to this browser’s library.',confirmLabel:form.dataset.id?'Save changes':'Add entry',onConfirm:persist});
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.target.matches('.resource-card[data-resource-id]')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();details(e.target.dataset.resourceId);}
   });
   document.addEventListener('click',e=>{
     if(e.target.closest('#modal .close'))managing=false;
