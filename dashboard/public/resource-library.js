@@ -1,4 +1,5 @@
 import {catalogueDepartments,saveDepartment,deleteDepartment, matchingResources, connectionConfig,seedCatalogue,saveResource,deleteResource,restoreResource} from './resource-catalogue.js';
+import {setupMethodTags} from './method-tags.js';
 
 export function createResourceLibrary(c) {
   const {esc,btn,link,modal,toast} = c;
@@ -108,9 +109,10 @@ export function createResourceLibrary(c) {
       <h3 class="full">Connection settings</h3>${field('endpoint','Endpoint URL',{optional:true,hint:'Required for Available entries. HTTP or HTTPS; do not include passwords or tokens.'})}${select('transport','Transport',[['Streamable HTTP','Streamable HTTP'],['SSE','SSE']])}
       ${field('authentication','Authentication instructions',{area:true,optional:true,hint:'Describe the authentication process. Do not store credentials here.'})}${field('referenceUrl','Reference / documentation URL',{optional:true})}
       ${field('permissions','Permissions & access scope',{area:true})}${field('data','Data scope',{area:true})}${field('setup','Connection instructions',{area:true})}
-      <h3 class="full">Tools & agent guidance</h3><div class="field full"><label for="mcp-methods">Tool methods</label><p class="resource-field-hint">One method name per line, or separate names with commas.</p><textarea id="mcp-methods" name="methods" rows="4" required maxlength="14000">${esc(r.methods.join('\n'))}</textarea></div>
+      <h3 class="full">Tools & agent guidance</h3><div class="field full"><label for="mcp-methods">Tool methods</label><p class="resource-field-hint" id="method-tags-help">Press Enter or comma to add a tag. Use × to remove one.</p><div class="method-tag-field" data-method-tags><div class="method-tag-list" data-method-list role="group" aria-label="Tool method tags"></div><input id="mcp-methods" data-method-input type="text" autocomplete="off" spellcheck="false" aria-describedby="method-tags-help method-tags-error"><input type="hidden" name="methods" data-method-value><p id="method-tags-error" data-method-error role="alert"></p><span class="sr-only" data-method-status role="status" aria-live="polite"></span></div></div>
       ${field('prompt','Example agent prompt',{area:true})}</div>
       <div class="resource-form-actions"><button class="btn lime" type="submit">${id?'Save changes':'Add MCP'}</button>${action('Cancel','cancel','','secondary')}</div></form>`);
+    setupMethodTags(document.querySelector('[data-method-tags]'),r.methods);
   }
 
   function confirmDelete(id){const r=resources().find(x=>x.id===id);if(!r)return;labelledModal('Delete MCP?',`<p>Remove <strong>${esc(r.title)}</strong> from this library? You can restore it from Deleted entries. The MCP server itself will not be changed.</p><div class="resource-form-actions">${action('Delete from library','confirm-delete',id,'danger')}${action('Cancel','cancel','','secondary')}</div>`);}
