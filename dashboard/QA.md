@@ -48,3 +48,9 @@ QA evidence for this run is in the workspace's `output` directory: `qa-results.j
 ## Scope limits
 
 This verifies the browser-local prototype. Roles remain a demo switcher, and persistence uses localStorage. Shared database persistence, server-enforced authorization and external MCP service execution were not part of this run. Safari and Firefox were not tested.
+
+## Admin full-access follow-up
+
+Admin now inherits contributor workflow permissions. Admin can claim challenges and tasks without contributor onboarding, submit implementation and maintenance evidence, and complete review and approval without switching roles. Task assignment uses the acting Admin's name. Contributor restrictions and required validation/review checks remain enforced.
+
+Verified in a separate workspace at port 8082: Admin claimed the scoped Evidence finder, submitted evidence, ran evaluations, acknowledged review, and approved pilot and live status. Admin also claimed, submitted and accepted a documentation task; assignment was Maya Chen and the final task status was Closed. No role switch was used and no console errors or warnings appeared. All three Node suites passed, including the new Admin workflow regression tests.

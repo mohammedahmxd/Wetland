@@ -33,3 +33,17 @@ assert.throws(()=>transition(regression,review.id,'Pilot'),/evaluation/);
 const candidate=regression.projects[0];candidate.candidate={version:'1.0.1',notes:'Regression',evals:[],checks:{scope:true,data:true,owner:true,quality:true}};
 assert.throws(()=>publishUpdate(regression,candidate.id),/evaluations/);
 console.log('PASS: revised evidence resets approval and empty evaluation lists cannot authorize releases.');
+
+const admin=initialState();
+assert.equal(admin.onboarded,false);
+const adminProject=createRequest(admin,{title:'Admin workflow',problem:'Complete work without switching roles',success:'Admin can claim, submit and review'});
+transition(admin,adminProject.id,'Scoped');transition(admin,adminProject.id,'Building');
+adminProject.submission='Admin-authored implementation and test evidence';transition(admin,adminProject.id,'Review');
+assert.throws(()=>transition(admin,adminProject.id,'Pilot'),/evaluation/);
+adminProject.evals=evaluations(adminProject);adminProject.checks={scope:true,data:true,owner:true,quality:true};
+transition(admin,adminProject.id,'Pilot');transition(admin,adminProject.id,'Live');
+claimTask(admin,'task-docs');assert.equal(admin.tasks[0].assignee,'Maya Chen');
+submitTask(admin,'task-docs','Admin documentation improvement with synthetic verification evidence.');
+acceptTask(admin,'task-docs');assert.equal(admin.tasks[0].status,'Closed');
+admin.role='contributor';assert.throws(()=>createRequest(admin,{title:'Restricted',problem:'Test',success:'Test'}));
+console.log('PASS: Admin can perform contributor workflows without switching roles; Contributor permissions and review gates remain enforced.');
