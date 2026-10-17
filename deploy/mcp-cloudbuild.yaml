@@ -1,0 +1,32 @@
+# Run from repository root; explicit, separately authorized build/runtime identities required.
+substitutions:
+  _PACKAGE: growth-kpi
+  _SERVICE: wetland-growth-kpi
+  _REGION: northamerica-northeast2
+  _RUNTIME_SA: REQUIRED
+  _BUILD_SA: REQUIRED
+  _PUBLIC_BASE_URL: REQUIRED
+steps:
+  - name: node:22-alpine
+    dir: services/${_PACKAGE}
+    entrypoint: npm
+    args: ['ci', '--ignore-scripts']
+  - name: node:22-alpine
+    dir: services/${_PACKAGE}
+    entrypoint: npm
+    args: ['test']
+  - name: node:22-alpine
+    dir: packages/mcp-runtime
+    entrypoint: npm
+    args: ['test']
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-f', 'services/${_PACKAGE}/Dockerfile', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID', '.']
+  - name: gcr.io/cloud-builders/docker
+    args: ['push', '${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID']
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args: ['run', 'deploy', '${_SERVICE}', '--project=$PROJECT_ID', '--region=${_REGION}', '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID', '--service-account=${_RUNTIME_SA}', '--set-env-vars=PUBLIC_BASE_URL=${_PUBLIC_BASE_URL}', '--port=8080', '--min-instances=0', '--max-instances=2', '--memory=256Mi', '--quiet']
+images: ['${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID']
+serviceAccount: projects/$PROJECT_ID/serviceAccounts/${_BUILD_SA}
+options:
+  logging: CLOUD_LOGGING_ONLY

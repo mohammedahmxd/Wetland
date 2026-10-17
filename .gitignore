@@ -6,3 +6,5 @@ backend/dist/
 .DS_Store
 gha-creds-*.json
 *.log
+
+.mcp/

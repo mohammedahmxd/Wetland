@@ -43,7 +43,7 @@ test('CSV supports BOM, CRLF, commas, quotes and multiline values',()=>{
 });
 test('Real MCP client can discover tools and request a report',async()=>{
  const client=new Client({name:'growth-test',version:'1.0.0'});const transport=new StdioClientTransport({command:process.execPath,args:[fileURLToPath(new URL('./server.mjs',import.meta.url))]});
- try{await client.connect(transport);assert.equal((await client.listTools()).tools.length,2);
+ try{await client.connect(transport);assert.equal((await client.listTools()).tools.length,4);
  const out=await client.callTool({name:'generate_growth_report',arguments:args});assert.ok(!out.isError);assert.equal(JSON.parse(out.content[0].text).actual,120);
  const bad=await client.callTool({name:'generate_growth_report',arguments:{...args,start:'invalid'}});assert.ok(bad.isError);
  }finally{await client.close();}
@@ -53,4 +53,17 @@ test('Export foreign keys, commitment links and allocation totals reconcile',asy
  const d=await loadDataset(),gifts=new Map(d.tables['gifts.csv'].map(g=>[g['System record ID'],g]));
  const totals=new Map();for(const s of d.tables['gift_splits.csv']){assert.ok(gifts.has(s['Gift System record ID']));totals.set(s['Gift System record ID'],(totals.get(s['Gift System record ID'])||0)+Math.round(Number(s['Split amount'])*100));}
  for(const [id,g] of gifts){assert.equal(totals.get(id),Math.round(Number(g.Amount)*100));const parent=g['Applied to gift System record ID'];if(parent){assert.ok(gifts.has(parent));assert.equal(gifts.get(parent)['Constituent System record ID'],g['Constituent System record ID']);}}
+});
+
+test('Shared HTTP runtime supports a real MCP connection and package resources',async()=>{
+ const {createServer}=await import('./capability.mjs');const {createMcpHandler,startHttp,readPackage}=await import('@wetland/mcp-runtime');
+ const {StreamableHTTPServerTransport}=await import('@modelcontextprotocol/sdk/server/streamableHttp.js');
+ const {StreamableHTTPClientTransport}=await import('@modelcontextprotocol/sdk/client/streamableHttp.js');const {once}=await import('node:events');
+ const p=await readPackage(new URL('./',import.meta.url));
+ const server=startHttp({manifest:p.manifest,port:0,host:'127.0.0.1',handler:createMcpHandler({createServer,Transport:StreamableHTTPServerTransport,publicBaseUrl:'http://localhost',dataClassification:'synthetic'})});
+ await once(server,'listening');const client=new Client({name:'http-test',version:'1.0.0'});
+ try{await client.connect(new StreamableHTTPClientTransport(new URL('http://127.0.0.1:'+server.address().port+'/mcp')));assert.equal((await client.listResources()).resources.length,3);
+ const r=await client.callTool({name:'generate_growth_report',arguments:args});const value=JSON.parse(r.content[0].text);assert.equal(value.actual,120);assert.equal(value.packageDigest,p.digest);
+ const definition=await client.callTool({name:'get_metric_definition',arguments:{}});assert.equal(JSON.parse(definition.content[0].text).version,'growth-first-receipt-v1');
+ }finally{await client.close();server.closeAllConnections();await new Promise(r=>server.close(r));}
 });

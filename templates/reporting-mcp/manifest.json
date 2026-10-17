@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "starter-example",
+  "name": "Starter example",
+  "description": "Replace this description with the specific problem your MCP solves.",
+  "version": "0.1.0",
+  "type": "reporting",
+  "owner": "Assign a maintainer",
+  "dataClassification": "synthetic"
+}

@@ -36,12 +36,14 @@ Keep downloadable archives consistent with their source assets when editing. Run
 
 ## Deployment
 
-The Dockerfile installs locked dependencies and runs as the non-root `node` user. Existing service: `wateraid-brand-hub`, project `wateraid-flow`, region `northamerica-northeast2`.
+Build the Dockerfile from the repository root; shared runtime files are required. The Dockerfile installs locked dependencies and runs as the non-root `node` user. Existing service: `wateraid-brand-hub`, project `wateraid-flow`, region `northamerica-northeast2`.
 
 An authorized deployer can run from this directory:
 
 ```sh
-PROJECT_ID=wateraid-flow REGION=northamerica-northeast2 sh deploy.sh
+PROJECT_ID=wateraid-flow REGION=northamerica-northeast2 \
+BUILD_SA=AUTHORIZED_BUILD_EMAIL RUNTIME_SA=BRAND_RUNTIME_EMAIL \
+PUBLIC_BASE_URL=https://YOUR_BRAND_SERVICE sh deploy.sh
 ```
 
 The script uses a Cloud Run source build and requires appropriate build and deployment permissions. It does not alter service IAM/public access. Public access is already configured on the existing service. GitHub CI tests this service, but the current automatic deployment pipeline only deploys the dashboard. Adding brand deployment needs separately scoped build permissions and configuration.
@@ -49,3 +51,5 @@ The script uses a Cloud Run source build and requires appropriate build and depl
 ## Assets and rights
 
 Public reference content includes original-source SVG artwork, derived PNGs, document examples and Noto Sans fonts. Source URLs and provenance are recorded in the asset catalogue. WaterAid retains its artwork rights; inclusion does not grant a licence or endorsement. Noto Sans is distributed under the SIL OFL in `dist/fonts/OFL.txt`. No proprietary RB Nylo fonts are included.
+
+Use `npm run studio` for the local editable package workflow. See [framework documentation](../../docs/MCP-FRAMEWORK.md). Original tool/resource contracts are preserved; three package resources are added.

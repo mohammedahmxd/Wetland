@@ -6,3 +6,5 @@ backend/dist
 .env
 **/.env
 gha-creds-*.json
+
+**/.mcp

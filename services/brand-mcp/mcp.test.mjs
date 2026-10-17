@@ -18,12 +18,12 @@ try{
  const filtered=await client.callTool({name:'list_assets',arguments:{query:'hygiene'}});assert.ok(JSON.parse(filtered.content[0].text).assets.some(a=>a.id==='hygiene'));
  for(const name of ['get_brand_system','get_ui_guidance'])assert.ok(!(await client.callTool({name,arguments:{}})).isError);
  const doc=JSON.parse((await client.callTool({name:'get_document_guidance',arguments:{}})).content[0].text);assert.ok(doc.profile.referenceUrl.startsWith(base+'/'));assert.match(doc.instructions,/Render/);for(const key of ['referenceUrl','starterUrl','instructionsUrl'])assert.equal((await fetch(doc.profile[key])).status,200);assert.equal((await fetch(doc.profile.referenceUrl)).headers.get('content-type'),'application/pdf');
- const resources=(await client.listResources()).resources;assert.equal(resources.length,4);
+ const resources=(await client.listResources()).resources;assert.equal(resources.length,7);
  for(const resource of resources){const r=await client.readResource({uri:resource.uri});assert.ok(r.contents[0].text.length>20);}
  const svg=await fetch(assets[0].localSvg);assert.equal(svg.status,200);assert.match(svg.headers.get('content-type'),/image\/svg/);
  const png=await fetch(assets[0].pngs[0].url);assert.equal(png.status,200);assert.equal(png.headers.get('content-type'),'image/png');
  assert.equal((await fetch(base+'/package.json')).status,404);
  assert.equal((await fetch(base+'/mcp')).status,405);
  assert.equal((await fetch(base+'/mcp',{method:'POST',headers:{origin:'https://untrusted.example'}})).status,403);
- console.log('PASS: MCP initialize, five read-only tools and document downloads, asset filtering and absolute URLs, unknown asset rejection, four resource reads, SVG/PNG/static serving, health alias, method/origin boundaries.');
+ console.log('PASS: MCP initialize, five read-only tools and document downloads, asset filtering and absolute URLs, unknown asset rejection, seven resource reads, SVG/PNG/static serving, health alias, method/origin boundaries.');
 }finally{await client.close().catch(()=>{});child.kill('SIGTERM');}
