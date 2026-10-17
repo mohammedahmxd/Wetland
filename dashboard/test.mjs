@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+import {identityFromEmail,resolveEmailPolicy,providerAllowed,publicAuthConfig,contentSecurityPolicy} from './public/auth-policy.js';
 import{initialState,createRequest,transition,compose,SOURCE_DOCS,evaluations,claimTask,submitTask,acceptTask,reportIssue,publishUpdate,rollback}from'./public/model.js';
 let s=initialState();
 const p=createRequest(s,{title:'A new tool',problem:'Recurring task',success:'Evidence-linked output'});
@@ -17,6 +20,51 @@ s.role='admin';acceptTask(s,t.id);const tool=s.projects[0];assert.equal(tool.can
 rollback(s,tool.id,'Restore prior release for review');assert.equal(tool.version,'1.0.0');assert.equal(tool.previous,null);assert.throws(()=>rollback(s,tool.id,'No version available'));
 transition(s,tool.id,'Retired');assert.equal(tool.status,'Retired');assert.throws(()=>transition(s,tool.id,'Live'));
 console.log('PASS: request-to-release gates, roles, onboarding, evidence extraction, conflict detection, maintenance-to-release, recognition, rollback and retirement.');
+const demo=resolveEmailPolicy({profile:'demo'});
+assert.deepEqual([...demo.domains],['wateraidflow.org']);
+assert.equal(identityFromEmail('flow-demo@wateraidflow.org',true,demo.domains).email,'flow-demo@wateraidflow.org');
+assert.throws(()=>identityFromEmail('flow-demo@wateraidflow.org',false,demo.domains));
+assert.throws(()=>identityFromEmail('person@wateraid.org',true,demo.domains));
+assert.throws(()=>identityFromEmail('person@evil.wateraidflow.org',true,demo.domains));
+assert.throws(()=>identityFromEmail('person@wateraidflow.org.evil.com',true,demo.domains));
+assert.equal(providerAllowed('demo','password'),true);
+assert.equal(providerAllowed('demo','google.com'),true);
+assert.equal(providerAllowed('production','password'),false);
+assert.equal(providerAllowed('production','google.com'),true);
+assert.throws(()=>resolveEmailPolicy({profile:'demo',domains:'wateraid.org'}));
+assert.equal(resolveEmailPolicy({}),null);
+const cfg=publicAuthConfig({AUTH_PROFILE:'demo',FIREBASE_API_KEY:'test-key',FIREBASE_AUTH_DOMAIN:'wateraid-flow.firebaseapp.com',FIREBASE_PROJECT_ID:'wateraid-flow',AUTH_SIGNING_SECRET:'do-not-publish'});
+assert.equal(cfg.firebase.apiKey,'test-key');
+assert.equal(cfg.passwordSignIn,true);
+assert.equal(cfg.demoUser,'flow-demo@wateraidflow.org');
+assert.equal(JSON.stringify(cfg).includes('do-not-publish'),false);
+assert.equal(publicAuthConfig({AUTH_PROFILE:'production',FIREBASE_API_KEY:'k',FIREBASE_AUTH_DOMAIN:'wateraid-flow.firebaseapp.com',FIREBASE_PROJECT_ID:'wateraid-flow'}).passwordSignIn,false);
+assert.equal(publicAuthConfig({AUTH_PROFILE:'demo',FIREBASE_API_KEY:'k',FIREBASE_AUTH_DOMAIN:'not a host',FIREBASE_PROJECT_ID:'wateraid-flow'}).firebase,null);
+const csp=contentSecurityPolicy({FIREBASE_AUTH_DOMAIN:'wateraid-flow.firebaseapp.com'});
+assert.match(csp,/identitytoolkit\.googleapis\.com/);
+assert.match(csp,/accounts\.google\.com/);
+assert.doesNotMatch(contentSecurityPolicy({FIREBASE_AUTH_DOMAIN:'https://evil.example/csp'}),/evil\.example/);
+const port=38123;
+const child=spawn(process.execPath,['server.mjs'],{cwd:fileURLToPath(new URL('.',import.meta.url)),env:{...process.env,PORT:String(port),AUTH_PROFILE:'demo',FIREBASE_API_KEY:'test-key',FIREBASE_AUTH_DOMAIN:'wateraid-flow.firebaseapp.com',FIREBASE_PROJECT_ID:'wateraid-flow',AUTH_SIGNING_SECRET:'do-not-publish'},stdio:'ignore'});
+try{
+  let body,status,policy;
+  for(let i=0;i<30;i++){
+    try{
+      const res=await fetch('http://127.0.0.1:'+port+'/auth/config');
+      status=res.status;body=await res.json();policy=res.headers.get('content-type');
+      break;
+    }catch{await new Promise(r=>setTimeout(r,50))}
+  }
+  assert.equal(status,200);
+  assert.match(policy,/application\/json/);
+  assert.equal(body.firebase.apiKey,'test-key');
+  assert.equal(JSON.stringify(body).includes('do-not-publish'),false);
+  const page=await fetch('http://127.0.0.1:'+port+'/');
+  assert.match(page.headers.get('content-security-policy'),/https:\/\/www\.gstatic\.com/);
+  const health=await fetch('http://127.0.0.1:'+port+'/healthz');
+  assert.equal(await health.text(),'ok');
+}finally{child.kill('SIGTERM')}
+console.log('PASS: dashboard sign-in audience, public config, and Firebase content security policy.');
 
 assert.deepEqual(Object.keys((await import('./public/model.js')).ROLES),['admin','contributor']);
 

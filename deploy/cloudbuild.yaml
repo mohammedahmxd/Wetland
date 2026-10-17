@@ -12,21 +12,33 @@ steps:
     args: ['push', 'northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-ai-workspace:$BUILD_ID']
   - id: deploy-sandbox
     name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
-    entrypoint: gcloud
+    entrypoint: bash
     args:
-      - run
-      - deploy
-      - wetland-ai-workspace
-      - --project=wateraid-flow
-      - --region=northamerica-northeast2
-      - --image=northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-ai-workspace:$BUILD_ID
-      - --service-account=wetland-workspace@wateraid-flow.iam.gserviceaccount.com
-      - --port=8080
-      - --min-instances=0
-      - --max-instances=2
-      - --memory=256Mi
-      - --cpu=1
-      - --quiet
+      - -c
+      - |
+        set -euo pipefail
+        args=(
+          run deploy wetland-ai-workspace
+          --project=wateraid-flow
+          --region=northamerica-northeast2
+          --image=northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-ai-workspace:$BUILD_ID
+          --service-account=wetland-workspace@wateraid-flow.iam.gserviceaccount.com
+          --port=8080
+          --min-instances=0
+          --max-instances=2
+          --memory=256Mi
+          --cpu=1
+          --quiet
+        )
+        if [ -n "${_FIREBASE_API_KEY}" ]; then
+          args+=(--update-env-vars=AUTH_PROFILE=${_AUTH_PROFILE},FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID},FIREBASE_AUTH_DOMAIN=${_FIREBASE_AUTH_DOMAIN},FIREBASE_API_KEY=${_FIREBASE_API_KEY})
+        fi
+        gcloud "$${args[@]}"
+substitutions:
+  _AUTH_PROFILE: demo
+  _FIREBASE_PROJECT_ID: wateraid-flow
+  _FIREBASE_AUTH_DOMAIN: wateraid-flow.firebaseapp.com
+  _FIREBASE_API_KEY: ''
 images:
   - northamerica-northeast2-docker.pkg.dev/wateraid-flow/web/wetland-ai-workspace:$BUILD_ID
 serviceAccount: projects/wateraid-flow/serviceAccounts/wateraid-build@wateraid-flow.iam.gserviceaccount.com
