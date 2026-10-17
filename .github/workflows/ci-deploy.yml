@@ -63,6 +63,8 @@ jobs:
       - run: node --test scripts/framework.test.mjs
       - run: npm test
         working-directory: dashboard
+      - run: python3 -m pip install --user -r requirements.txt && python3 -m unittest test_deck.py
+        working-directory: services/deck-mcp
       - run: npm ci --ignore-scripts
         working-directory: backend
       - run: npm run build

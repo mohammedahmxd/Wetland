@@ -1,0 +1,83 @@
+{
+  "title": "Wetland MCP marketplace",
+  "footer": "Independent Wetland project  ·  Not official WaterAid guidance",
+  "slides": [
+    {
+      "layout": "title",
+      "kicker": "WETLAND  ·  MCP MARKETPLACE",
+      "headline": "The catalogue that can\nbuild the deck",
+      "body": "A home for shared helpers, plus the MCP that turns a brief into slides. This file is one of those slides."
+    },
+    {
+      "layout": "statement",
+      "kicker": "THE GAP",
+      "headline": "A clever chat still needs a key to the work.",
+      "body": "On its own, an assistant does not know Water Care proposals, campaign results, brand rules, or which helpers are approved. An MCP is the adapter: one resource, with the rules built into the plug rather than into the chat."
+    },
+    {
+      "layout": "bullets",
+      "kicker": "THE MARKETPLACE",
+      "headline": "Find the helper. Paste the link. Then decide.",
+      "bullets": [
+        "Search by the task: a grant draft, a brand token, a retention question.",
+        "Live and Pilot can be used. Proposed stays labelled as an idea.",
+        "Copy the MCP link into the assistant you already use. One helper per chat.",
+        "Read the answer, open the source, and check it before it leaves your desk."
+      ]
+    },
+    {
+      "layout": "catalogue",
+      "kicker": "ON THE SHELF",
+      "headline": "One live endpoint. Seven honest concepts.",
+      "items": [
+        {"name": "Brand & design system", "meta": "Knowledge & brand", "status": "Live"},
+        {"name": "Programme reporting", "meta": "International Programmes", "status": "Concept"},
+        {"name": "Supporter care", "meta": "Supporter Care", "status": "Concept"},
+        {"name": "Water point insights", "meta": "Programme & MERL", "status": "Concept"},
+        {"name": "Fundraising intelligence", "meta": "Fundraising", "status": "Concept"},
+        {"name": "Grant reconciliation", "meta": "Grants Finance", "status": "Concept"},
+        {"name": "Policy & evidence library", "meta": "Policy & Advocacy", "status": "Concept"},
+        {"name": "Team knowledge", "meta": "IT & Operations", "status": "Concept"}
+      ]
+    },
+    {
+      "layout": "bullets",
+      "kicker": "THE DECK MCP",
+      "headline": "We built the MCP that builds the deck.",
+      "bullets": [
+        "An agent sends a brief: the message, the points, and the layout.",
+        "build_deck asks the Brand MCP for colour, type, and the wordmark.",
+        "The tool returns a 16:9 PowerPoint a person can open and edit.",
+        "The person who presents it still owns every claim on the slide."
+      ]
+    },
+    {
+      "layout": "steps",
+      "kicker": "THIS FILE",
+      "headline": "You are looking at an MCP output.",
+      "steps": [
+        {"title": "Read the hub", "body": "The story is the Wetland marketplace: status, owner, and a link you can paste."},
+        {"title": "Read the brand", "body": "Colour, Noto Sans, and the white wordmark came from the live Brand MCP."},
+        {"title": "build_deck", "body": "The Deck MCP composed these slides. This deck was built with an MCP too."}
+      ]
+    },
+    {
+      "layout": "bullets",
+      "kicker": "WHAT STAYS HUMAN",
+      "headline": "The layout can be generated.\nThe judgment cannot.",
+      "bullets": [
+        "Numbers for a funder, the board, or the public still need a person.",
+        "Material AI use is disclosed, including in funder text.",
+        "A concept card is not a connection to donor or programme data.",
+        "A refusal is the boundary working, not a broken tool."
+      ]
+    },
+    {
+      "layout": "close",
+      "kicker": "NEXT DECK, SAME PATH",
+      "headline": "Find the tool. Ask for the deck.",
+      "body": "The marketplace is the front door. The Deck MCP is how a presentation comes back out.",
+      "link": "https://wetland-ai-workspace-462504004653.northamerica-northeast2.run.app"
+    }
+  ]
+}
