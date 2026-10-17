@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test test.mjs reports.test.mjs import-export.test.mjs",
-    "check": "node --check model.mjs && node --check server.mjs",
+    "test": "node --test test.mjs reports.test.mjs import-export.test.mjs workflow.test.mjs",
+    "check": "node --check model.mjs && node --check server.mjs && node --check workflow.mjs && node --check demo/demo.js",
     "demo": "node demo.mjs",
     "studio": "node ../../scripts/mcp-studio.mjs .",
     "start:http": "node server.mjs --http"
