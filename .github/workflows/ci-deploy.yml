@@ -50,6 +50,9 @@ jobs:
       - run: npm test
         working-directory: services/growth-kpi
       - run: npm test
+        working-directory: packages/mcp-runtime
+      - run: node --test scripts/framework.test.mjs
+      - run: npm test
         working-directory: dashboard
       - run: npm ci --ignore-scripts
         working-directory: backend

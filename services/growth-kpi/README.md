@@ -68,7 +68,7 @@ Use an MCP client that supports local stdio servers. Replace the absolute path b
 }
 ```
 
-Tools: `inspect_growth_dataset` and `generate_growth_report`. The server reads its bundled fixture independently of the client's working directory. Example report arguments:
+Tools: `inspect_growth_dataset`, `get_metric_definition`, `generate_growth_report` and `explain_growth_result`. The server reads its bundled fixture independently of the client's working directory. Example report arguments:
 
 ```json
 {"start":"2026-07-01","end":"2026-09-30","target":150,"comparisonStart":"2026-04-01","comparisonEnd":"2026-06-30"}
@@ -76,6 +76,8 @@ Tools: `inspect_growth_dataset` and `generate_growth_report`. The server reads i
 
 ## Boundaries
 
-Local stdio only: this is not deployed to GCP, exposed as a remote MCP endpoint, or wired into the dashboard. Tools read only the fixed bundled synthetic dataset. There is no arbitrary upload/import interface, live Blackbaud connection or automatic donor matching. Known aliases are explicit; names are never used for deduplication. A production adapter needs tenant authorization, verified real-export field mappings, validated completeness, receipts/refunds reconciliation and approved data retention. Cohort IDs would be sensitive in a real dataset and must not be exposed to unauthorized users.
+Supports local stdio and HTTP (`npm run start:http`); it is not yet deployed to GCP or wired into authenticated dashboard execution. Tools read only the fixed bundled synthetic dataset. There is no arbitrary upload/import interface, live Blackbaud connection or automatic donor matching. Known aliases are explicit; names are never used for deduplication. A production adapter needs tenant authorization, verified real-export field mappings, validated completeness, receipts/refunds reconciliation and approved data retention. Cohort IDs would be sensitive in a real dataset and must not be exposed to unauthorized users.
 
 Tests exercise known cohorts, target comparison, inclusive boundaries, accounting independence, duplicate handling, refund timing, pending receipts, incomplete-history refusal, identity failures and a real MCP stdio client call. GitHub CI runs these tests; the existing deployment workflow still deploys only the dashboard.
+
+Use `npm run studio` to edit guidance, report title, default target and metadata through the local draft/test/apply workflow. Shared framework documentation: [MCP-FRAMEWORK](../../docs/MCP-FRAMEWORK.md).

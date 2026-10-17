@@ -59,3 +59,7 @@ https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/#agents
 It is an independent reference, not official endorsement. Noto Sans is bundled under its SIL OFL licence in dashboard/public/assets/OFL.txt.
 
 The separate brand MCP endpoint is https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/mcp. Its source and local setup are in [services/brand-mcp](services/brand-mcp/README.md). The dashboard deployment workflow does not redeploy this service.
+
+## Build and edit MCPs
+
+See [MCP framework](docs/MCP-FRAMEWORK.md) for the shared runtime, knowledge/reporting starters, local editing studio, candidate tests and release workflow. Run `node scripts/create-mcp.mjs knowledge my-guidance` to scaffold a capability, or `npm run studio` inside Growth or Brand to edit a tested draft.
