@@ -10,6 +10,7 @@ The public site uses synthetic data and browser-local state. It is not an authen
 ## Start here
 - **dashboard/** — resource library, document editor, tool builder, comparison bench, releases, community and maintenance.
 - **services/brand-mcp/** — existing public brand reference website and read-only MCP server, with assets, document guidance and protocol tests.
+- **mcp-marketplace/** — standalone marketplace with expandable MCP cards, category filters, saved tools and browser-local submissions. Includes the live brand reference MCP and seven labelled Water Care concepts.
 - **backend/** — Node 22 / TypeScript / Fastify / PostgreSQL; OIDC verification, organization scoping, immutable versions, server evaluations, independent approvals, concurrent activation protection, audit.
 - **deploy/cloudbuild.yaml** — tests, build, image push and deployment of the public dashboard.
 - **docs/ARCHITECTURE.md** — boundaries, scale assumptions, next production gates.
@@ -17,6 +18,13 @@ The public site uses synthetic data and browser-local state. It is not an authen
 - **docs/HUB-API.md** — versioned document/tool control-plane API.
 
 ## Run locally
+Standalone MCP marketplace (no dependency installation required):
+```sh
+python -m http.server 4317 --directory mcp-marketplace/dist --bind 127.0.0.1
+# http://localhost:4317
+```
+See [mcp-marketplace/README.md](mcp-marketplace/README.md) for catalogue editing and browser-local storage details. This is a separate static application; the existing dashboard deployment remains configured for `dashboard/`.
+
 Dashboard:
 ```sh
 cd dashboard
