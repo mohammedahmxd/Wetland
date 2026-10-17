@@ -16,7 +16,11 @@ Status: 17 October 2026. This separates working demonstration capabilities from 
 ## Current delivery work
 
 - Complete integration review, CI and release verification of the combined changes.
-- Complete and test the eight example MCP capabilities being developed for the catalogue. Keep them labelled as examples until actual deployment and endpoint verification; they are not live CRM/programme integrations.
+- Eight scoped synthetic MCP examples are deployed and verified. They are not live CRM/programme integrations.
+
+## Next authoring feature
+
+- Markdown skill packs: upload as drafts, preview metadata and instructions, validate declared tool dependencies, test, review, publish a pinned version and support rollback. Expose instructions as MCP resources/prompts with an explicit compatible-agent retrieval path. Uploading instructions must not grant permissions or execute code. This is proposed, not implemented.
 
 ## External setup and remaining engineering
 
