@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="TaskPaneApp">
+  <Id>4fc4c928-5b52-431f-9422-42a59db46447</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Wetland independent demonstration</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Wetland Growth demo"/>
+  <Description DefaultValue="Copilot-style synthetic demonstration, not Microsoft Copilot. Verifies the supplied fixture and uses the Growth MCP to generate a branded report."/>
+  <SupportUrl DefaultValue="https://github.com/mohammedahmxd/Wetland"/>
+  <Hosts><Host Name="Workbook"/></Hosts>
+  <Requirements><Sets DefaultMinVersion="1.7"><Set Name="ExcelApi" MinVersion="1.7"/></Sets></Requirements>
+  <DefaultSettings><SourceLocation DefaultValue="https://wetland-growth-kpi-demo-462504004653.northamerica-northeast2.run.app/excel.html"/></DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>
