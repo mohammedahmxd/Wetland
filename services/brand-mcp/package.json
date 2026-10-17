@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check mcp.mjs && node --check auth-policy.mjs && node --check mcp-auth.mjs && node --check auth-client.js && node --check auth.test.mjs && node --check dist/app.js",
-    "test": "node mcp.test.mjs && node auth.test.mjs"
+    "check": "node --check server.mjs && node --check mcp.mjs && node --check auth-policy.mjs && node --check mcp-auth.mjs && node --check auth-client.js && node --check auth.test.mjs && node --check demo-user.mjs && node --check demo-auth.mjs && node --check dist/app.js",
+    "test": "node mcp.test.mjs && node auth.test.mjs",
+    "demo:auth": "node demo-auth.mjs"
   },
   "engines": {
     "node": ">=20"
