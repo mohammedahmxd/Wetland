@@ -87,3 +87,7 @@ This change does not expose authoring writes on the public dashboard or deploy t
 ## Microsoft Copilot deployment
 
 Install runtime dependencies first: `npm ci --ignore-scripts --prefix packages/mcp-runtime`. See [Copilot + GCP](COPILOT-GCP.md) for Entra delegated-token validation, demo mode and deployment. Starter HTTP servers use the same optional Entra adapter.
+
+## Reports that require Brand
+
+Growth demonstrates the shared `packages/mcp-reporting` pipeline. Calculation and document generation are separate tools. Document generation requires a fresh Brand MCP contract and embedded assets; unsupported guidance or missing assets blocks publication. The service protects generated downloads with the same authentication as MCP. See [Copilot + GCP](COPILOT-GCP.md) for deployment and authenticated file-delivery constraints.

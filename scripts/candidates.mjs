@@ -15,7 +15,7 @@ async function sourceDigest(root){
    if(entry.isDirectory())await visit(p,name+'/');else hashes.push([name,createHash('sha256').update(await readFile(p)).digest('hex')]);
   }
  }
- await visit(root);await visit(fileURLToPath(new URL('../packages/mcp-runtime/',import.meta.url)),'runtime/');return signature(hashes);
+ await visit(root);await visit(fileURLToPath(new URL('../packages/mcp-runtime/',import.meta.url)),'runtime/');await visit(fileURLToPath(new URL('../packages/mcp-reporting/',import.meta.url)),'reporting/');return signature(hashes);
 }
 export async function validate(root,value){
  validateManifest(value.manifest);const current=await readPackage(root);

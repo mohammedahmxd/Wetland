@@ -81,3 +81,7 @@ Supports local stdio and HTTP (`npm run start:http`); it is not yet deployed to 
 Tests exercise known cohorts, target comparison, inclusive boundaries, accounting independence, duplicate handling, refund timing, pending receipts, incomplete-history refusal, identity failures and a real MCP stdio client call. GitHub CI runs these tests; the existing deployment workflow still deploys only the dashboard.
 
 Use `npm run studio` to edit guidance, report title, default target and metadata through the local draft/test/apply workflow. Shared framework documentation: [MCP-FRAMEWORK](../../docs/MCP-FRAMEWORK.md).
+
+## Branded documents
+
+Use `calculate_growth` for numeric results or `generate_growth_report` for Brand-dependent PDF/HTML reports. The latter needs `PUBLIC_BASE_URL` and a reachable `BRAND_MCP_URL` (defaults to the existing public Brand service). The Docker image includes Python/Poppler. Local render tests require ReportLab, pypdf, Pillow and pdftoppm; set `REPORT_PYTHON` to your Python binary and `REPORT_RENDER_TESTS=true`. See [deployment handoff](../../docs/COPILOT-GCP.md).

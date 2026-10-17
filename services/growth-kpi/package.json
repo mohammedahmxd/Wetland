@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test test.mjs",
+    "test": "node --test test.mjs reports.test.mjs",
     "check": "node --check model.mjs && node --check server.mjs",
     "demo": "node demo.mjs",
     "studio": "node ../../scripts/mcp-studio.mjs .",
@@ -17,6 +17,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
     "zod": "4.6.7",
-    "@wetland/mcp-runtime": "file:../../packages/mcp-runtime"
+    "@wetland/mcp-runtime": "file:../../packages/mcp-runtime",
+    "@wetland/mcp-reporting": "file:../../packages/mcp-reporting"
   }
 }

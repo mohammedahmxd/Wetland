@@ -8,3 +8,4 @@ gha-creds-*.json
 *.log
 
 .mcp/
+services/growth-kpi/examples/growth-branded.*
