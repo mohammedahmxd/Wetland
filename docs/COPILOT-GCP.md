@@ -38,7 +38,7 @@ Public synthetic presenter deployment:
 gcloud run deploy "$SERVICE" --project="$PROJECT_ID" --region="$REGION" \
   --image="$IMAGE" --service-account="$RUNTIME_SA" \
   --set-env-vars="PUBLIC_BASE_URL=$SERVICE_URL,MCP_AUTH_MODE=none,MCP_DEMO_UI=true" \
-  --no-invoker-iam-check --min-instances=0 --max-instances=2 --memory=256Mi --port=8080
+  --no-invoker-iam-check --min-instances=0 --max-instances=2 --memory=512Mi --concurrency=2 --timeout=120 --port=8080
 ```
 
 Use a separate demo service; never apply public demo settings to a private data service. Configure project budget alerts and monitoring according to local operating policy. After deploy, run `node services/growth-kpi/smoke.mjs "$SERVICE_URL/mcp"` from the repository root.
@@ -62,7 +62,7 @@ Copy `deploy/entra.env.example.yaml` to a local configuration file; fill in the 
 gcloud run deploy "$SERVICE" --project="$PROJECT_ID" --region="$REGION" \
   --image="$IMAGE" --service-account="$RUNTIME_SA" \
   --env-vars-file=PATH_TO_FILLED_ENTRA_CONFIG \
-  --no-invoker-iam-check --min-instances=0 --max-instances=2 --memory=256Mi --port=8080
+  --no-invoker-iam-check --min-instances=0 --max-instances=2 --memory=512Mi --concurrency=2 --timeout=120 --port=8080
 ```
 
 This ingress setting permits Microsoft to reach the HTTPS application; **the application still requires a verified Entra token on every MCP request**. Google Cloud Run IAM tokens and Microsoft API tokens are distinct. An organization that requires IAM-private ingress must supply an approved gateway/federation design instead. Health/manifest routes are public and must contain no sensitive data. The runtime has no client secret; it verifies Microsoft signing keys remotely with caching.
