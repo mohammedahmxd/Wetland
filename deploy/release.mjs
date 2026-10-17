@@ -2,7 +2,7 @@
 // Existing services only. Defaults to printing a reviewable plan; never changes IAM or env.
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
-export const services = ['wetland-ai-workspace','wateraid-brand-hub','wetland-growth-kpi-demo'];
+export const services = ['wetland-ai-workspace','wateraid-brand-hub','wetland-growth-kpi-demo','wetland-examples-mcp'];
 export function plan(args) {
  const [action,service,value,...flags]=args;
  if(!['deploy','rollback'].includes(action)||!services.includes(service)||flags.some(x=>x!=='--apply')||flags.length>1)
