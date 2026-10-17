@@ -3,11 +3,11 @@ import {constants} from 'node:fs';
 import {resolve,join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
-const MAX_BYTES=65536,MAX_FILES=128;
+const MAX_BYTES=65536,MAX_FILES=50;
 const idPattern=/^[a-z][a-z0-9-]{2,63}$/;
 const toolPattern=/^[a-z][a-z0-9_]{1,63}$/;
 const versionPattern=/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-const filePattern=/^[a-z0-9][a-z0-9._-]{0,127}\.md$/;
+const filePattern=/^[-a-z0-9]{1,50}\.md$/;
 const plain=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 function exact(value,keys,label){if(!plain(value)||Object.keys(value).some(k=>!keys.includes(k))||keys.some(k=>!(k in value)))throw Error('Invalid '+label+' fields');}
 function text(value,max,label){if(typeof value!=='string'||!value.trim()||value.length>max||value.includes('\0'))throw Error('Invalid '+label);return value;}

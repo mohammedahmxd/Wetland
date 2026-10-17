@@ -1,6 +1,6 @@
 export {authorizationFromEnv,createEntraAuthorizer} from './entra.mjs';
 import http from 'node:http';
-import {readFile,realpath} from 'node:fs/promises';
+import {readFile,realpath,readdir,lstat} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash,randomUUID} from 'node:crypto';
@@ -17,8 +17,18 @@ export async function readPackage(root){
  const manifest=validateManifest(JSON.parse(await readFile(path.join(dir,'manifest.json'),'utf8')));
  const config=JSON.parse(await readFile(path.join(dir,'config.json'),'utf8'));
  const guidance=await readFile(path.join(dir,'knowledge/guidance.md'),'utf8');
- const digest=createHash('sha256').update(JSON.stringify({manifest,config,guidance})).digest('hex');
- return {manifest,config,guidance,digest};
+ const skills=[];let hasSkills=false;const skillsDir=path.join(dir,'skills');
+ try{
+  if((await lstat(skillsDir)).isSymbolicLink())throw Error('Skill directory symlinks are not allowed');
+  const entries=await readdir(skillsDir,{withFileTypes:true});hasSkills=true;if(entries.length>50)throw Error('At most 50 skill files allowed');
+  for(const entry of entries.sort((a,b)=>a.name.localeCompare(b.name))){
+   if(!entry.isFile()||!/^[-a-z0-9]{1,50}\.md$/.test(entry.name))throw Error('Skills must be plain named Markdown files');
+   const filename=entry.name,markdown=await readFile(path.join(skillsDir,filename),'utf8');if(Buffer.byteLength(markdown)>65536)throw Error('Skill file too large');skills.push({filename,markdown});
+  }
+ }catch(error){if(error.code!=='ENOENT')throw error;}
+ const value={manifest,config,guidance,...(hasSkills?{skills}:{})};
+ const digest=createHash('sha256').update(JSON.stringify(value)).digest('hex');
+ return {...value,digest};
 }
 export function registerPackageResources(server,pkg){
  for(const [name,value,mime] of [['manifest',JSON.stringify(pkg.manifest,null,2),'application/json'],['configuration',JSON.stringify(pkg.config,null,2),'application/json'],['guidance',pkg.guidance,'text/markdown']]){

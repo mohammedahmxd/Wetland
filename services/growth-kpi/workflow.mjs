@@ -20,7 +20,7 @@ export function workflowSecret({http=false,env=process.env}={}){
 function validateArtifact(report,calculation,baseUrl){
  if(report.synthetic!==true||report.start!==calculation.start||report.end!==calculation.end||report.target!==calculation.target||report.actual!==calculation.actual||report.packageDigest!==calculation.packageDigest)throw Error('Report differs from the verified calculation');
  const brand=report.brand,checks=brand?.checks;
- if(!hex.test(report.artifactId||'')||!hex.test(brand?.snapshotDigest||'')||!hex.test(brand?.pdfSha256||'')||!hex.test(brand?.htmlSha256||'')||!brand.profileVersion||!brand.rendererVersion||checks?.pageCount!==1||checks.embeddedFontCount<3||checks.logoEmbedded!==true||checks.boundsChecked!==true||checks.rendered!==true)throw Error('Required Brand and artifact validation evidence is missing');
+ if(!hex.test(report.artifactId||'')||!hex.test(brand?.snapshotDigest||'')||!hex.test(brand?.pdfSha256||'')||!hex.test(brand?.htmlSha256||'')||!brand.profileVersion||!brand.rendererVersion||checks?.pageCount!==1||!Number.isInteger(checks.embeddedFontCount)||checks.embeddedFontCount<3||checks.logoEmbedded!==true||checks.boundsChecked!==true||checks.rendered!==true)throw Error('Required Brand and artifact validation evidence is missing');
  if(!baseUrl)throw Error('PUBLIC_BASE_URL is required for report release');
  for(const format of ['pdf','html']){
   const url=new URL(report.downloads?.[format]);

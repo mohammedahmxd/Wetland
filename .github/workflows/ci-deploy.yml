@@ -66,7 +66,7 @@ jobs:
         working-directory: packages/mcp-runtime
       - run: npm test
         working-directory: packages/mcp-skills
-      - run: node --test scripts/framework.test.mjs
+      - run: node --test scripts/framework.test.mjs scripts/skill-authoring.test.mjs
       - run: node --test deploy/tests/*.test.mjs
       - run: npm test
         working-directory: dashboard

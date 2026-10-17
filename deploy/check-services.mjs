@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const skillTools=['find_skills','get_skill','start_workflow','get_workflow_step','advance_workflow'];
 // Explicit on-demand read-only checks; no scheduler or alert destination is installed.
 import {pathToFileURL} from 'node:url';
 const host='462504004653.northamerica-northeast2.run.app';
@@ -59,10 +60,10 @@ export async function check(target,{reports=false}={}){
  const list=await rpc(target.url,'tools/list',{});
  for(const name of target.tools)if(!list.tools?.some(x=>x.name===name))throw Error(`Required tool absent: ${name}`);
  if(target.id==='examples'){
-  assertToolList(list,exampleContracts.map(x=>x.tool));
+  assertToolList(list,[...exampleContracts.map(x=>x.tool),...skillTools]);
   for(const contract of exampleContracts){
    const path='/mcp/'+contract.scope;
-   assertToolList(await rpc(target.url,'tools/list',{},path),[contract.tool]);
+   assertToolList(await rpc(target.url,'tools/list',{},path),[contract.tool,...skillTools]);
    validateExample(await rpc(target.url,'tools/call',{name:contract.tool,arguments:contract.args},path),contract.tool);
    // A scoped connection must not expose another capability even by direct tool call.
    const other=exampleContracts.find(x=>x.tool!==contract.tool);
