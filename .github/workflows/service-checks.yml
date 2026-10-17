@@ -1,0 +1,30 @@
+name: Check deployed demo services
+on:
+  workflow_dispatch:
+    inputs:
+      reports:
+        description: Generate and validate the synthetic branded PDF (checks Brand dependency)
+        type: boolean
+        default: true
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Check public synthetic services
+        env:
+          CHECK_REPORTS: ${{ inputs.reports }}
+        run: |
+          if [ "$CHECK_REPORTS" = "true" ]; then
+            node deploy/check-services.mjs --reports
+          else
+            node deploy/check-services.mjs
+          fi

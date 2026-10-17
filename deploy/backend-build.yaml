@@ -1,0 +1,10 @@
+# Build only: CI runs backend database tests before this image is released.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/web/wetland-backend:$BUILD_ID', 'backend']
+images: ['${_REGION}-docker.pkg.dev/$PROJECT_ID/web/wetland-backend:$BUILD_ID']
+substitutions:
+  _REGION: northamerica-northeast2
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 900s

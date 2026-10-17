@@ -61,6 +61,7 @@ jobs:
       - run: npm test
         working-directory: packages/mcp-runtime
       - run: node --test scripts/framework.test.mjs
+      - run: node --test deploy/tests/*.test.mjs
       - run: npm test
         working-directory: dashboard
       - run: python3 -m pip install --user -r requirements.txt && python3 -m unittest test_deck.py
@@ -73,6 +74,11 @@ jobs:
         working-directory: backend
         env:
           DATABASE_URL: postgres://wetland:ci-test-only@localhost:5432/wetland_ci
+      - name: Verify production backend image and migration entrypoint
+        run: |
+          docker build -t wetland-backend-ci backend
+          docker run --rm --network host -e DATABASE_URL=postgres://wetland:ci-test-only@localhost:5432/wetland_ci wetland-backend-ci node dist/migrate.js
+          docker run --rm --network host -e DATABASE_URL=postgres://wetland:ci-test-only@localhost:5432/wetland_ci wetland-backend-ci node dist/migrate.js
   deploy-sandbox:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: verify
