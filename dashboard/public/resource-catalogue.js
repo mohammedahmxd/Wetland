@@ -1,3 +1,5 @@
+import {scenarios} from './example-scenarios.js';
+
 export const BRAND_ENDPOINT = 'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/mcp';
 
 export const departments = [
@@ -80,10 +82,40 @@ export const resources = [
     'Communications & Brand','Reviewed public messaging, source references and editorial guidance.')
 ];
 
+const workflowMethods = ['find_skills','get_skill','start_workflow','get_workflow_step','advance_workflow'];
+const growthOrigin = 'https://wetland-growth-kpi-demo-462504004653.northamerica-northeast2.run.app';
+const examplesOrigin = 'https://wetland-examples-mcp-462504004653.northamerica-northeast2.run.app';
+const exampleDepartments = {grants:'fundraising','programme-reporting':'fundraising',governance:'it',maintenance:'it',onboarding:'it',communications:'brand','developer-standards':'it',learning:'support'};
+
+// Add working demonstrations alongside the team's planned capabilities; never replace them.
+export const integratedResources = [
+  {
+    id:'growth-reporting', department:'fundraising', title:'Growth reporting',
+    description:'Count first-time donors against a target and generate evidence-backed PDF and HTML reports using the shared Brand service.',
+    methods:['inspect_growth_dataset','get_metric_definition','calculate_growth','generate_growth_report','explain_growth_result',...workflowMethods],
+    prompt:'Find and read the growth-reporting skill. Generate a branded Growth report for 1 July–30 September 2026 against a target of 150 new donors. Use first-ever received qualifying donations, include the definition and evidence, and return the generated PDF and HTML links. Clearly label the data as synthetic.',
+    owner:'Wetland Growth demo project', data:'Fixed synthetic donor dataset. No live supporter or CRM records.', synthetic:true,
+    status:'Available', endpoint:growthOrigin+'/mcp', demoUrl:growthOrigin+'/', skillIds:['growth-reporting'],
+    transport:'Streamable HTTP', authentication:'No authentication required for this public synthetic demo.',
+    permissions:'Synthetic reporting only. Generates demo documents; does not change donor records.',
+    setup:'Connect this Streamable HTTP endpoint in a compatible agent. Discover tools and read the growth-reporting skill with find_skills and get_skill. Use start_workflow for guided reporting. Finished reports require the Brand MCP; calculations remain available independently. Microsoft agent setup requires your tenant administrator.'
+  },
+  ...scenarios.map(s=>({
+    id:'example-'+s.scope, department:exampleDepartments[s.scope], title:s.name+' · example',
+    description:s.prompt, methods:[s.tool,...workflowMethods], prompt:s.prompt,
+    owner:'Wetland synthetic examples project', data:'Invented demonstration fixtures and illustrative guidance. No live organisational records.', synthetic:true,
+    status:'Available', endpoint:examplesOrigin+'/mcp/'+s.scope, demoUrl:examplesOrigin+'/?capability='+s.scope, skillIds:[s.scope],
+    transport:'Streamable HTTP', authentication:'No authentication required for this public synthetic example.',
+    permissions:'Advisory drafts only. No approvals, publication, account changes or live tool changes.',
+    setup:'Connect this scoped Streamable HTTP endpoint in a compatible agent. Use find_skills and get_skill to read the '+s.scope+' playbook, then start_workflow for guided checks. This endpoint exposes only this capability and its workflow tools. Finished-document integration is separate; Microsoft agent setup requires your tenant administrator.'
+  }))
+];
+resources.push(...integratedResources);
+
 export function matchingResources(query='', status='All', catalogue=resources, groups=departments) {
   const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
   return catalogue.filter(r => (status==='All' || r.status===status) && words.every(word =>
-    [r.title,r.description,r.owner,r.department,groups.find(d=>d.id===r.department)?.title||'',...r.methods].join(' ').toLowerCase().includes(word)));
+    [r.title,r.description,r.owner,r.department,r.synthetic?'synthetic':'',...(r.skillIds||[]),groups.find(d=>d.id===r.department)?.title||'',...r.methods].join(' ').toLowerCase().includes(word)));
 }
 
 export function connectionConfig(resource) {
@@ -146,6 +178,11 @@ export function saveResource(catalogue,input,id,role){
   result.department=input.department;result.status=input.status;
   result.endpoint=webUrl(input.endpoint,'MCP');
   result.referenceUrl=webUrl(input.referenceUrl,'Reference link');
+  result.demoUrl=webUrl(input.demoUrl??current?.demoUrl,'Demo link');
+  const skillInput=input.skillIds??current?.skillIds??[];
+  result.skillIds=[...new Set((Array.isArray(skillInput)?skillInput:String(skillInput).split(/[\n,]/)).map(x=>String(x).trim()).filter(Boolean))];
+  if(result.skillIds.length>50||result.skillIds.some(id=>!/^[a-z][a-z0-9-]{2,63}$/.test(id)))throw Error('Use skill IDs of 3–64 lowercase letters, numbers or hyphens.');
+  result.synthetic=input.synthetic===undefined?!!current?.synthetic:input.synthetic===true||input.synthetic==='true';
   if(result.status==='Available'&&!result.endpoint)throw Error('An available MCP needs an MCP URL.');
   result.transport=input.transport||'Streamable HTTP';
   if(!['Streamable HTTP','SSE'].includes(result.transport))throw Error('Select a supported transport.');

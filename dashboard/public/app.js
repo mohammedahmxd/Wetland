@@ -1,3 +1,4 @@
+import {migrateCatalogue} from './resource-migration.js';
 import {ensureMembers,currentMember,selectMember,roleLabel} from './members.js';
 import {createRoleManager} from './roles.js';
 import {enhanceDropdowns} from './dropdowns.js';
@@ -7,6 +8,7 @@ const KEY='wetland-demo-v1';let storageError=false;let s;
 try{s=JSON.parse(localStorage.getItem(KEY));if(s?.schema!==1)s=initialState()}catch{s=initialState();storageError=true}
 if(s.role==='staff'||s.role==='reviewer')s.role='admin';
 ensureMembers(s);
+s.resourceCatalogue=migrateCatalogue(s.resourceCatalogue);
 let sidebarCollapsed=false;try{sidebarCollapsed=localStorage.getItem('wetland-sidebar-collapsed')==='true';}catch{}
 let route='overview',selected='',query='',filter='All',selectedSources=['A','B','C'],draft=null,editing=false,changeQuery='';
 const $=q=>document.querySelector(q);

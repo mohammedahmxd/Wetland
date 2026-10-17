@@ -7,13 +7,15 @@ const saveDepartment=(c,input,id)=>writeDepartment(c,input,id,'admin');
 const deleteDepartment=(c,id)=>removeDepartment(c,id,'admin');
 
 assert.equal(new Set(resources.map(r=>r.id)).size,resources.length);
-assert.equal(resources.filter(r=>r.status==='Available').length,1);
+assert.equal(resources.filter(r=>r.status==='Available').length,10);
+assert.equal(resources.length,21);
 for(const r of resources){
   assert(departments.some(d=>d.id===r.department));
   if(r.status==='Planned'){assert.equal(r.endpoint,null);assert.equal(connectionConfig(r),null);}
-  else {assert.equal(r.endpoint,BRAND_ENDPOINT);assert.equal(connectionConfig(r).mcpServers[r.id].url,BRAND_ENDPOINT);}
+  else {assert.ok(r.endpoint.startsWith('https://'));assert.equal(connectionConfig(r).mcpServers[r.id].url,r.endpoint);}
 }
-assert.equal(matchingResources('FUNDRAISING').length,3);
+assert.equal(matchingResources('FUNDRAISING','Planned').length,3);
+assert.equal(resources.find(r=>r.id==='brand-system').endpoint,BRAND_ENDPOINT);
 assert.deepEqual(matchingResources('  giving summary  ').map(r=>r.id),['donor-crm']);
 assert.equal(matchingResources('translation','Available').length,0);
 assert.equal(matchingResources('','Planned').length,11);
@@ -22,10 +24,10 @@ console.log('PASS: departmental search, status filters and connection configs ex
 let catalogue=seedCatalogue();
 const input={title:'Test service',department:'it',description:'Find reviewed operational guidance.',owner:'IT team',data:'Public guidance',permissions:'Read only',setup:'Connect with the MCP.',prompt:'Find a source.',methods:'find_source, get_version\nfind_source',status:'Planned',endpoint:'',authentication:'No authentication',transport:'Streamable HTTP',referenceUrl:''};
 const added=saveResource(catalogue,input);
-assert.equal(catalogue.items.length,13);assert.deepEqual(added.methods,['find_source','get_version']);
+assert.equal(catalogue.items.length,resources.length+1);assert.deepEqual(added.methods,['find_source','get_version']);
 assert.equal(matchingResources('test service','All',catalogue.items).length,1);
 const updated=saveResource(catalogue,{...input,title:'Updated service',status:'Available',endpoint:'https://example.org/mcp',transport:'SSE'},added.id);
-assert.equal(updated.id,added.id);assert.equal(catalogue.items.length,13);
+assert.equal(updated.id,added.id);assert.equal(catalogue.items.length,resources.length+1);
 assert.equal(connectionConfig(updated).mcpServers[added.id].type,'sse');
 catalogue=JSON.parse(JSON.stringify(catalogue));
 assert.equal(catalogue.items.find(r=>r.id===added.id).title,'Updated service');
@@ -34,19 +36,19 @@ assert.throws(()=>saveResource(catalogue,{...input,endpoint:'javascript:alert(1)
 assert.throws(()=>saveResource(catalogue,{...input,referenceUrl:'https://secret:password@example.org'}),/credentials/);
 assert.throws(()=>saveResource(catalogue,{...input,department:'unknown'}),/department/);
 assert.throws(()=>saveResource(catalogue,{...input,methods:'<script>'}),/method names/);
-assert.equal(catalogue.items.length,13);
-deleteResource(catalogue,added.id);assert.equal(catalogue.items.length,12);
+assert.equal(catalogue.items.length,resources.length+1);
+deleteResource(catalogue,added.id);assert.equal(catalogue.items.length,resources.length);
 assert.equal(matchingResources('updated service','All',catalogue.items).length,0);
 assert.equal(catalogue.deleted[0].resource.prompt,input.prompt);
 assert.throws(()=>deleteResource(catalogue,added.id),/already been deleted/);
 catalogue=JSON.parse(JSON.stringify(catalogue));restoreResource(catalogue,added.id);
-assert.equal(catalogue.items.length,13);assert.equal(catalogue.deleted.length,0);
+assert.equal(catalogue.items.length,resources.length+1);assert.equal(catalogue.deleted.length,0);
 assert.equal(catalogue.items.find(r=>r.id===added.id).endpoint,'https://example.org/mcp');
-assert.equal(resources.length,12);
+assert.equal(resources.length,21);
 console.log('PASS: MCP create/edit/delete/restore, persisted records, URL validation and immutable seed data.');
 const legacy={items:structuredClone(resources),deleted:[]};
 assert.equal(catalogueDepartments(legacy).length,4);
-assert.equal(legacy.items.length,12);
+assert.equal(legacy.items.length,resources.length);
 const group=saveDepartment(legacy,{title:'Research',description:'Research tools',position:2});
 assert.equal(legacy.departments[1].id,group.id);
 assert.deepEqual(legacy.departments.map(d=>d.number),['01','02','03','04','05']);
