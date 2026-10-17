@@ -1,0 +1,8 @@
+{
+  "name": "@wetland/mcp-skills",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {".": "./catalogue.mjs", "./workflow": "./workflow.mjs"},
+  "engines": {"node": ">=22"},
+  "scripts": {"test": "node --test *.test.mjs"}
+}
