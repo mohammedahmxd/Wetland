@@ -49,3 +49,11 @@ test('Candidate rejects absent tool dependencies and filenames that the package 
  // An empty skill directory remains represented, allowing an explicit clear operation.
  assert.deepEqual((await readPackage(root)).skills,[]);
 }));
+test('Approved instruction edits require a higher skill version, not the same or a lower version',async()=>fixture(async root=>{
+ const approved=(version,body)=>markdown({body}).replace('"status": "draft"','"status": "approved"').replace('"version": "1.0.0"','"version": "'+version+'"');
+ await writeFile(join(root,'skills/draft-authoring.md'),approved('1.0.0','Original approved instructions.'));
+ await writeFile(join(root,'test.mjs'),`import test from 'node:test';import assert from 'node:assert/strict';import {loadSkills} from ${JSON.stringify(catalogueUrl)};test('approved candidate remains valid',async()=>{assert.equal((await loadSkills(new URL('./',import.meta.url),{allowedTools:['fixture_tool']})).length,1);});`);
+ const before=await readPackage(root);
+ for(const version of ['1.0.0','0.9.0','1.0.1']){const candidate={...before,manifest:{...before.manifest,version:'0.1.1'},skills:[{filename:'draft-authoring.md',markdown:approved(version,'Revised approved instructions.')} ]};await draft(root,candidate,before.digest);const result=await evaluate(root);assert.ok(result.passed,result.log);if(version==='1.0.1')await apply(root);else await assert.rejects(apply(root),/Increment the changed approved skill version/);}
+ assert.equal((await loadSkills(root,{allowedTools}))[0].version,'1.0.1');
+}));
