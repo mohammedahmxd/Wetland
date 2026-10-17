@@ -231,3 +231,16 @@ dialog:has(.resource-manager) .modal-head{position:sticky;top:0;background:white
 .resource-empty-department .btn{font-size:12px}
 .resource-manager-row .resource-number{margin-right:6px}
 @media(max-width:550px){.resource-empty-department{align-items:flex-start;flex-direction:column}}
+/* The same select component is applied to every page and dialog. */
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.resource-select-wrap select{height:48px;min-height:48px;box-sizing:border-box;text-align:left;font-family:Noto,Arial,sans-serif;font-size:14px;border-radius:8px}
+.resource-filter-select select{height:50px;min-height:50px;font-size:13px}
+.top-actions>.resource-select-wrap{width:210px;flex:0 1 210px}
+.top-actions .resource-select-wrap .role-select{height:44px;min-height:44px;max-width:none;font-size:13px;padding:0 40px 0 12px}
+.resource-select-wrap:has(select:disabled){opacity:.6}
+.resource-select-wrap select:disabled{cursor:not-allowed}
+@supports(appearance:base-select){
+  .resource-select-wrap select::picker(select){max-width:calc(100vw - 32px);font-family:Noto,Arial,sans-serif}
+  .resource-select-wrap select option{white-space:normal;overflow-wrap:anywhere}
+}
+@media(max-width:760px){.top-actions>.resource-select-wrap{width:185px;flex-basis:185px}.resource-select-wrap select{max-width:100%}}
