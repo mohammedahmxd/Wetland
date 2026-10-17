@@ -12,6 +12,7 @@ The public site uses synthetic data and browser-local state. It is not an authen
 - **services/brand-mcp/** — existing public brand reference website and read-only MCP server, with assets, document guidance and protocol tests.
 - **mcp-marketplace/** — standalone marketplace with expandable MCP cards, category filters, saved tools and browser-local submissions. Includes the live brand reference MCP and seven labelled Water Care concepts.
 - **backend/** — Node 22 / TypeScript / Fastify / PostgreSQL; OIDC verification, organization scoping, immutable versions, server evaluations, independent approvals, concurrent activation protection, audit.
+- **synthetic-data** — synthetic data for experimentation/demonstration.
 - **deploy/cloudbuild.yaml** — tests, build, image push and deployment of the public dashboard.
 - **docs/ARCHITECTURE.md** — boundaries, scale assumptions, next production gates.
 - **docs/DEPLOYMENT.md** — GitHub-to-GCP setup and deployment/rollback.
