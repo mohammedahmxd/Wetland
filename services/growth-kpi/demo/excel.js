@@ -14,6 +14,23 @@ export function reportRows(report,verification,skill){return [
  ['Output type','Neutral extraction of the validated branded report'],
  ['Period',report.start+' to '+report.end],['First-time donors',report.actual],['Target',report.target],['Target achieved',report.attainmentPercent+'%'],['Gap to target',report.gapToTarget],['Definition',report.definition],['Skill',skill.id+' v'+skill.version],['Source fingerprint',verification.digest],['Source rows',verification.rowCount],['Brand snapshot',report.brand.snapshotDigest],['Artifact ID',report.artifactId],['Branded PDF',report.downloads.pdf],['Branded HTML',report.downloads.html],['Notice','Copilot-style demonstration, not Microsoft Copilot. No organisational approvals granted.']
  ].map(row=>row.map(safeCell));}
+export async function runExcelWorkflow(call,{fingerprint,inputs,onStep=()=>{}}){
+ const verification=await call('verify_excel_demo_input',fingerprint);
+ if((verification.matched!==true&&verification.verified!==true)||verification.digest!==fingerprint.digest||verification.rowCount!==fingerprint.rowCount)throw Error('Server did not match the selected synthetic fixture.');
+ onStep(0,true);onStep(1);
+ const found=await call('find_skills',{query:'Growth'});
+ if(!found.skills?.some(s=>s.id==='growth-reporting'))throw Error('Approved Growth skill is unavailable.');
+ const skill=await call('get_skill',{id:'growth-reporting'});
+ let state=await call('start_workflow',inputs);
+ if(state.status!=='active'||state.step!=='calculate')throw Error('Workflow needs valid reporting inputs.');
+ const sameSkill=()=>{if(state.skill?.id!==skill.id||state.skill?.version!==skill.version||state.skill?.digest!==skill.digest)throw Error('Reviewed skill changed during the request. Start again.');};
+ sameSkill();onStep(1,true);
+ const nextSteps=['brand_validation','release',null];
+ for(let index=2;index<=4;index++){onStep(index);state=await call('advance_workflow',{token:state.token});sameSkill();if(state.step!==nextSteps[index-2])throw Error('Unexpected workflow stage; report not released.');onStep(index,true);}
+ const report=state.result;
+ if(state.status!=='completed'||report?.synthetic!==true||report.start!==inputs.start||report.end!==inputs.end||report.target!==inputs.target||!Number.isInteger(report.actual)||report.brand?.checks?.rendered!==true||!report.downloads)throw Error('Workflow did not release the requested validated report.');
+ return {report,skill,verification};
+}
 function init(){
  const $=id=>document.getElementById(id);let excelReady=false,source=null,report=null,skill=null,verification=null,busy=false,id=0,protocol='2025-03-26';
  const log=[];
@@ -34,10 +51,8 @@ function init(){
   step(0);note('Checking the exact synthetic source…');if(source.kind==='excel'){const fresh=await readSheet();if(fresh.sheetId!==source.sheetId)throw Error('The active worksheet changed. Read the source sheet again.');source={...fresh,fingerprint:await knownFixture(fresh)};}else source.fingerprint=await knownFixture(source);
   const init=await rpc('initialize',{protocolVersion:protocol,capabilities:{},clientInfo:{name:'wetland-excel-demo',version:'1.0.0'}});protocol=init.protocolVersion;
   await fetch('/mcp',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json, text/event-stream','MCP-Protocol-Version':protocol},body:JSON.stringify({jsonrpc:'2.0',method:'notifications/initialized'})});
-  verification=await call('verify_excel_demo_input',source.fingerprint);if(verification.verified!==true&&verification.matched!==true)throw Error('Server did not verify the synthetic fixture.');verification={...verification,...source.fingerprint};step(0,true);
-  step(1);await call('find_skills',{query:'Growth'});skill=await call('get_skill',{id:'growth-reporting'});let state=await call('start_workflow',args);if(state.status!=='active')throw Error('Workflow needs valid reporting inputs.');step(1,true);
-  for(let index=2;index<=4;index++){step(index);note(['','','Calculating Growth…','Retrieving Brand and validating documents…','Revalidating and releasing the report…'][index]);state=await call('advance_workflow',{token:state.token});step(index,true);}
-  if(state.status!=='completed'||!state.result?.brand?.checks?.rendered||!state.result?.downloads)throw Error('Workflow did not release a validated report.');report=state.result;
+  const completed=await runExcelWorkflow(call,{fingerprint:source.fingerprint,inputs:args,onStep:(index,done)=>{step(index,done);if(!done)note(['Checking source…','Finding the approved skill…','Calculating Growth…','Retrieving Brand and validating documents…','Revalidating and releasing the report…'][index]);}});
+  ({report,skill,verification}=completed);
   for(const format of ['pdf','html']){const url=new URL(report.downloads[format]);if(url.origin!==location.origin||url.pathname!=='/reports/growth.'+format)throw Error('Unexpected report download destination');$(format).href=url.href;}
   $('metrics').textContent=report.actual+' new donors · '+report.attainmentPercent+'% of target · gap '+report.gapToTarget;$('skill').textContent='Reviewed skill '+skill.id+' v'+skill.version+' · Brand profile '+report.brand.profileVersion;$('result').hidden=false;$('write-sheet').hidden=!excelReady||source.kind!=='excel';note('Finished. Brand-validated PDF and HTML are ready.');
  }catch(error){report=null;$('result').hidden=true;note('Stopped: '+error.message);}finally{setBusy(false);}};
