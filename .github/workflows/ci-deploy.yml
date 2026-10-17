@@ -47,6 +47,10 @@ jobs:
         working-directory: services/brand-mcp
       - run: npm ci --ignore-scripts
         working-directory: services/growth-kpi
+      - run: npm ci --ignore-scripts
+        working-directory: services/examples-hub
+      - run: npm test
+        working-directory: services/examples-hub
       - run: npm run check
         working-directory: services/growth-kpi
       - name: Install PDF rendering and validation dependencies
