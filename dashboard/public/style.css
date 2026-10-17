@@ -139,3 +139,50 @@ h3{font-size:20px}
 .resource-form-error{background:#fff0ee;color:#9c251a!important;border-radius:6px;padding:14px}
 .resource-trash-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);font-size:14px}
 @media(max-width:760px){.resource-management-bar,.resource-manage-note{align-items:flex-start;flex-direction:column}.resource-editor-grid{grid-template-columns:1fr}.resource-trash-row{flex-wrap:wrap}}
+/* Shared control geometry keeps labels, text fields and dropdowns aligned. */
+.resource-editor-grid{align-items:start;column-gap:20px;row-gap:24px}
+.resource-editor-grid label{display:block;min-height:20px;line-height:20px;margin:0 0 9px;font-weight:700}
+.resource-editor-grid input,.resource-editor-grid select{height:48px;min-height:48px;padding:12px 14px;line-height:22px;border-radius:8px}
+.resource-editor-grid textarea{padding:12px 14px;line-height:1.65;border-radius:8px}
+.resource-editor-grid .resource-field-hint{margin:9px 0 0;font-size:11px;line-height:1.65}
+.resource-editor-grid .resource-field-hint+textarea{margin-top:9px}
+.resource-select-wrap{position:relative;min-width:0;width:100%}
+.resource-select-wrap:after{content:"";position:absolute;right:17px;top:50%;width:7px;height:7px;border-right:1.8px solid var(--muted);border-bottom:1.8px solid var(--muted);transform:translateY(-70%) rotate(45deg);pointer-events:none;transition:transform .18s ease,border-color .18s ease}
+.resource-select-wrap select{appearance:none;-webkit-appearance:none;width:100%;padding-right:42px;cursor:pointer;transition:border-color .18s ease,background-color .18s ease,box-shadow .18s ease}
+.resource-select-wrap:focus-within:after{border-color:var(--blue)}
+.resource-select-wrap:has(select:open):after{transform:translateY(-20%) rotate(225deg)}
+.resource-select-wrap select:hover{border-color:#91b4dd;background-color:#fbfdff}
+.resource-select-wrap select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #006bd912}
+.resource-filter-select{width:166px;flex:0 0 166px}
+.resource-filter-select select{width:100%;padding-right:40px}
+.resource-editor input,.resource-editor textarea{transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease}
+.resource-editor input:hover,.resource-editor textarea:hover{border-color:#91b4dd}
+.resource-editor input:focus,.resource-editor textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #006bd912}
+.resource-library .btn,.resource-detail .btn,.resource-editor .btn,.resource-library .resource-open{transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease}
+.resource-library .btn:hover,.resource-detail .btn:hover,.resource-editor .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px #1514350d}
+.resource-library .btn:active,.resource-detail .btn:active,.resource-editor .btn:active{transform:translateY(0);box-shadow:none}
+.resource-card{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;animation:resource-reveal .3s ease both}
+.resource-card:nth-child(2){animation-delay:.035s}.resource-card:nth-child(3){animation-delay:.07s}
+.resource-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px #1514350b}
+dialog:has(.resource-editor),dialog:has(.resource-detail){border:1px solid #e1e5eb;border-radius:16px}
+dialog[open]:has(.resource-editor),dialog[open]:has(.resource-detail){animation:resource-dialog-in .22s cubic-bezier(.2,.8,.2,1) both}
+dialog[open]::backdrop{animation:resource-backdrop-in .2s ease both}
+dialog:has(.resource-editor) .modal-head,dialog:has(.resource-detail) .modal-head{background:#fff;position:sticky;top:0;z-index:2}
+.resource-editor .resource-form-actions{position:sticky;bottom:0;background:white;margin:28px -26px -25px;padding:18px 26px;border-top:1px solid var(--line);z-index:1}
+@supports(appearance:base-select){
+  .resource-select-wrap select,.resource-select-wrap select::picker(select){appearance:base-select}
+  .resource-select-wrap select::picker-icon{display:none}
+  .resource-select-wrap select::picker(select){background:white;color:var(--ink);border:1px solid #d9e2ee;border-radius:10px;padding:6px;box-shadow:0 12px 32px #1514351a;max-height:280px;overflow:auto;opacity:0;transform:translateY(-5px);transition:opacity .18s ease,transform .18s ease,display .18s allow-discrete,overlay .18s allow-discrete}
+  .resource-select-wrap select:open::picker(select){opacity:1;transform:translateY(0)}
+  .resource-select-wrap select option{min-height:42px;padding:11px 12px;gap:10px;border-radius:6px;font-size:13px;line-height:1.5;cursor:pointer;transition:background-color .15s ease,color .15s ease}
+  .resource-select-wrap select option:hover,.resource-select-wrap select option:focus{background:var(--pale);color:var(--blue);outline:none}
+  .resource-select-wrap select option:checked{background:var(--cream);font-weight:700}
+  .resource-select-wrap select option::checkmark{color:var(--blue)}
+  @starting-style{.resource-select-wrap select:open::picker(select){opacity:0;transform:translateY(-5px)}}
+}
+@keyframes resource-reveal{from{opacity:0;translate:0 7px}to{opacity:1;translate:0 0}}
+@keyframes resource-dialog-in{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes resource-backdrop-in{from{opacity:0}to{opacity:1}}
+@media(max-width:760px){.resource-filter-select{flex:1;width:auto}.resource-editor-grid{row-gap:20px}.resource-card:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.resource-library *,.resource-detail *,.resource-editor *,dialog[open],dialog[open]::backdrop{animation:none!important;transition:none!important;scroll-behavior:auto!important}.resource-card:hover,.resource-library .btn:hover,.resource-detail .btn:hover,.resource-editor .btn:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.resource-select-wrap:after,.resource-select-wrap select::picker(select){transition:none!important}}
