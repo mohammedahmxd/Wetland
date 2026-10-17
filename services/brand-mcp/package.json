@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check mcp.mjs && node --check dist/app.js",
-    "test": "node mcp.test.mjs"
+    "check": "node --check server.mjs && node --check mcp.mjs && node --check auth-policy.mjs && node --check mcp-auth.mjs && node --check auth-client.js && node --check auth.test.mjs && node --check dist/app.js",
+    "test": "node mcp.test.mjs && node auth.test.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
+    "jose": "6.2.12",
     "zod": "4.6.7"
   }
 }
