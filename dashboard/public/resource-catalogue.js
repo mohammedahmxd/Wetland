@@ -80,17 +80,45 @@ export const resources = [
     'Communications & Brand','Reviewed public messaging, source references and editorial guidance.')
 ];
 
-export function matchingResources(query='', status='All', catalogue=resources) {
+export function matchingResources(query='', status='All', catalogue=resources, groups=departments) {
   const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
   return catalogue.filter(r => (status==='All' || r.status===status) && words.every(word =>
-    [r.title,r.description,r.owner,r.department,departments.find(d=>d.id===r.department).title,...r.methods].join(' ').toLowerCase().includes(word)));
+    [r.title,r.description,r.owner,r.department,groups.find(d=>d.id===r.department)?.title||'',...r.methods].join(' ').toLowerCase().includes(word)));
 }
 
 export function connectionConfig(resource) {
   return resource.status==='Available' && resource.endpoint ? {mcpServers:{[resource.id]:{type:resource.transport==='SSE'?'sse':'http',url:resource.endpoint}}} : null;
 }
 
-export function seedCatalogue(){return {items:structuredClone(resources),deleted:[]};}
+export function seedCatalogue(){return {items:structuredClone(resources),deleted:[],departments:structuredClone(departments)};}
+
+export function catalogueDepartments(catalogue){return catalogue.departments??(catalogue.departments=structuredClone(departments));}
+
+function renumber(groups){groups.forEach((d,index)=>{d.number=String(index+1).padStart(2,'0');});}
+
+export function saveDepartment(catalogue,input,id){
+  const groups=catalogueDepartments(catalogue),current=id?groups.find(d=>d.id===id):null;
+  if(id&&!current)throw Error('This department no longer exists.');
+  const title=String(input.title||'').trim(),description=String(input.description||'').trim();
+  if(!title||title.length>100)throw Error('Enter a department name of 1–100 characters.');
+  if(description.length>1000)throw Error('Keep the description under 1,000 characters.');
+  if(groups.some(d=>d.id!==id&&d.title.toLowerCase()===title.toLowerCase()))throw Error('A department with this name already exists.');
+  const count=groups.length+(current?0:1),position=Number(input.position??count);
+  if(!Number.isInteger(position)||position<1||position>count)throw Error('Select a valid display position.');
+  const result={id:current?.id||'department-'+crypto.randomUUID(),title,description};
+  const next=groups.filter(d=>d.id!==id);next.splice(position-1,0,result);renumber(next);catalogue.departments=next;
+  return result;
+}
+
+export function deleteDepartment(catalogue,id,destination){
+  const groups=catalogueDepartments(catalogue),department=groups.find(d=>d.id===id);
+  if(!department)throw Error('This department no longer exists.');
+  const entries=[...catalogue.items,...catalogue.deleted.map(e=>e.resource)].filter(r=>r.department===id);
+  if(entries.length&&(!destination||destination===id||!groups.some(d=>d.id===destination)))throw Error('Choose another department for this department’s MCPs, including deleted entries.');
+  entries.forEach(r=>{r.department=destination;});
+  catalogue.departments=groups.filter(d=>d.id!==id);renumber(catalogue.departments);
+  return department;
+}
 
 function webUrl(value,label){
   if(!value?.trim())return null;
@@ -109,7 +137,7 @@ export function saveResource(catalogue,input,id){
     if(value.length>(['title','owner'].includes(key)?200:12000))throw Error('The '+key+' field is too long.');
     result[key]=value;
   }
-  if(!departments.some(d=>d.id===input.department))throw Error('Select a department.');
+  if(!catalogueDepartments(catalogue).some(d=>d.id===input.department))throw Error('Select a department.');
   if(!['Available','Planned'].includes(input.status))throw Error('Select a valid availability.');
   result.department=input.department;result.status=input.status;
   result.endpoint=webUrl(input.endpoint,'Endpoint');

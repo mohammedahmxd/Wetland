@@ -225,3 +225,9 @@ dialog:has(.resource-editor) .modal-head,dialog:has(.resource-detail) .modal-hea
 .resource-manager-empty{padding:32px 12px;text-align:center;font-size:14px;color:var(--muted)}
 dialog:has(.resource-manager) .modal-head{position:sticky;top:0;background:white;z-index:2}
 @media(max-width:550px){.resource-manager-row{align-items:flex-start;flex-direction:column;gap:12px}.resource-manager-row-actions{align-self:flex-end}}
+.resource-manager-tabs{flex-wrap:wrap}
+.resource-empty-department{grid-column:1/-1;border:1px dashed var(--line);border-radius:8px;padding:24px;background:var(--cream);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.resource-empty-department p{font-size:14px;margin:0;color:var(--muted)}
+.resource-empty-department .btn{font-size:12px}
+.resource-manager-row .resource-number{margin-right:6px}
+@media(max-width:550px){.resource-empty-department{align-items:flex-start;flex-direction:column}}

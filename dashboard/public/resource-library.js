@@ -1,10 +1,11 @@
-import {departments, matchingResources, connectionConfig,seedCatalogue,saveResource,deleteResource,restoreResource} from './resource-catalogue.js';
+import {catalogueDepartments,saveDepartment,deleteDepartment, matchingResources, connectionConfig,seedCatalogue,saveResource,deleteResource,restoreResource} from './resource-catalogue.js';
 
 export function createResourceLibrary(c) {
   const {esc,btn,link,modal,toast} = c;
   let query='', status='All',managing=false,managerSearch='',managerTab='active';
   const catalogue=()=>c.state().resourceCatalogue??(c.state().resourceCatalogue=seedCatalogue());
   const resources=()=>catalogue().items;
+  const departments=()=>catalogueDepartments(catalogue());
   const available=r=>r.status==='Available'&&!!r.endpoint;
   const action = (label, type, id, cls='secondary') => btn(label,'hub-library-'+type,'data-id="'+esc(id)+'"',cls);
   const statusLabel = r => '<span class="resource-status '+(available(r)?'available':'planned')+'"><span aria-hidden="true"></span>'+esc(r.status)+'</span>';
@@ -22,25 +23,25 @@ export function createResourceLibrary(c) {
   }
 
   function results() {
-    const matches=matchingResources(query,status,resources());
-    if(!resources().length)return {count:0,html:'<div class="resource-empty"><h2>Your MCP library is empty.</h2><p>Add a resource to get started, or restore one from Deleted entries.</p>'+action('Add MCP','add','','lime')+'</div>'};
-    return {count:matches.length, html:departments.map(d=>{
+    const matches=matchingResources(query,status,resources(),departments());
+    if(!departments().length)return {count:0,html:'<div class="resource-empty"><h2>Create your first department.</h2><p>Departments organise the MCPs in your library.</p>'+action('Add department','department-add','','lime')+'</div>'};
+    return {count:matches.length, html:departments().map(d=>{
       const list=matches.filter(r=>r.department===d.id);
-      return !list.length?'':`<section class="resource-department" id="library-${d.id}" aria-labelledby="library-title-${d.id}">
-        <div class="resource-section-head"><div><span class="resource-number">${d.number}</span><h2 id="library-title-${d.id}">${d.title}</h2></div><p>${d.description}</p></div>
-        <div class="resource-grid">${list.map(card).join('')}</div></section>`;
+      return !list.length&&(query.trim()||status!=='All')?'':`<section class="resource-department" id="library-${d.id}" aria-labelledby="library-title-${d.id}">
+        <div class="resource-section-head"><div><span class="resource-number">${d.number}</span><h2 id="library-title-${d.id}">${esc(d.title)}</h2></div><p>${esc(d.description)}</p></div>
+        <div class="resource-grid">${list.length?list.map(card).join(''):'<div class="resource-empty-department"><p>No MCPs in this department yet.</p>'+action('Add MCP','add',d.id,'secondary')+'</div>'}</div></section>`;
     }).join('') || '<div class="resource-empty"><h2>No resources match.</h2><p>Try a department, a tool name or a broader search.</p>'+action('Clear filters','reset','','secondary')+'</div>'};
   }
 
   function render() {
     const result=results();
     return `<div class="resource-library">
-      <div class="resource-management-bar"><span>Library changes are saved in this browser.</span><div>${action('Manage MCPs','manage','','secondary')}${action('Add MCP','add','','lime')}</div></div>
+      <div class="resource-management-bar"><span>Library changes are saved in this browser.</span><div>${action('Manage library','manage','','secondary')}${action('Add MCP','add','','lime')}</div></div>
       <header class="resource-intro"><p class="eyebrow">RESOURCE LIBRARY / MCP DIRECTORY</p><h1>Shared tools.<br><span>Greater possibilities.</span></h1>
         <p class="resource-lead">Find the right knowledge for your next task. Explore resources by department, understand what each one does, and bring it to your approved AI agent.</p>
         <div class="resource-intro-links"><a href="#library" data-library-scroll="library-directory">Explore the directory <span aria-hidden="true">↓</span></a><a href="#library" data-library-scroll="library-guide">How to connect an agent <span aria-hidden="true">↗</span></a></div>
       </header>
-      <nav class="resource-jumps" aria-label="Jump to department"><span>JUMP TO</span>${departments.map(d=>'<a href="#library" data-library-scroll="library-'+d.id+'">'+d.number+' '+esc(d.title.split(' & ')[0])+'</a>').join('')}</nav>
+      <nav class="resource-jumps" aria-label="Jump to department"><span>JUMP TO</span>${departments().map(d=>'<a href="#library" data-library-scroll="library-'+d.id+'">'+d.number+' '+esc(d.title.split(' & ')[0])+'</a>').join('')}</nav>
       <section id="library-directory" aria-label="Resource directory"><div class="resource-toolbar"><div class="resource-search"><label class="sr-only" for="library-search">Search resources</label><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input type="search" id="library-search" placeholder="Search tools, departments or capabilities…" value="${esc(query)}"></div><label class="sr-only" for="library-status">Availability</label><div class="resource-select-wrap resource-filter-select"><select id="library-status">${['All','Available','Planned'].map(x=>'<option value="'+x+'" '+(status===x?'selected':'')+'>'+(x==='All'?'All resources':x)+'</option>').join('')}</select></div><span id="library-count" role="status" aria-live="polite">${result.count} resource${result.count===1?'':'s'}</span></div>
       <p class="resource-scope" id="library-scope">${scopeSummary()}</p>
       <div id="library-results">${result.html}</div></section>
@@ -65,24 +66,44 @@ export function createResourceLibrary(c) {
   function labelledModal(title,body){modal(title,body);const dialog=document.querySelector('#modal');dialog.querySelector('h2').id='library-dialog-title';dialog.setAttribute('aria-labelledby','library-dialog-title');dialog.scrollTop=0;}
 
   function managerRows(){
+    if(managerTab==='departments')return departmentRows();
     const list=managerTab==='active'?resources():catalogue().deleted.map(entry=>entry.resource);
-    const matches=list.filter(r=>(r.title+' '+r.owner+' '+departments.find(d=>d.id===r.department).title).toLowerCase().includes(managerSearch.toLowerCase().trim()));
-    return matches.length?matches.map(r=>'<div class="resource-manager-row"><div><strong>'+esc(r.title)+'</strong><small>'+esc(departments.find(d=>d.id===r.department).title)+' · '+esc(r.status)+'</small></div><div class="resource-manager-row-actions">'+(managerTab==='active'?action(actionIcon('edit')+'Edit','edit',r.id,'secondary')+action(actionIcon('delete')+'Delete','delete',r.id,'resource-trash-button'):action('Restore','restore',r.id,'secondary'))+'</div></div>').join(''):'<p class="resource-manager-empty">'+(managerSearch?'No MCPs match your search.':managerTab==='deleted'?'No deleted MCPs.':'No MCPs in the library yet.')+'</p>';
+    const matches=list.filter(r=>(r.title+' '+r.owner+' '+departments().find(d=>d.id===r.department).title).toLowerCase().includes(managerSearch.toLowerCase().trim()));
+    return matches.length?matches.map(r=>'<div class="resource-manager-row"><div><strong>'+esc(r.title)+'</strong><small>'+esc(departments().find(d=>d.id===r.department).title)+' · '+esc(r.status)+'</small></div><div class="resource-manager-row-actions">'+(managerTab==='active'?action(actionIcon('edit')+'Edit','edit',r.id,'secondary')+action(actionIcon('delete')+'Delete','delete',r.id,'resource-trash-button'):action('Restore','restore',r.id,'secondary'))+'</div></div>').join(''):'<p class="resource-manager-empty">'+(managerSearch?'No MCPs match your search.':managerTab==='deleted'?'No deleted MCPs.':'No MCPs in the library yet.')+'</p>';
   }
 
   function manage(){
     managing=true;
-    labelledModal('Manage MCPs','<div class="resource-manager"><p>Edit or delete MCP entries. Changes are saved in this browser.</p><div class="resource-manager-toolbar"><div class="resource-manager-tabs" aria-label="Library entries">'+btn('MCPs ('+resources().length+')','hub-library-manager-active','aria-pressed="'+(managerTab==='active')+'"','secondary')+btn('Deleted ('+catalogue().deleted.length+')','hub-library-manager-deleted','aria-pressed="'+(managerTab==='deleted')+'"','secondary')+'</div>'+action('Add MCP','add','','lime')+'</div><label class="sr-only" for="manager-search">Search MCPs</label><input type="search" id="manager-search" placeholder="Search by name, department or owner…" aria-label="Search MCPs" value="'+esc(managerSearch)+'"><div id="manager-list">'+managerRows()+'</div><div class="resource-form-actions">'+action('Done','manager-done','','secondary')+'</div></div>');
+    labelledModal('Manage library','<div class="resource-manager"><p>Manage MCP entries and the departments that organise them. Changes are saved in this browser.</p><div class="resource-manager-toolbar"><div class="resource-manager-tabs" aria-label="Library entries">'+btn('MCPs ('+resources().length+')','hub-library-manager-active','aria-pressed="'+(managerTab==='active')+'"','secondary')+btn('Departments ('+departments().length+')','hub-library-manager-departments','aria-pressed="'+(managerTab==='departments')+'"','secondary')+btn('Deleted ('+catalogue().deleted.length+')','hub-library-manager-deleted','aria-pressed="'+(managerTab==='deleted')+'"','secondary')+'</div>'+action(managerTab==='departments'?'Add department':'Add MCP',managerTab==='departments'?'department-add':'add','','lime')+'</div><label class="sr-only" for="manager-search">Search library</label><input type="search" id="manager-search" placeholder="'+(managerTab==='departments'?'Search departments…':'Search by name, department or owner…')+'" aria-label="Search library" value="'+esc(managerSearch)+'"><div id="manager-list">'+managerRows()+'</div><div class="resource-form-actions">'+action('Done','manager-done','','secondary')+'</div></div>');
   }
 
-  function edit(id){
-    const r=resources().find(x=>x.id===id)||{department:'fundraising',status:'Planned',methods:[],transport:'Streamable HTTP'};
+  function departmentRows(){
+    const matches=departments().filter(d=>(d.title+' '+d.description).toLowerCase().includes(managerSearch.toLowerCase().trim()));
+    return matches.length?matches.map(d=>'<div class="resource-manager-row"><div><strong><span class="resource-number">'+d.number+'</span> '+esc(d.title)+'</strong><small>'+esc(d.description||'No description')+'</small><small>'+resources().filter(r=>r.department===d.id).length+' MCPs</small></div><div class="resource-manager-row-actions">'+action(actionIcon('edit')+'Edit','department-edit',d.id,'secondary')+action(actionIcon('delete')+'Delete','department-delete',d.id,'resource-trash-button')+'</div></div>').join(''):'<p class="resource-manager-empty">'+(managerSearch?'No departments match your search.':'No departments yet. Add one to organise your MCPs.')+'</p>';
+  }
+
+  function editDepartment(id){
+    managing=true;managerTab='departments';
+    const groups=departments(),current=groups.find(d=>d.id===id),position=current?groups.indexOf(current)+1:groups.length+1;
+    labelledModal(current?'Edit department':'Add department',`<form class="resource-editor" data-library-form="department" data-id="${esc(id||'')}"><p>Update the name and description shown in the library. Display position controls the section order and numbering.</p><p class="resource-form-error" role="alert" hidden></p><div class="resource-editor-grid"><div class="field full"><label for="department-title">Department name</label><input id="department-title" name="title" required maxlength="100" value="${esc(current?.title||'')}"></div><div class="field full"><label for="department-description">Description <span class="field-note">Optional</span></label><textarea id="department-description" name="description" rows="3" maxlength="1000">${esc(current?.description||'')}</textarea></div><div class="field full"><label for="department-position">Display position</label><div class="resource-select-wrap"><select id="department-position" name="position">${Array.from({length:groups.length+(current?0:1)},(_,i)=>'<option value="'+(i+1)+'" '+(i+1===position?'selected':'')+'>'+String(i+1).padStart(2,'0')+(groups[i]?' · '+esc(groups[i].title):' · Last')+'</option>').join('')}</select></div></div></div><div class="resource-form-actions"><button class="btn lime" type="submit">${current?'Save department':'Add department'}</button>${action('Cancel','cancel','','secondary')}</div></form>`);
+  }
+
+  function confirmDeleteDepartment(id){
+    const d=departments().find(x=>x.id===id);if(!d)return;
+    managing=true;managerTab='departments';
+    const entries=[...resources(),...catalogue().deleted.map(e=>e.resource)].filter(r=>r.department===id),targets=departments().filter(x=>x.id!==id);
+    labelledModal('Delete department?',`<form class="resource-editor" data-library-form="department-delete" data-id="${esc(id)}"><p>Delete <strong>${esc(d.title)}</strong> from the library? ${entries.length?entries.length+' MCP entries, including any deleted entries, must be moved to another department.':'This department has no MCP entries.'}</p><p class="resource-form-error" role="alert" hidden></p>${entries.length?(targets.length?'<div class="resource-editor-grid"><div class="field full"><label for="department-destination">Move MCPs to</label><div class="resource-select-wrap"><select id="department-destination" name="destination" required><option value="">Choose a department</option>'+targets.map(t=>'<option value="'+esc(t.id)+'">'+esc(t.title)+'</option>').join('')+'</select></div></div></div>':'<p>Create another department before deleting this one so its MCPs have somewhere to go.</p>'):''}<div class="resource-form-actions"><button class="btn danger" type="submit" ${entries.length&&!targets.length?'disabled':''}>Delete department</button>${action('Cancel','cancel','','secondary')}</div></form>`);
+  }
+
+  function edit(id,departmentId){
+    if(!departments().length){managing=true;managerTab='departments';editDepartment();return;}
+    const r=resources().find(x=>x.id===id)||{department:departmentId||departments()[0]?.id||'',status:'Planned',methods:[],transport:'Streamable HTTP'};
     const field=(name,label,{area=false,optional=false,hint=''}={})=>'<div class="field '+(area?'full':'')+'"><label for="mcp-'+name+'">'+label+(optional?' <span class="field-note">Optional</span>':'')+'</label>'+(area?'<textarea id="mcp-'+name+'" name="'+name+'" rows="3" maxlength="12000" '+(optional?'':'required')+'>'+esc(r[name]||'')+'</textarea>':'<input id="mcp-'+name+'" name="'+name+'" maxlength="'+(name==='endpoint'||name==='referenceUrl'?'2000':'200')+'" '+(optional?'':'required')+' value="'+esc(r[name]||'')+'">')+(hint?'<p class="resource-field-hint">'+hint+'</p>':'')+'</div>';
-    const select=(name,label,options)=>'<div class="field"><label for="mcp-'+name+'">'+label+'</label><div class="resource-select-wrap"><select id="mcp-'+name+'" name="'+name+'">'+options.map(([v,t])=>'<option value="'+v+'" '+(r[name]===v?'selected':'')+'>'+t+'</option>').join('')+'</select></div></div>';
+    const select=(name,label,options)=>'<div class="field"><label for="mcp-'+name+'">'+label+'</label><div class="resource-select-wrap"><select id="mcp-'+name+'" name="'+name+'">'+options.map(([v,t])=>'<option value="'+esc(v)+'" '+(r[name]===v?'selected':'')+'>'+esc(t)+'</option>').join('')+'</select></div></div>';
     labelledModal(id?'Edit MCP':'Add an MCP',`<form class="resource-editor" data-library-form="save" data-id="${esc(id||'')}">
       <p>Edit the library entry here. Connection settings describe the service; saving does not deploy or modify an MCP server.</p>
       <p class="resource-form-error" role="alert" hidden></p><div class="resource-editor-grid">
-      ${field('title','Name')}${select('department','Department',departments.map(d=>[d.id,d.title]))}
+      ${field('title','Name')}${select('department','Department',departments().map(d=>[d.id,d.title]))}
       ${field('description','Description',{area:true})}${field('owner','Owner / maintainer')}${select('status','Availability',[['Planned','Planned'],['Available','Available']])}
       <h3 class="full">Connection settings</h3>${field('endpoint','Endpoint URL',{optional:true,hint:'Required for Available entries. HTTP or HTTPS; do not include passwords or tokens.'})}${select('transport','Transport',[['Streamable HTTP','Streamable HTTP'],['SSE','SSE']])}
       ${field('authentication','Authentication instructions',{area:true,optional:true,hint:'Describe the authentication process. Do not store credentials here.'})}${field('referenceUrl','Reference / documentation URL',{optional:true})}
@@ -101,7 +122,7 @@ export function createResourceLibrary(c) {
   function details(id) {
     const r=resources().find(x=>x.id===id);if(!r)return;
     const config=connectionConfig(r);
-    labelledModal(esc(r.title),`<div class="resource-detail"><div class="resource-detail-meta">${statusLabel(r)}<span>${esc(departments.find(d=>d.id===r.department).title)}</span></div>
+    labelledModal(esc(r.title),`<div class="resource-detail"><div class="resource-detail-meta">${statusLabel(r)}<span>${esc(departments().find(d=>d.id===r.department).title)}</span></div>
       <p>${esc(r.description)}</p><dl><div><dt>Owner / maintainer</dt><dd>${esc(r.owner)}</dd></div><div><dt>Access & scope</dt><dd>${esc(r.permissions)}</dd></div><div><dt>Data</dt><dd>${esc(r.data)}</dd></div><div><dt>Transport</dt><dd>${esc(r.transport||'Streamable HTTP')}</dd></div><div><dt>Authentication</dt><dd>${esc(r.authentication||'Not specified')}</dd></div></dl>
       <h3>Connection</h3>${r.endpoint?'<div class="resource-code">'+esc(r.endpoint)+'</div><div class="actions">'+(available(r)?action('Copy endpoint','endpoint',r.id):'<p>Connection pending; this entry is marked Planned.</p>')+'</div>':'<div class="resource-pending">Endpoint not provisioned. This concept cannot be connected yet.</div>'}${r.referenceUrl?'<a class="btn secondary" href="'+esc(r.referenceUrl)+'" target="_blank" rel="noopener noreferrer">View reference / documentation ↗</a>':''}<p>${esc(r.setup)}</p>
       <div class="resource-detail-heading"><h3>Example agent prompt</h3>${action('Copy prompt','prompt',r.id)}</div><div class="resource-code prompt-example">${esc(r.prompt)}</div>
@@ -123,8 +144,13 @@ export function createResourceLibrary(c) {
   document.querySelector('#modal').addEventListener('cancel',()=>{managing=false;});
   document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const menu=document.querySelector('.resource-action-menu[open]');if(menu){e.preventDefault();e.stopPropagation();menu.open=false;menu.querySelector('summary').focus();}},true);
   document.addEventListener('submit',e=>{
-    const form=e.target.closest('[data-library-form="save"]');if(!form)return;e.preventDefault();
-    try{const saved=saveResource(catalogue(),Object.fromEntries(new FormData(form)),form.dataset.id||undefined);query='';status='All';changed(form.dataset.id?'MCP updated.':'MCP added.',saved.id);}
+    const form=e.target.closest('[data-library-form]');if(!form)return;e.preventDefault();
+    try{
+      const input=Object.fromEntries(new FormData(form));
+      if(form.dataset.libraryForm==='department'){const saved=saveDepartment(catalogue(),input,form.dataset.id||undefined);managerSearch='';query='';status='All';changed((form.dataset.id?'Updated department: ':'Added department: ')+saved.title,saved.id);return;}
+      if(form.dataset.libraryForm==='department-delete'){const removed=deleteDepartment(catalogue(),form.dataset.id,input.destination);managerSearch='';changed('Deleted department: '+removed.title,removed.id);return;}
+      const saved=saveResource(catalogue(),input,form.dataset.id||undefined);query='';status='All';changed(form.dataset.id?'MCP updated.':'MCP added.',saved.id);
+    }
     catch(error){const message=form.querySelector('.resource-form-error');message.textContent=error.message;message.hidden=false;message.setAttribute('tabindex','-1');message.focus();}
   });
   document.addEventListener('click',e=>{
@@ -136,9 +162,12 @@ export function createResourceLibrary(c) {
     const b=e.target.closest('[data-action^="hub-library-"]');if(!b)return;
     const type=b.dataset.action.replace('hub-library-',''),r=resources().find(x=>x.id===b.dataset.id);
     if(type==='manage'){managerSearch='';managerTab='active';manage();}
-    if(type==='manager-active'||type==='manager-deleted'){managerTab=type==='manager-active'?'active':'deleted';managerSearch='';manage();}
+    if(['manager-active','manager-deleted','manager-departments'].includes(type)){managerTab=type.replace('manager-','');managerSearch='';manage();}
+    if(type==='department-add')editDepartment();
+    if(type==='department-edit')editDepartment(b.dataset.id);
+    if(type==='department-delete')confirmDeleteDepartment(b.dataset.id);
     if(type==='manager-done'){managing=false;c.close();}
-    if(type==='add')edit();
+    if(type==='add')edit(undefined,b.dataset.id);
     if(type==='edit'&&r)edit(r.id);
     if(type==='delete'&&r)confirmDelete(r.id);
     if(type==='cancel'){if(managing)manage();else c.close();}

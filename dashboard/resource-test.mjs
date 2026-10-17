@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {resources,departments,matchingResources,connectionConfig,BRAND_ENDPOINT,seedCatalogue,saveResource,deleteResource,restoreResource} from './public/resource-catalogue.js';
+import {resources,departments,matchingResources,connectionConfig,BRAND_ENDPOINT,seedCatalogue,saveResource,deleteResource,restoreResource,catalogueDepartments,saveDepartment,deleteDepartment} from './public/resource-catalogue.js';
 assert.equal(new Set(resources.map(r=>r.id)).size,resources.length);
 assert.equal(resources.filter(r=>r.status==='Available').length,1);
 for(const r of resources){
@@ -38,3 +38,30 @@ assert.equal(catalogue.items.length,13);assert.equal(catalogue.deleted.length,0)
 assert.equal(catalogue.items.find(r=>r.id===added.id).endpoint,'https://example.org/mcp');
 assert.equal(resources.length,12);
 console.log('PASS: MCP create/edit/delete/restore, persisted records, URL validation and immutable seed data.');
+const legacy={items:structuredClone(resources),deleted:[]};
+assert.equal(catalogueDepartments(legacy).length,4);
+assert.equal(legacy.items.length,12);
+const group=saveDepartment(legacy,{title:'Research',description:'Research tools',position:2});
+assert.equal(legacy.departments[1].id,group.id);
+assert.deepEqual(legacy.departments.map(d=>d.number),['01','02','03','04','05']);
+const moved=saveResource(legacy,{...input,department:group.id});
+saveDepartment(legacy,{title:'Research & evidence',description:'Reviewed research',position:1},group.id);
+assert.equal(legacy.departments[0].id,group.id);
+assert.equal(matchingResources('research evidence','All',legacy.items,legacy.departments).length,1);
+assert.throws(()=>saveDepartment(legacy,{title:'research & evidence',position:1}),/already exists/);
+assert.throws(()=>saveDepartment(legacy,{title:'',position:1}),/name/);
+assert.throws(()=>saveDepartment(legacy,{title:'Invalid position',position:99}),/position/);
+assert.throws(()=>deleteDepartment(legacy,group.id),/Choose another department/);
+assert.equal(legacy.items.find(r=>r.id===moved.id).department,group.id);
+deleteResource(legacy,moved.id);
+assert.throws(()=>deleteDepartment(legacy,group.id),/Choose another department/);
+deleteDepartment(legacy,group.id,'support');
+restoreResource(legacy,moved.id);
+assert.equal(legacy.items.find(r=>r.id===moved.id).department,'support');
+assert.deepEqual(legacy.departments.map(d=>d.number),['01','02','03','04']);
+const empty={items:[],deleted:[],departments:[]};
+const first=saveDepartment(empty,{title:'First',position:1});
+assert.equal(first.number,'01');deleteDepartment(empty,first.id);assert.equal(empty.departments.length,0);
+assert.equal(JSON.parse(JSON.stringify(legacy)).departments.length,4);
+assert.equal(departments[0].title,'Fundraising & donor relations');
+console.log('PASS: department migration, CRUD, ordering, renamed search and safe reassignment of active/deleted MCPs.');
