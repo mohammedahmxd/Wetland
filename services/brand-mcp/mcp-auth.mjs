@@ -236,6 +236,7 @@ export function loadMcpAuth(env = process.env) {
   button:disabled{opacity:.6;cursor:not-allowed}
   label{display:block;font-size:.85rem;font-weight:700;margin-bottom:4px}
   input{width:100%;box-sizing:border-box;margin:0 0 12px;padding:10px 12px;border:1px solid #151435;border-radius:8px;font:inherit}
+  h2{font-size:1rem;margin:20px 0 8px}
   #password-sign-in{margin-bottom:16px}
   #status{min-height:1.5em}
 </style>
@@ -243,13 +244,13 @@ export function loadMcpAuth(env = process.env) {
 <body>
 <main>
   <h1>Sign in to the MCP server</h1>
-  <p>Use a verified <strong id="domains">${escapeHtml(policy.domains.join(' or '))}</strong> account. This server is set to the <span id="profile">${escapeHtml(policy.profile)}</span> audience.</p>
-  ${policy.profile === 'demo' ? '<form id="password-sign-in"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in with email</button></form>' : ''}
+  <p>Use a verified <strong id="domains">${escapeHtml(policy.domains.join(' or '))}</strong> Google account. This server is set to the <span id="profile">${escapeHtml(policy.profile)}</span> audience.</p>
   <form id="session" method="POST" action="/oauth/session">
     <input type="hidden" name="transaction" value="${escapeHtml(transaction)}">
     <input type="hidden" name="idToken" id="idToken" value="">
     <button type="button" id="sign-in">Continue with Google</button>
   </form>
+  ${policy.profile === 'demo' ? '<h2>Email fallback</h2><p>Use this when Google sign-in is not available for the account.</p><form id="password-sign-in"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in with email</button></form>' : ''}
   <p id="status" role="status"></p>
 </main>
 <script type="module" src="/auth/client.js"></script>

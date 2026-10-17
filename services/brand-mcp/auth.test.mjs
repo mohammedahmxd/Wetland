@@ -157,6 +157,8 @@ try {
   const page = await request('GET', `${demoBase}/oauth/authorize?response_type=code&client_id=cursor-test&redirect_uri=${encodeURIComponent('http://127.0.0.1:9/callback')}&code_challenge=${'a'.repeat(43)}&code_challenge_method=S256&state=state-123&scope=mcp`);
   assert.match(page.body, /wateraidflow\.org/);
   assert.match(page.body, /id="profile">demo</);
+  assert.match(page.body, /Continue with Google/);
+  assert.match(page.body, /Email fallback/);
   assert.match(page.body, /Sign in with email/);
   const open = await request('GET', `${demoBase}/oauth/authorize?response_type=code&client_id=cursor-test&redirect_uri=${encodeURIComponent('https://evil.example/callback')}&code_challenge=${'a'.repeat(43)}&code_challenge_method=S256&state=state-123`);
   assert.equal(open.status, 400);

@@ -87,7 +87,7 @@ if (!config.firebase) {
       const result = await signInWithPopup(auth, provider);
       await finish(result.user);
     } catch {
-      fail('Google sign-in did not finish. Try again.');
+      fail(passwordForm ? 'Google sign-in did not finish. Use the email fallback, or try again.' : 'Google sign-in did not finish. Try again.');
     }
   });
 }

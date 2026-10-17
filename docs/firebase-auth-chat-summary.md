@@ -49,4 +49,4 @@ The local server was started with `npm run demo:auth`. Its health check reported
 
 The verified user `flow-demo@wateraidflow.org` can sign in to `wateraid-flow`. A local server started with `npm run start:cloud` accepted that Firebase ID token and completed an MCP initialize call. The web API key and signing secret stay in the gitignored `.env.local`.
 
-Google sign-in has not been provisioned. Deploying it stopped because the Firebase terms of service still need to be accepted at http://console.firebase.google.com/?authuser=0&forceCheckTos=true.
+Google sign-in is enabled on `wateraid-flow`, with email and password kept as the demo fallback. The sign-in page offers Continue with Google first, then the email form.

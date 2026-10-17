@@ -10,6 +10,8 @@
     },
     "authorizedDomains": [
       "localhost",
+      "wateraid-flow.firebaseapp.com",
+      "wateraid-flow.web.app",
       "wateraidflow.org",
       "wateraid-brand-hub-462504004653.northamerica-northeast2.run.app"
     ]

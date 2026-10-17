@@ -70,7 +70,7 @@ To run this server against that project, copy `.env.example` to `.env.local`, fi
 npm run start:cloud
 ```
 
-Open the printed or local sign-in page at `http://localhost:8080`, not `127.0.0.1`. Firebase only treats `localhost` as an authorized domain. Google sign-in provisioning still requires the Firebase terms of service to be accepted in the console. Email and password sign-in is already enabled.
+Open the sign-in page at `http://localhost:8080`, not `127.0.0.1`. Firebase only treats `localhost` as an authorized domain. Google sign-in is enabled on `wateraid-flow`. The demo page keeps email and password as the fallback.
 
 `services/brand-mcp/firebase.json` enables Google sign-in for the Firebase project. Authorized domains are hosting names, not the email allowlist. After choosing the Firebase project, deploy that configuration from this directory:
 
