@@ -1,0 +1,46 @@
+{
+  "dataset_id": "synthetic-re-growth-v1",
+  "synthetic": true,
+  "exported_at": "2026-10-17",
+  "history_start": "2023-01-01",
+  "complete_lifetime_history": true,
+  "history_note": "Synthetic organization begins 2023-01-01. All gifts since inception are supplied. This assertion must be verified for real exports.",
+  "currency": "CAD",
+  "demo": {
+    "start": "2026-07-01",
+    "end": "2026-09-30",
+    "target": 150,
+    "expected_new_donors": 120,
+    "previous_quarter_new_donors": 90
+  },
+  "files": {
+    "constituents.csv": {
+      "rows": 501,
+      "sha256": "e885b3f373446f836c64e12d22ac7527fdfc3b7f4cf5fa9a24bad8997af85924"
+    },
+    "gifts.csv": {
+      "rows": 1083,
+      "sha256": "f2c7f3f28b56b7799b045d0b49c4b396b62bac1eb86217034ab25d3439a9ce69"
+    },
+    "gift_splits.csv": {
+      "rows": 2166,
+      "sha256": "8eba6c76d1115e7051a9e9391656560286dd3661a96dcea26bfed9041293fe57"
+    },
+    "payment_events.csv": {
+      "rows": 882,
+      "sha256": "8a0e3da63a492a711480f2dc0ae94923fa27ea27f78b2444879e74b9907990d8"
+    },
+    "soft_credits.csv": {
+      "rows": 10,
+      "sha256": "341de83c38333610c31c702512cb2d2168597d0551b2713568b606ffae08496b"
+    },
+    "constituent_merges.csv": {
+      "rows": 1,
+      "sha256": "c782ffbc2ce3e69fe593ab4f3669891d5bcc4b5bd1bf47e66a47af987733ced3"
+    },
+    "campaigns.csv": {
+      "rows": 1,
+      "sha256": "d20de906d295c3084fc8cb74d0fd6de8bd093f46b6743371235b7555c2efc0f7"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {z} from 'zod';
+import {loadDataset,growthReport} from './model.mjs';
+const server=new McpServer({name:'wetland-growth-kpi',version:'0.1.0'});
+const annotations={readOnlyHint:true,destructiveHint:false,idempotentHint:true,openWorldHint:false};
+const result=value=>({content:[{type:'text',text:JSON.stringify(value,null,2)}],structuredContent:value});
+server.registerTool('inspect_growth_dataset',{description:'Inspect the bundled synthetic Raisers Edge-style export, completeness, evidence hashes and demo period. No live CRM access.',inputSchema:{},annotations},async()=>result((await loadDataset()).manifest));
+server.registerTool('generate_growth_report',{description:'Generate first-time donor Growth KPI from the bundled synthetic lifetime history. Counts first retained received donation, not CRM creation or accounting posting. Returns Markdown, target progress, cohort and source hashes. Dates inclusive.',inputSchema:{start:z.string(),end:z.string(),target:z.number().int().positive(),comparisonStart:z.string().optional(),comparisonEnd:z.string().optional()},annotations},async input=>{try{return result(growthReport(await loadDataset(),input));}catch(e){return {isError:true,content:[{type:'text',text:e.message}]};}});
+await server.connect(new StdioServerTransport());
