@@ -15,7 +15,11 @@ function isoDay(value){
  return value;
 }
 function dateCell(value,dateSystem){
- if(typeof value==='string')return isoDay(value);
+ if(typeof value==='string'){
+  // OOXML date cells may be returned as UTC-midnight ISO timestamps.
+  if(/^\d{4}-\d{2}-\d{2}T00:00:00(?:\.000)?Z$/.test(value))value=value.slice(0,10);
+  return isoDay(value);
+ }
  if(!Number.isSafeInteger(value)||value<0||value>2958465)invalid('date serial must be a whole day in range');
  // Excel 1900 serial60 represents a nonexistent1900-02-29. Reject it rather
  // than silently mapping two distinct cells onto the same date.
