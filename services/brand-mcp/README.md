@@ -31,7 +31,7 @@ Switch the admitted mailboxes with one variable:
 
 | `AUTH_PROFILE` | Who can sign in |
 | --- | --- |
-| `demo` | verified `@wateraidflow.org` Google accounts |
+| `demo` | verified `@wateraidflow.org` Google accounts, plus the local email test user |
 | `production` | verified `@wateraid.org` Google accounts |
 
 Leave `AUTH_PROFILE` unset to keep the public reference endpoint. Setting it fails closed unless Firebase and the signing secret are configured. `AUTH_EMAIL_DOMAINS` can name an explicit list on its own; when it is set together with `AUTH_PROFILE`, the list must match that profile. A token from the other audience is rejected immediately after the switch, including tokens that were already issued.
@@ -50,6 +50,19 @@ PUBLIC_BASE_URL=https://your-host
 `AUTH_PROFILE=production` is the same set of variables with the production audience. The Google sign-in page asks for the active domain, and the server checks `email` and `email_verified` on the Firebase ID token. The hosted-domain hint is not the security check.
 
 Clients that understand remote MCP OAuth can use the same `/mcp` URL. The server publishes protected-resource and authorization-server metadata, then runs an authorization-code flow with PKCE. The browser step is `Continue with Google` on `/oauth/authorize`. Loopback redirect URLs (`http://127.0.0.1` and `http://localhost`) are accepted so desktop agents can finish the flow. `AUTH_TEST_MODE=true` signs local Firebase-shaped tokens for automated tests and refuses to start under `NODE_ENV=production`, Cloud Run, or AWS.
+
+The demo audience also accepts email/password. Production stays on Google sign-in. A local test user is created in the Auth emulator, which does not create a mailbox or a user in a cloud Firebase project:
+
+```sh
+npm run demo:auth
+```
+
+| Field | Local test user |
+| --- | --- |
+| Email | `flow-demo@wateraidflow.org` |
+| Password | `local-development-only` |
+
+The command prints a sign-in URL. Use that email and password on the page. The password is for local development. The same verified user also exists in the Firebase project `wateraid-flow`. Browser sign-in against that project still needs a web API key from a Firebase web app.
 
 `services/brand-mcp/firebase.json` enables Google sign-in for the Firebase project. Authorized domains are hosting names, not the email allowlist. After choosing the Firebase project, deploy that configuration from this directory:
 
@@ -72,12 +85,14 @@ Keep downloadable archives consistent with their source assets when editing. Run
 
 ## Deployment
 
-The Dockerfile installs locked dependencies and runs as the non-root `node` user. Existing service: `wateraid-brand-hub`, project `wateraid-flow`, region `northamerica-northeast2`.
+Build the Dockerfile from the repository root; shared runtime files are required. The Dockerfile installs locked dependencies and runs as the non-root `node` user. Existing service: `wateraid-brand-hub`, project `wateraid-flow`, region `northamerica-northeast2`.
 
 An authorized deployer can run from this directory:
 
 ```sh
-PROJECT_ID=wateraid-flow REGION=northamerica-northeast2 sh deploy.sh
+PROJECT_ID=wateraid-flow REGION=northamerica-northeast2 \
+BUILD_SA=AUTHORIZED_BUILD_EMAIL RUNTIME_SA=BRAND_RUNTIME_EMAIL \
+PUBLIC_BASE_URL=https://YOUR_BRAND_SERVICE sh deploy.sh
 ```
 
 The script uses a Cloud Run source build and requires appropriate build and deployment permissions. It does not alter service IAM/public access. Public access is already configured on the existing service. GitHub CI tests this service, but the current automatic deployment pipeline only deploys the dashboard. Adding brand deployment needs separately scoped build permissions and configuration.
@@ -85,3 +100,5 @@ The script uses a Cloud Run source build and requires appropriate build and depl
 ## Assets and rights
 
 Public reference content includes original-source SVG artwork, derived PNGs, document examples and Noto Sans fonts. Source URLs and provenance are recorded in the asset catalogue. WaterAid retains its artwork rights; inclusion does not grant a licence or endorsement. Noto Sans is distributed under the SIL OFL in `dist/fonts/OFL.txt`. No proprietary RB Nylo fonts are included.
+
+Use `npm run studio` for the local editable package workflow. See [framework documentation](../../docs/MCP-FRAMEWORK.md). Original tool/resource contracts are preserved; three package resources are added.

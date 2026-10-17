@@ -1,7 +1,7 @@
 import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 const base=new URL('./data/',import.meta.url);
-export function parseCSV(text){
+export function parseCSV(text,{withHeaders=false}={}){
  const rows=[];let row=[],value='',quoted=false,closed=false;
  for(let i=0,s=text.replace(/^\uFEFF/,'');i<s.length;i++){
   const c=s[i];
@@ -12,7 +12,8 @@ export function parseCSV(text){
  }
  if(quoted)throw Error('Unclosed CSV quote');if(value||row.length||closed){row.push(value);rows.push(row);}
  const h=rows.shift();if(!h||new Set(h).size!==h.length)throw Error('Missing or duplicate headers');
- return rows.map(r=>{if(r.length!==h.length)throw Error('CSV row width mismatch');return Object.fromEntries(h.map((k,i)=>[k,r[i]]));});
+ const records=rows.map(r=>{if(r.length!==h.length)throw Error('CSV row width mismatch');return Object.fromEntries(h.map((k,i)=>[k,r[i]]));});
+ return withHeaders?{headers:h,rows:records}:records;
 }
 export function day(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s)||!Number.isFinite(Date.parse(s))||new Date(s).toISOString().slice(0,10)!==s)throw Error('Use a valid YYYY-MM-DD date');return s;}
 function cents(s){if(!/^\d+\.\d{2}$/.test(s))throw Error('Invalid monetary amount');const n=Math.round(Number(s)*100);if(!Number.isSafeInteger(n))throw Error('Amount out of range');return n;}
@@ -29,7 +30,7 @@ const TYPES=new Set(['Cash','Pay-Cash','MG Pay-Cash','Recurring Gift Pay-Cash'])
 export function calculate(data,{start,end,target}){
  day(start);day(end);if(start>end)throw Error('Start must precede end');if(!Number.isInteger(target)||target<=0)throw Error('Target must be a positive integer');
  const {manifest:m,tables:t}=data;if(!m.complete_lifetime_history)throw Error('Cannot claim first-ever donors without complete lifetime history');
- if(start<m.history_start||end>m.exported_at)throw Error('Period outside verified coverage');
+ if(start<m.history_start||end>m.exported_at)throw Error('Period outside declared coverage');
  const donors=unique(t['constituents.csv'],'System record ID'),gifts=unique(t['gifts.csv'],'System record ID'),events=unique(t['payment_events.csv'],'Event ID'),aliases=new Map();
  for(const x of t['constituent_merges.csv']){const a=x['Alias System record ID'],b=x['Canonical System record ID'];if(aliases.has(a)&&aliases.get(a)!==b)throw Error('Conflicting merge');if(!donors.records.has(a)||!donors.records.has(b))throw Error('Unknown merged constituent');aliases.set(a,b);}
  const canonical=id=>{const seen=new Set();while(aliases.has(id)){if(seen.has(id))throw Error('Merge cycle');seen.add(id);id=aliases.get(id);}return id;};for(const id of donors.records.keys())canonical(id);
@@ -46,7 +47,7 @@ export function calculate(data,{start,end,target}){
  const cohort=[...first].filter(([,date])=>date>=start&&date<=end).map(([id,date])=>({constituentSystemId:id,firstReceivedDate:date})).sort((a,b)=>a.firstReceivedDate.localeCompare(b.firstReceivedDate)||a.constituentSystemId.localeCompare(b.constituentSystemId));
  const months={};for(const d of cohort)months[d.firstReceivedDate.slice(0,7)]=(months[d.firstReceivedDate.slice(0,7)]||0)+1;
  const newRecords=[...donors.records].filter(([id,r])=>!aliases.has(id)&&day(r['Date added'])>=start&&r['Date added']<=end).length;
- return {metric:'Growth: first-time donors',definitionVersion:'growth-first-receipt-v1',synthetic:m.synthetic,dataset:m.dataset_id,start,end,asOf:end,actual:cohort.length,target,attainmentPercent:Math.round(cohort.length/target*10000)/100,gapToTarget:Math.max(0,target-cohort.length),status:cohort.length>=target?'Target met':'Below target',monthly:months,newCrmRecords:newRecords,cohort,quality:{completeLifetimeHistory:true,mergedAliases:aliases.size,exactDuplicatesIgnored:donors.duplicates+gifts.duplicates+events.duplicates,nonqualifyingGiftRecords:excluded},definition:'Unique canonical direct donors (individuals and organizations) whose earliest positive received donation retained after refunds/voids as of period end falls within the inclusive period. Pledges, recurring commitments, failed/pending payments, fully refunded gifts, noncash gifts and soft credits do not qualify. Posting status does not determine receipt.',sourceHashes:m.files};
+ return {metric:'Growth: first-time donors',definitionVersion:'growth-first-receipt-v1',synthetic:m.synthetic,dataset:m.dataset_id,start,end,asOf:end,actual:cohort.length,target,attainmentPercent:Math.round(cohort.length/target*10000)/100,gapToTarget:Math.max(0,target-cohort.length),status:cohort.length>=target?'Target met':'Below target',monthly:months,newCrmRecords:newRecords,cohort,quality:{completeLifetimeHistory:true,historyAssurance:m.history_attestation?'operator-attested':(m.synthetic?'synthetic-fixture':'unverified-declaration'),mergedAliases:aliases.size,exactDuplicatesIgnored:donors.duplicates+gifts.duplicates+events.duplicates,nonqualifyingGiftRecords:excluded},definition:'Unique canonical direct donors (individuals and organizations) whose earliest positive received donation retained after refunds/voids as of period end falls within the inclusive period. Pledges, recurring commitments, failed/pending payments, fully refunded gifts, noncash gifts and soft credits do not qualify. Posting status does not determine receipt.',sourceHashes:m.files};
 }
 export function growthReport(data,input){
  const r=calculate(data,input);if(Boolean(input.comparisonStart)!==Boolean(input.comparisonEnd))throw Error('Supply both comparison dates');

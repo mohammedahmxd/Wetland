@@ -11,6 +11,7 @@ The public site uses synthetic data and browser-local state. It is not an authen
 - **dashboard/** — resource library, document editor, tool builder, comparison bench, releases, community and maintenance.
 - **services/growth-kpi/** — synthetic Raiser’s Edge-style export and local MCP for first-time donor Growth reporting; includes a reproducible demo and cohort evidence.
 - **services/brand-mcp/** — existing public brand reference website and read-only MCP server, with assets, document guidance and protocol tests.
+- **services/deck-mcp/** — local MCP that builds a branded 16:9 PowerPoint. `decks/wetland-mcp-marketplace.pptx` is the marketplace deck it produced.
 - **mcp-marketplace/** — standalone marketplace with expandable MCP cards, category filters, saved tools and browser-local submissions. Includes the live brand reference MCP and seven labelled Water Care concepts.
 - **backend/** — Node 22 / TypeScript / Fastify / PostgreSQL; OIDC verification, organization scoping, immutable versions, server evaluations, independent approvals, concurrent activation protection, audit.
 - **synthetic-data/** — synthetic data for experimentation/demonstration.
@@ -59,3 +60,11 @@ https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/#agents
 It is an independent reference, not official endorsement. Noto Sans is bundled under its SIL OFL licence in dashboard/public/assets/OFL.txt.
 
 The separate brand MCP endpoint is https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/mcp. Its source and local setup are in [services/brand-mcp](services/brand-mcp/README.md). The dashboard deployment workflow does not redeploy this service.
+
+## Build and edit MCPs
+
+See [MCP framework](docs/MCP-FRAMEWORK.md) for the shared runtime, knowledge/reporting starters, local editing studio, candidate tests and release workflow. Run `node scripts/create-mcp.mjs knowledge my-guidance` to scaffold a capability, or `npm run studio` inside Growth or Brand to edit a tested draft.
+
+## Copilot on GCP
+
+See [deployment and Microsoft setup](docs/COPILOT-GCP.md) for the real MCP presenter demo, Entra configuration, Cloud Run build recipes and tenant acceptance checks. The presenter uses synthetic data; Microsoft tenant sign-in is configured separately.

@@ -38,6 +38,8 @@ jobs:
             services/brand-mcp/package-lock.json
             services/growth-kpi/package-lock.json
       - run: npm ci --ignore-scripts
+        working-directory: packages/mcp-runtime
+      - run: npm ci --ignore-scripts
         working-directory: services/brand-mcp
       - run: npm run check
         working-directory: services/brand-mcp
@@ -45,12 +47,29 @@ jobs:
         working-directory: services/brand-mcp
       - run: npm ci --ignore-scripts
         working-directory: services/growth-kpi
+      - run: npm ci --ignore-scripts
+        working-directory: services/examples-hub
+      - run: npm test
+        working-directory: services/examples-hub
       - run: npm run check
         working-directory: services/growth-kpi
+      - name: Install PDF rendering and validation dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y poppler-utils
+          python3 -m pip install reportlab==4.4.9 pypdf==6.1.3 Pillow==12.1.0
       - run: npm test
         working-directory: services/growth-kpi
+        env:
+          REPORT_RENDER_TESTS: "true"
+      - run: npm test
+        working-directory: packages/mcp-runtime
+      - run: node --test scripts/framework.test.mjs
+      - run: node --test deploy/tests/*.test.mjs
       - run: npm test
         working-directory: dashboard
+      - run: python3 -m pip install --user -r requirements.txt && python3 -m unittest test_deck.py
+        working-directory: services/deck-mcp
       - run: npm ci --ignore-scripts
         working-directory: backend
       - run: npm run build
@@ -59,6 +78,11 @@ jobs:
         working-directory: backend
         env:
           DATABASE_URL: postgres://wetland:ci-test-only@localhost:5432/wetland_ci
+      - name: Verify production backend image and migration entrypoint
+        run: |
+          docker build -t wetland-backend-ci backend
+          docker run --rm --network host -e DATABASE_URL=postgres://wetland:ci-test-only@localhost:5432/wetland_ci wetland-backend-ci node dist/migrate.js
+          docker run --rm --network host -e DATABASE_URL=postgres://wetland:ci-test-only@localhost:5432/wetland_ci wetland-backend-ci node dist/migrate.js
   deploy-sandbox:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: verify

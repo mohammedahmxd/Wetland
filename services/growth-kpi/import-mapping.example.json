@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "synthetic-import-check",
+  "synthetic": true,
+  "currency": "CAD",
+  "historyStart": "2023-01-01",
+  "exportedAt": "2026-10-17",
+  "completeLifetimeHistory": true,
+  "historyAttestation": {
+    "verifiedBy": "Synthetic fixture generator",
+    "evidenceReference": "services/growth-kpi/data/manifest.json; fabricated inception 2023-01-01"
+  },
+  "tables": {
+    "constituents.csv": {
+      "source": "constituents.csv",
+      "columns": {
+        "System record ID": "System record ID",
+        "Date added": "Date added"
+      }
+    },
+    "gifts.csv": {
+      "source": "gifts.csv",
+      "columns": {
+        "System record ID": "System record ID",
+        "Constituent System record ID": "Constituent System record ID",
+        "Gift date": "Gift date",
+        "Gift type": "Gift type",
+        "Amount": "Amount",
+        "Currency": "Currency"
+      }
+    },
+    "payment_events.csv": {
+      "source": "payment_events.csv",
+      "columns": {
+        "Event ID": "Event ID",
+        "Gift System record ID": "Gift System record ID",
+        "Event date": "Event date",
+        "Outcome": "Outcome",
+        "Amount": "Amount"
+      }
+    },
+    "constituent_merges.csv": {
+      "source": "constituent_merges.csv",
+      "columns": {
+        "Alias System record ID": "Alias System record ID",
+        "Canonical System record ID": "Canonical System record ID"
+      }
+    }
+  }
+}

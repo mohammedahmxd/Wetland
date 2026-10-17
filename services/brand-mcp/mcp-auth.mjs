@@ -23,10 +23,21 @@ function publicOrigin(env) {
   return { issuer: base.origin, resource: new URL('/mcp', base).href };
 }
 
-function testModeAllowed(env) {
+function assertLocalOnly(env, feature) {
   if (env.NODE_ENV === 'production' || env.K_SERVICE || env.AWS_EXECUTION_ENV) {
-    throw new Error('AUTH_TEST_MODE is limited to local development');
+    throw new Error(`${feature} is limited to local development`);
   }
+}
+
+function emulatorOrigin(env) {
+  const raw = String(env.FIREBASE_AUTH_EMULATOR_HOST || '').trim();
+  if (!raw) return null;
+  assertLocalOnly(env, 'FIREBASE_AUTH_EMULATOR_HOST');
+  const url = new URL(raw.includes('://') ? raw : `http://${raw}`);
+  if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(url.hostname) || !url.port) {
+    throw new Error('FIREBASE_AUTH_EMULATOR_HOST must be a loopback host and port');
+  }
+  return url.origin;
 }
 
 function signingKey(env) {
@@ -108,7 +119,8 @@ export function loadMcpAuth(env = process.env) {
   const policy = resolveEmailPolicy(env);
   if (!policy) return null;
   const testMode = env.AUTH_TEST_MODE === 'true';
-  if (testMode) testModeAllowed(env);
+  if (testMode) assertLocalOnly(env, 'AUTH_TEST_MODE');
+  const emulator = emulatorOrigin(env);
   const key = signingKey(env);
   const { issuer, resource } = publicOrigin(env);
   const firebase = firebaseProject(env, testMode);
@@ -135,14 +147,39 @@ export function loadMcpAuth(env = process.env) {
     return result.payload;
   }
 
+  const allowedProviders = policy.profile === 'production' ? ['google.com'] : ['google.com', 'password'];
+
+  function decodeUnsignedFirebaseToken(token) {
+    const parts = String(token || '').split('.');
+    if (parts.length !== 3 || parts[2] !== '') throw new Error('Malformed emulator token');
+    const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
+    if (header.alg !== 'none') throw new Error('Malformed emulator token');
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.iss !== `https://securetoken.google.com/${firebase.projectId}`) throw new Error('Invalid issuer');
+    if (payload.aud !== firebase.projectId) throw new Error('Invalid audience');
+    if (typeof payload.exp !== 'number' || payload.exp <= now) throw new Error('Expired token');
+    if (typeof payload.iat !== 'number' || payload.iat > now + 60) throw new Error('Invalid issued-at');
+    return payload;
+  }
+
   async function verifyFirebaseIdToken(token) {
-    const { payload } = await jwtVerify(token, testMode ? key : jwks, {
-      issuer: `https://securetoken.google.com/${firebase.projectId}`,
-      audience: firebase.projectId,
-      algorithms: [testMode ? 'HS256' : 'RS256'],
-    });
+    const headerPart = String(token || '').split('.')[0] || '';
+    let headerAlg = '';
+    try { headerAlg = JSON.parse(Buffer.from(headerPart, 'base64url').toString('utf8')).alg; } catch { headerAlg = ''; }
+    let payload;
+    if (headerAlg === 'none') {
+      if (!emulator) throw new Error('Emulator tokens are not accepted');
+      payload = decodeUnsignedFirebaseToken(token);
+    } else {
+      ({ payload } = await jwtVerify(token, testMode ? key : jwks, {
+        issuer: `https://securetoken.google.com/${firebase.projectId}`,
+        audience: firebase.projectId,
+        algorithms: [testMode ? 'HS256' : 'RS256'],
+      }));
+    }
     const provider = payload.firebase && payload.firebase.sign_in_provider;
-    if (provider !== 'google.com') throw new Error('Google sign-in is required');
+    if (!allowedProviders.includes(provider)) throw new Error('This sign-in method is not allowed');
     const identity = identityFromEmail(payload.email, payload.email_verified === true, policy.domains);
     if (typeof payload.sub !== 'string' || !payload.sub) throw new Error('Missing subject');
     return { sub: payload.sub, email: identity.email };
@@ -195,15 +232,19 @@ export function loadMcpAuth(env = process.env) {
   h1{font-size:1.4rem;line-height:1.3;margin:0 0 8px}
   p{margin:0 0 16px}
   button{background:#006BD9;color:#fff;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}
-  button:focus-visible{outline:3px solid #151435;outline-offset:2px}
+  button:focus-visible,input:focus-visible{outline:3px solid #151435;outline-offset:2px}
   button:disabled{opacity:.6;cursor:not-allowed}
+  label{display:block;font-size:.85rem;font-weight:700;margin-bottom:4px}
+  input{width:100%;box-sizing:border-box;margin:0 0 12px;padding:10px 12px;border:1px solid #151435;border-radius:8px;font:inherit}
+  #password-sign-in{margin-bottom:16px}
   #status{min-height:1.5em}
 </style>
 </head>
 <body>
 <main>
   <h1>Sign in to the MCP server</h1>
-  <p>Use a verified <strong id="domains">${escapeHtml(policy.domains.join(' or '))}</strong> Google account. This server is set to the <span id="profile">${escapeHtml(policy.profile)}</span> audience.</p>
+  <p>Use a verified <strong id="domains">${escapeHtml(policy.domains.join(' or '))}</strong> account. This server is set to the <span id="profile">${escapeHtml(policy.profile)}</span> audience.</p>
+  ${policy.profile === 'demo' ? '<form id="password-sign-in"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in with email</button></form>' : ''}
   <form id="session" method="POST" action="/oauth/session">
     <input type="hidden" name="transaction" value="${escapeHtml(transaction)}">
     <input type="hidden" name="idToken" id="idToken" value="">
@@ -216,7 +257,7 @@ export function loadMcpAuth(env = process.env) {
 </html>`;
     send(res, 200, html, {
       'Content-Type': 'text/html; charset=utf-8',
-      'Content-Security-Policy': "default-src 'none'; script-src 'self' https://www.gstatic.com; style-src 'unsafe-inline'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://apis.google.com; frame-src https://accounts.google.com https://*.google.com https://*.firebaseapp.com; img-src https://www.gstatic.com data:; base-uri 'none'; form-action 'self'",
+      'Content-Security-Policy': "default-src 'none'; script-src 'self' https://www.gstatic.com; style-src 'unsafe-inline'; connect-src 'self' http://127.0.0.1:9099 http://localhost:9099 https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://apis.google.com; frame-src https://accounts.google.com https://*.google.com https://*.firebaseapp.com; img-src https://www.gstatic.com data:; base-uri 'none'; form-action 'self'",
     });
   }
 
@@ -379,6 +420,9 @@ export function loadMcpAuth(env = process.env) {
           profile: policy.profile,
           allowedDomains: policy.domains,
           hostedDomain: policy.domains[0],
+          passwordSignIn: policy.profile === 'demo',
+          emulatorHost: emulator,
+          demoUser: emulator && policy.profile === 'demo' ? 'flow-demo@wateraidflow.org' : null,
           firebase: firebase.apiKey ? { apiKey: firebase.apiKey, authDomain: firebase.authDomain, projectId: firebase.projectId } : null,
         });
         return true;
@@ -386,6 +430,12 @@ export function loadMcpAuth(env = process.env) {
       if (pathname === '/auth/client.js') {
         if (req.method !== 'GET' && req.method !== 'HEAD') sendJson(res, 405, { error: 'invalid_request' }, { Allow: 'GET, HEAD' });
         else send(res, 200, req.method === 'HEAD' ? '' : clientJs, { 'Content-Type': 'text/javascript; charset=utf-8' });
+        return true;
+      }
+      if (pathname === '/auth/demo-complete') {
+        const params = new URL(req.url, issuer).searchParams;
+        const ok = Boolean(params.get('code') && params.get('state'));
+        page(res, ok ? 200 : 400, ok ? 'Test user signed in' : 'Sign-in did not finish', ok ? 'The demo account completed the authorization-code flow.' : 'The provider did not return an authorization code.');
         return true;
       }
       if (pathname === '/oauth/authorize') {
@@ -426,7 +476,7 @@ export function loadMcpAuth(env = process.env) {
 
 export async function mintTestFirebaseIdToken(env, { sub, email, emailVerified = true, provider = 'google.com' }) {
   if (env.AUTH_TEST_MODE !== 'true') throw new Error('Test Firebase tokens require AUTH_TEST_MODE');
-  testModeAllowed(env);
+  assertLocalOnly(env, 'AUTH_TEST_MODE');
   return new SignJWT({ email, email_verified: emailVerified, firebase: { sign_in_provider: provider } })
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
     .setIssuer(`https://securetoken.google.com/${env.FIREBASE_PROJECT_ID}`)

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "wetland-growth-kpi",
+  "name": "Growth Reporting",
+  "description": "First-time donor reports with target comparisons and auditable synthetic evidence.",
+  "version": "0.3.0",
+  "type": "reporting",
+  "owner": "Wetland fundraising team",
+  "dataClassification": "synthetic",
+  "dependencies": [
+    {
+      "id": "wateraid-brand-hub",
+      "requiredFor": [
+        "generate_growth_report"
+      ],
+      "profileVersion": "0.3.0",
+      "failurePolicy": "block-report"
+    }
+  ]
+}

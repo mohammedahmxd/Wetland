@@ -36,3 +36,9 @@ h3{font-size:20px}
 @media(max-width:1150px){.hero h2{font-size:34px}.hero{grid-template-columns:1.2fr 1fr}.stats{gap:12px}.wide-main .two{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){h1,.page-head h1{font-size:30px}.hero{grid-template-columns:1fr;min-height:0}.hero h2{font-size:34px}.hero p{font-size:16px}.wide-main .two{grid-template-columns:1fr}.page-head{flex-wrap:wrap}.topbar{min-height:76px}.role-select{max-width:185px}.page-head>.btn{font-size:13px}.card p,.subtitle,.notice{font-size:16px}.stats{grid-template-columns:1fr 1fr}.stat{padding:14px}.stat .label{font-size:12px}.column .card p{font-size:16px}}
 .output-preview{font:14px/1.7 Noto,Arial,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;max-height:530px;overflow:auto;padding:18px;background:var(--cream);border-radius:8px}.card code{font-size:15px;overflow-wrap:anywhere}.card details{border-top:1px solid var(--line);padding:12px 0}.card summary{cursor:pointer;min-height:44px;font-size:14px}.sidebar .nav-item{font-size:13px;padding:9px 12px;margin:1px 0;min-height:44px}.brand{padding-bottom:14px}.brand .project{margin-top:14px}.nav-label{margin-top:8px}.sidebar{padding-top:24px}.side-bottom{padding-top:16px}
+
+.capability-card details{margin-top:20px;padding-top:16px;border-top:1px solid var(--line,#ddd)}
+.capability-card summary{cursor:pointer;font-weight:700}
+.capability-card a,.capability-card pre{overflow-wrap:anywhere;white-space:pre-wrap}
+.catalogue-prompt{padding:16px;background:#F8F0E4;border-radius:8px;line-height:1.65}
+.btn:disabled{opacity:.55;cursor:not-allowed}

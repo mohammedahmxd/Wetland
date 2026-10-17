@@ -1,0 +1,146 @@
+{
+  "title": "Wetland MCP marketplace",
+  "footer": "Independent Wetland project  \u00b7  Not official WaterAid guidance",
+  "slides": [
+    {
+      "layout": "title",
+      "kicker": "WETLAND  \u00b7  MCP MARKETPLACE",
+      "headline": "The catalogue that can\nbuild the deck",
+      "body": "A home for shared helpers, plus the MCP that turns a brief into slides. This file is one of those slides."
+    },
+    {
+      "layout": "statement",
+      "kicker": "THE GAP",
+      "headline": "A clever chat still needs a key to the work.",
+      "body": "On its own, an assistant does not know Water Care proposals, campaign results, brand rules, or which helpers are approved. An MCP is the adapter: one resource, with the rules built into the plug rather than into the chat."
+    },
+    {
+      "layout": "bullets",
+      "kicker": "THE MARKETPLACE",
+      "headline": "Find a capability. Open the approved agent.",
+      "bullets": [
+        "Browse Wetland by task and try Growth or a synthetic capability example.",
+        "Open the approved Copilot agent after IT configures its MCP connections.",
+        "Copy the example prompt. Pasting an MCP URL alone does not connect Copilot.",
+        "Review the report, source and definition before sharing."
+      ]
+    },
+    {
+      "layout": "bullets",
+      "kicker": "LIVE REFERENCE AND REPORTING",
+      "headline": "Brand guidance and Growth reporting",
+      "bullets": [
+        "Brand provides the shared colours, fonts, logos and document guidance.",
+        "Growth uses synthetic donation history: Q3 has 120 new donors against a target of 150.",
+        "Growth must retrieve Brand guidance before releasing its PDF and HTML reports.",
+        "These services demonstrate the workflow; real donor data is not connected."
+      ]
+    },
+    {
+      "layout": "catalogue",
+      "kicker": "LIVE SYNTHETIC CAPABILITY EXAMPLES",
+      "headline": "Eight scoped examples, one MCP service",
+      "items": [
+        {
+          "name": "Grant applications",
+          "meta": "Synthetic application outline",
+          "status": "Live example"
+        },
+        {
+          "name": "Programme reporting",
+          "meta": "Synthetic progress analysis",
+          "status": "Live example"
+        },
+        {
+          "name": "Governance and approvals",
+          "meta": "Advisory release checks",
+          "status": "Live example"
+        },
+        {
+          "name": "Tool maintenance",
+          "meta": "Synthetic maintenance triage",
+          "status": "Live example"
+        },
+        {
+          "name": "Staff onboarding",
+          "meta": "Synthetic onboarding plan",
+          "status": "Live example"
+        },
+        {
+          "name": "Communications",
+          "meta": "Synthetic campaign outline",
+          "status": "Live example"
+        },
+        {
+          "name": "Developer standards",
+          "meta": "Advisory development checks",
+          "status": "Live example"
+        },
+        {
+          "name": "Organisational learning",
+          "meta": "Synthetic learning retrieval",
+          "status": "Live example"
+        }
+      ]
+    },
+    {
+      "layout": "bullets",
+      "kicker": "CONNECTING THE EXAMPLES",
+      "headline": "Choose a scoped endpoint or connect all eight",
+      "bullets": [
+        "One hosted Examples MCP: each /mcp/<scope> exposes one capability; /mcp exposes all eight.",
+        "The examples return synthetic evidence, outlines and advisory checks.",
+        "They cannot grant approvals, change systems or generate finished branded reports.",
+        "IT must configure the Copilot connection; pasting the URL into a prompt does not connect tools."
+      ]
+    },
+    {
+      "layout": "bullets",
+      "kicker": "THE DECK MCP",
+      "headline": "We built the MCP that builds the deck.",
+      "bullets": [
+        "An agent sends a brief to the locally run Deck MCP.",
+        "build_deck asks the Brand MCP for colour, type, and the wordmark.",
+        "The tool returns a 16:9 PowerPoint a person can open and edit.",
+        "The person who presents it still owns every claim on the slide."
+      ]
+    },
+    {
+      "layout": "steps",
+      "kicker": "THIS FILE",
+      "headline": "You are looking at an MCP output.",
+      "steps": [
+        {
+          "title": "Read the hub",
+          "body": "Find capabilities, demo links and connection instructions in Wetland."
+        },
+        {
+          "title": "Read the brand",
+          "body": "Colour, Noto Sans, and the white wordmark came from the live Brand MCP."
+        },
+        {
+          "title": "build_deck",
+          "body": "The Deck MCP composed these slides. This deck was built with an MCP too."
+        }
+      ]
+    },
+    {
+      "layout": "bullets",
+      "kicker": "WHAT STAYS HUMAN",
+      "headline": "The layout can be generated.\nThe judgment cannot.",
+      "bullets": [
+        "Numbers for a funder, the board, or the public still need a person.",
+        "Material AI use is disclosed, including in funder text.",
+        "Synthetic examples are not connections to donor or programme systems.",
+        "A refusal is the boundary working, not a broken tool."
+      ]
+    },
+    {
+      "layout": "close",
+      "kicker": "NEXT DECK, SAME PATH",
+      "headline": "Find the tool. Ask for the deck.",
+      "body": "Try the live demos in Wetland. Deck generation runs locally; a published Copilot agent still requires tenant setup.",
+      "link": "https://wetland-ai-workspace-462504004653.northamerica-northeast2.run.app"
+    }
+  ]
+}

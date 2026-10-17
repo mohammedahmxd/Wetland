@@ -1,0 +1,12 @@
+{
+  "name": "@wetland/mcp-reporting",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.mjs",
+    "./brand": "./brand.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

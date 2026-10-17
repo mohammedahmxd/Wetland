@@ -1,10 +1,12 @@
-import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {reportRoutes} from './reports.mjs';
+import {fileURLToPath} from 'node:url';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
-import {z} from 'zod';
-import {loadDataset,growthReport} from './model.mjs';
-const server=new McpServer({name:'wetland-growth-kpi',version:'0.1.0'});
-const annotations={readOnlyHint:true,destructiveHint:false,idempotentHint:true,openWorldHint:false};
-const result=value=>({content:[{type:'text',text:JSON.stringify(value,null,2)}],structuredContent:value});
-server.registerTool('inspect_growth_dataset',{description:'Inspect the bundled synthetic Raisers Edge-style export, completeness, evidence hashes and demo period. No live CRM access.',inputSchema:{},annotations},async()=>result((await loadDataset()).manifest));
-server.registerTool('generate_growth_report',{description:'Generate first-time donor Growth KPI from the bundled synthetic lifetime history. Counts first retained received donation, not CRM creation or accounting posting. Returns Markdown, target progress, cohort and source hashes. Dates inclusive.',inputSchema:{start:z.string(),end:z.string(),target:z.number().int().positive(),comparisonStart:z.string().optional(),comparisonEnd:z.string().optional()},annotations},async input=>{try{return result(growthReport(await loadDataset(),input));}catch(e){return {isError:true,content:[{type:'text',text:e.message}]};}});
-await server.connect(new StdioServerTransport());
+import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import {startStdio,startHttp,authorizationFromEnv,createMcpHandler,readPackage} from '@wetland/mcp-runtime';
+import {createServer,root,validateDraft} from './capability.mjs';
+if(process.argv.includes('--http')){
+ const pkg=validateDraft(await readPackage(root));const url=process.env.PUBLIC_BASE_URL||`http://localhost:${process.env.PORT||8080}`;
+ if(process.env.MCP_DEMO_UI==='true'&&process.env.MCP_AUTH_MODE&&process.env.MCP_AUTH_MODE!=='none')throw Error('Public presenter requires demo authentication mode none');
+ const authorize=authorizationFromEnv();
+ startHttp({beforeRequest:reportRoutes(authorize),staticRoot:process.env.MCP_DEMO_UI==='true'?fileURLToPath(new URL('./demo',import.meta.url)):undefined,manifest:pkg.manifest,handler:createMcpHandler({authorize,createServer,Transport:StreamableHTTPServerTransport,publicBaseUrl:url,dataClassification:pkg.manifest.dataClassification})});
+}else await startStdio(createServer,StdioServerTransport);
