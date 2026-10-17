@@ -1,0 +1,76 @@
+{
+  "purpose": "Reviewed release-time UI snapshot from Brand MCP; report generation still validates Brand live.",
+  "endpoint": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/mcp",
+  "serverVersion": "0.3.0",
+  "profileVersion": "0.3.0",
+  "tokenVersion": "0.2.0",
+  "packageVersion": null,
+  "packageDigest": null,
+  "status": "Required Wetland team default; not official WaterAid guidance",
+  "hashes": {
+    "logo": "840506d96b630ab618e7b4f762efc22172ac930a898973c44b970e4d483edad9",
+    "regular": "5be701a9511117e73603bdab95947feef4f18bd1851dbddc30659370b26c69f1",
+    "bold": "9f0ce911354e554bbac00c399dcea71c785962cebfd86e965656f0bd011dfca9",
+    "black": "a01579f3792f3f0bda40dfa60087a3e1065217da576fdd27e13c9b6dda1c24cb",
+    "license": "cee9892f9f0cc8fe882c9e9537ee6a89621d86ee7ceaf70b02e2b2b1c25c061a"
+  },
+  "guidanceDigest": "94129c50e1a95582d6656ed3f5f4d02758c328d514b0257da88a12616661bccc",
+  "snapshotDigest": "058de48d3dbe4af41c08c762fd0d392618133d683e8f98f97d95406eb5442a6b",
+  "tokens": {
+    "version": "0.2.0",
+    "status": "Research prototype; not WaterAid-approved",
+    "observedAt": "2026-10-17",
+    "source": "https://www.wateraid.org/ca",
+    "colors": {
+      "blue": {
+        "value": "#006BD9",
+        "status": "observed official website CSS",
+        "recommendedUse": "Links, headings and primary actions"
+      },
+      "ink": {
+        "value": "#151435",
+        "status": "observed official website CSS",
+        "recommendedUse": "Body text and dark surfaces"
+      },
+      "lime": {
+        "value": "#D6FF00",
+        "status": "observed official website CSS",
+        "recommendedUse": "Selective high-visibility accent with dark text"
+      },
+      "cream": {
+        "value": "#F8F0E4",
+        "status": "observed official website CSS",
+        "recommendedUse": "Warm supporting surface"
+      },
+      "white": {
+        "value": "#FFFFFF",
+        "status": "observed official website CSS",
+        "recommendedUse": "Main content surface"
+      },
+      "muted": {
+        "value": "#44435D",
+        "status": "observed official website CSS",
+        "recommendedUse": "Secondary text"
+      }
+    },
+    "typography": {
+      "heading": {
+        "observed": "RB Nylo Black",
+        "licence": "Not established; font files not bundled",
+        "prototypeFallback": "Self-hosted Noto Sans Black; open-licensed substitute, not RB Nylo"
+      },
+      "body": {
+        "observed": "Noto Sans",
+        "prototypeFallback": "Self-hosted Noto Sans, Arial, sans-serif",
+        "note": "Noto Sans bundled under SIL OFL 1.1; see /fonts/OFL.txt."
+      }
+    },
+    "product": {
+      "status": "Proposed Wetland conventions, not official brand rules",
+      "radius": "8px",
+      "spacingUnit": "4px",
+      "bodySize": "16px",
+      "minTarget": "44px"
+    }
+  }
+}

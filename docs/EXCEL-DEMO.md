@@ -30,7 +30,7 @@ The browser task-pane URL alone cannot read an Excel workbook. It must run insid
 5. Inspect the returned definition, period, data evidence and actual/target comparison. For the unchanged fixture and period, the expected result is **120 new donors, 80% attainment and a gap of 30**. These are acceptance expectations, not values prefilled in this workbook.
 6. If generating a finished PDF/HTML report, require the Brand-aware report tool and inspect its returned provenance and validation. An Excel summary is not automatically a Brand-approved document.
 
-Outside Excel, the task pane offers **Read selected CSV locally** as a browser-only demonstration. It accepts the CSV and can exercise the MCP workflow, but cannot write a result worksheet to Excel. The `.xlsx` route requires Excel itself.
+Outside Excel, select **Load demo data**, then **Verify data and run the MCP workflow** for the browser demonstration. No file download or upload is required. **Read selected CSV locally** remains available for the supplied CSV. It accepts the CSV and can exercise the MCP workflow, but cannot write a result worksheet to Excel. The `.xlsx` route requires Excel itself.
 
 For another run, reactivate **Gift export** rather than the generated results sheet. Keep the original source sheet unchanged. Save the `.xlsx` after the live workflow has written its results.
 
@@ -39,3 +39,7 @@ For another run, reactivate **Gift export** rather than the generated results sh
 The supplied workbook has been authored, inspected and rendered as an `.xlsx`, with its source rows compared separately against the fixture. Native Excel add-in loading, Office.js worksheet access and the live write-back must still be acceptance-tested in the intended Excel client and tenant. A browser preview or successful MCP call alone does not prove native Excel integration. Do not bypass administrator restrictions or substitute a screenshot for that test.
 
 Installation guidance was checked against Microsoft's official documentation on 17 October 2026.
+
+## Brand styling
+
+The task pane uses a reviewed release-time snapshot fetched from the Brand MCP: actual logo, licensed Noto Sans fonts and validated palette. Refresh with `npm run sync:excel-brand --prefix services/growth-kpi`, review the resulting asset/provenance diff, then redeploy. `/brand/provenance.json` records the source endpoint, versions and hashes. A Brand outage does not remove the interface's styling; generated reports still require live Brand validation. The kit is a Wetland research reference, not official WaterAid approval.
