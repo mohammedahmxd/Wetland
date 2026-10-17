@@ -147,14 +147,14 @@ h3{font-size:20px}
 .resource-editor-grid .resource-field-hint{margin:9px 0 0;font-size:11px;line-height:1.65}
 .resource-editor-grid .resource-field-hint+textarea{margin-top:9px}
 .resource-select-wrap{position:relative;min-width:0;width:100%}
-.resource-select-wrap:after{content:"";position:absolute;right:17px;top:50%;width:7px;height:7px;border-right:1.8px solid var(--muted);border-bottom:1.8px solid var(--muted);transform:translateY(-70%) rotate(45deg);pointer-events:none;transition:transform .18s ease,border-color .18s ease}
-.resource-select-wrap select{appearance:none;-webkit-appearance:none;width:100%;padding-right:42px;cursor:pointer;transition:border-color .18s ease,background-color .18s ease,box-shadow .18s ease}
-.resource-select-wrap:focus-within:after{border-color:var(--blue)}
-.resource-select-wrap:has(select:open):after{transform:translateY(-20%) rotate(225deg)}
+.resource-select-wrap:after{content:"";position:absolute;right:16px;top:50%;width:12px;height:7px;background:var(--muted);clip-path:polygon(0 0,15% 0,50% 66%,85% 0,100% 0,50% 100%);transform:translateY(-50%);pointer-events:none;transition:transform .18s ease,background-color .18s ease}
+.resource-select-wrap select{appearance:none;-webkit-appearance:none;display:flex;align-items:center;width:100%;padding:0 42px 0 14px;line-height:20px;cursor:pointer;transition:border-color .18s ease,background-color .18s ease,box-shadow .18s ease}
+.resource-select-wrap:focus-within:after{background:var(--blue)}
+.resource-select-wrap:has(select:open):after{transform:translateY(-50%) rotate(180deg)}
 .resource-select-wrap select:hover{border-color:#91b4dd;background-color:#fbfdff}
 .resource-select-wrap select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #006bd912}
 .resource-filter-select{width:166px;flex:0 0 166px}
-.resource-filter-select select{width:100%;padding-right:40px}
+.resource-filter-select select{width:100%;height:50px;min-height:50px;padding:0 40px 0 14px;line-height:20px}
 .resource-editor input,.resource-editor textarea{transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease}
 .resource-editor input:hover,.resource-editor textarea:hover{border-color:#91b4dd}
 .resource-editor input:focus,.resource-editor textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #006bd912}
