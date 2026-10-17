@@ -17,7 +17,7 @@ assert.deepEqual(resources.filter(r=>r.department==='live').map(r=>r.id),['brand
 assert.equal(resources.find(r=>r.id==='branding').endpoint,BRAND_ENDPOINT);
 assert.equal(resources.find(r=>r.id==='growth-reporting').endpoint,GROWTH_ENDPOINT);
 assert.equal(matchingResources('DEMONSTRATION').length,8);
-assert.deepEqual(matchingResources('  approval thresholds  ').map(r=>r.id),['example-governance']);
+assert.deepEqual(matchingResources('  release evidence  ').map(r=>r.id),['example-governance']);
 assert.equal(matchingResources('','Planned').length,0);
 assert.equal(matchingResources('no-such-resource').length,0);
 console.log('PASS: departmental search, status filters and connection configs exclude unprovisioned concepts.');

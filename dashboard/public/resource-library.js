@@ -1,17 +1,19 @@
-import {CATALOGUE_VERSION,catalogueDepartments,saveDepartment,deleteDepartment, matchingResources,seedCatalogue,saveResource,deleteResource,restoreResource} from './resource-catalogue.js';
+import {ensureCatalogue} from './resource-migration.js';
+import {catalogueDepartments,saveDepartment,deleteDepartment, matchingResources,saveResource,deleteResource,restoreResource} from './resource-catalogue.js';
 import {setupMethodTags} from './method-tags.js';
 
 export function createResourceLibrary(c) {
   const {esc,btn,link,modal,toast} = c;
   let query='', status='All',managing=false,managerSearch='',managerTab='active';
-  const catalogue=()=>{const state=c.state();if(state.resourceCatalogue?.version!==CATALOGUE_VERSION)state.resourceCatalogue=seedCatalogue();return state.resourceCatalogue;};
+  const catalogue=()=>{const state=c.state();state.resourceCatalogue=ensureCatalogue(state.resourceCatalogue);return state.resourceCatalogue;};
   const resources=()=>catalogue().items;
   const departments=()=>catalogueDepartments(catalogue());
   const canManage=()=>c.state().role==='admin';
   const canEdit=()=>canManage()||c.state().role==='contributor';
   const action = (label, type, id, cls='secondary') => btn(label,'hub-library-'+type,'data-id="'+esc(id)+'"',cls);
-  const mcpUrl=r=>r.endpoint||'https://mcp.example.org/'+r.id;
-  const promptWithUrl=r=>'Use the MCP at '+mcpUrl(r)+'. '+r.prompt;
+  const mcpUrl=r=>r.endpoint||'';
+  const available=r=>r.status==='Available'&&!!r.endpoint;
+  const examplePrompt=r=>r.prompt;
   const actionIcon=name=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+(name==='edit'?'m16 3 5 5-12 12-6 1 1-6Z M14 5l5 5':'M3 6h18 M9 6V3h6v3 M5 6l1 15h12l1-15 M10 10v7 M14 10v7')+'"/></svg>';
   const actionMenu=r=>!canEdit()?'':'<details class="resource-action-menu"><summary aria-label="Actions for '+esc(r.title)+'"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></summary><div class="resource-action-popover">'+action(actionIcon('edit')+'Edit MCP','edit',r.id,'resource-menu-item')+(canManage()?action(actionIcon('delete')+'Delete MCP','delete',r.id,'resource-menu-item resource-menu-delete'):'')+'</div></details>';
 
@@ -45,7 +47,7 @@ export function createResourceLibrary(c) {
       <section id="library-directory" aria-label="Resource directory"><div class="resource-toolbar"><div class="resource-search"><label class="sr-only" for="library-search">Search resources</label><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input type="search" id="library-search" placeholder="Search tools, departments or capabilities…" value="${esc(query)}"></div><span id="library-count" role="status" aria-live="polite">${result.count} resource${result.count===1?'':'s'}</span></div>
       <div id="library-results">${result.html}</div></section>
       <section class="resource-guide" id="library-guide" aria-labelledby="library-guide-title"><p class="eyebrow">BRING YOUR OWN APPROVED AGENT</p><h2 id="library-guide-title">From discovery to your first prompt.</h2><p>Model Context Protocol (MCP) lets a compatible AI agent discover tools and retrieve information from a connected service.</p>
-        <div class="resource-guide-grid"><div><span class="resource-step">01 / CHOOSE</span><h3>Find a useful resource.</h3><p>Open its details to read what it does and copy its MCP URL.</p></div><div><span class="resource-step">02 / CONNECT</span><h3>Add the MCP server.</h3><p>Paste the MCP URL into your prompt so your agent knows which MCP to use.</p></div><div><span class="resource-step">03 / ASK & REVIEW</span><h3>Start with a clear prompt.</h3><p>Copy the resource’s example, adapt it to your task and review the answer against its sources before using it.</p></div></div>
+        <div class="resource-guide-grid"><div><span class="resource-step">01 / CHOOSE</span><h3>Find a useful resource.</h3><p>Open its details to read what it does. Try its demo or copy its MCP URL for connection setup.</p></div><div><span class="resource-step">02 / CONNECT</span><h3>Add the MCP server.</h3><p>Add the MCP URL once in your approved assistant’s connection settings, or ask its administrator to connect it. Pasting a URL into chat does not connect tools.</p></div><div><span class="resource-step">03 / ASK & REVIEW</span><h3>Start with a clear prompt.</h3><p>Once connected, copy the resource’s example, adapt it to your task and review the answer against its sources before using it.</p></div></div>
         <div class="resource-prompt-panel"><div><span class="resource-step">A SHARED STARTING POINT</span><h3>Keep people and evidence in the loop.</h3></div>${action('Copy starter prompt','starter','','secondary')}<p id="library-starter">Use only connected, approved tools and permitted data for this task. Cite sources and versions, flag uncertainty or missing information, and prepare a draft for human review. Do not make decisions about people or take external action without authorisation.</p></div>
       </section>
       <p class="resource-footnote">Independent Wetland prototype. Departmental concepts are illustrative, not live WaterAid systems. Availability describes connection readiness, not a real-time health check.</p>
@@ -120,10 +122,16 @@ export function createResourceLibrary(c) {
     const r=resources().find(x=>x.id===id);if(!r)return;
     labelledModal(esc(r.title),`<div class="resource-detail"><div class="resource-detail-meta"><span>${esc(departments().find(d=>d.id===r.department).title)}</span></div>
       <p>${esc(r.description)}</p>${r.synthetic?'<p class="resource-pending"><strong>Synthetic demonstration.</strong> Uses fictional data or illustrative guidance. No real approvals or account changes.</p>':''}
-      <h3><label for="mcp-url-${esc(r.id)}">MCP URL</label></h3><div class="resource-url-field"><input id="mcp-url-${esc(r.id)}" type="text" readonly value="${esc(mcpUrl(r))}">${action('Copy','endpoint',r.id)}${r.endpoint?'<a class="btn secondary" href="'+esc(r.demoUrl||r.endpoint.replace(/\/mcp\/?$/,'/'))+'" target="_blank" rel="noopener noreferrer">View &amp; Edit</a>':''}</div>
-      <p class="resource-field-hint">${r.endpoint?'<strong>Copy</strong> the MCP URL to paste it into your AI assistant’s chat. <strong>View &amp; Edit</strong> opens the MCP’s own page, where you can see and change what it contains.':'<strong>Copy</strong> the MCP URL to paste it into your AI assistant’s chat.'}</p>
-      <div class="resource-detail-heading"><h3>Example prompt</h3>${action('Copy prompt','prompt',r.id)}</div><div class="resource-code prompt-example">${esc(promptWithUrl(r))}</div>
-      <p class="resource-field-hint">Paste the MCP URL into your prompt for your agent to use this MCP.</p>
+      ${available(r)?'<h3><label for="mcp-url-'+esc(r.id)+'">MCP URL</label></h3><div class="resource-url-field"><input id="mcp-url-'+esc(r.id)+'" type="text" readonly value="'+esc(mcpUrl(r))+'">'+action('Copy','endpoint',r.id)+'</div><p class="resource-field-hint">Add this URL once in your approved assistant’s MCP connection settings, or ask its administrator to connect it. Then use the example prompt below. Pasting the URL into chat does not connect tools.</p>':'<p class="resource-pending">Connection pending. This entry is not available to connect yet.</p>'}
+      <div class="actions">${available(r)&&r.demoUrl?'<a class="btn secondary" href="'+esc(r.demoUrl)+'" target="_blank" rel="noopener noreferrer">Try demo ↗</a>':''}${r.referenceUrl?'<a class="btn secondary" href="'+esc(r.referenceUrl)+'" target="_blank" rel="noopener noreferrer">'+(r.id==='growth-reporting'?'Excel demo':'View reference')+' ↗</a>':''}</div>
+      ${r.id==='growth-reporting'&&r.referenceUrl?'<p class="resource-field-hint">The Excel demo supports only the supplied synthetic workbook. It is not an upload route for your own donor data; worksheet actions require Excel and the add-in setup.</p>':''}
+      <div class="resource-detail-heading"><h3>Example prompt · for a connected assistant</h3>${available(r)?action('Copy prompt','prompt',r.id):''}</div><div class="resource-code prompt-example">${esc(examplePrompt(r))}</div>
+      <details class="resource-config"><summary>Connection &amp; tools</summary>
+        <dl><div><dt>Owner / maintainer</dt><dd>${esc(r.owner)}</dd></div><div><dt>Transport</dt><dd>${esc(r.transport||'Streamable HTTP')}</dd></div><div><dt>Authentication</dt><dd>${esc(r.authentication||'Not specified')}</dd></div><div><dt>Data</dt><dd>${esc(r.data)}</dd></div><div><dt>Permissions</dt><dd>${esc(r.permissions)}</dd></div></dl>
+        <h3>Connection instructions</h3><p>${esc(r.setup)}</p>
+        <h3>${available(r)?'Available tools':'Proposed tools'}</h3><div class="resource-methods">${r.methods.map(name=>'<code>'+esc(name)+'</code>').join('')}</div>
+        ${r.skillIds?.length?'<h3>Skills &amp; guided workflows</h3><p>Use <code>find_skills</code> to discover current versions and <code>get_skill</code> to read the instructions. Start the guided steps with <code>start_workflow</code>, then follow the returned steps.</p><div class="resource-methods">'+r.skillIds.map(id=>'<code>'+esc(id)+'</code>').join('')+'</div>':''}
+      </details>
       </div>`);
     document.querySelector('#modal .modal-head .close').insertAdjacentHTML('beforebegin',actionMenu(r));
   }
@@ -197,8 +205,8 @@ export function createResourceLibrary(c) {
     if(type==='details')details(b.dataset.id);
     if(type==='reset'){query='';status='All';document.querySelector('#library-search').value='';updateResults();document.querySelector('#library-search').focus();}
     if(type==='starter')copy(document.querySelector('#library-starter').textContent,'Starter prompt');
-    if(type==='prompt'&&r)copy(promptWithUrl(r),'Prompt');
-    if(type==='endpoint'&&r)copy(mcpUrl(r),'MCP URL');
+    if(type==='prompt'&&r&&available(r))copy(examplePrompt(r),'Prompt');
+    if(type==='endpoint'&&r&&available(r))copy(mcpUrl(r),'MCP URL');
   });
   return {render};
 }
