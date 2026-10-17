@@ -257,3 +257,12 @@ dialog:has(.resource-manager) .modal-head{position:sticky;top:0;background:white
 .method-tag-field [data-method-error]:empty{display:none}
 @media(max-width:550px){.method-tag-field{padding:10px}.method-tag{font-size:11px}.method-tag-remove{width:32px;height:32px}}
 @media(prefers-reduced-motion:reduce){.method-tag,.method-tag-field,.method-tag-remove{animation:none!important;transition:none!important}}
+.library-confirm-dialog{width:calc(100% - 40px);max-width:430px;border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 80px #15143540}
+.library-confirm-dialog[open]{animation:resource-dialog-in .18s ease both}
+.library-confirm-content{padding:28px}
+.library-confirm-content h2{font-size:23px;margin:10px 0 14px;line-height:1.35}
+.library-confirm-content p{font-size:14px;line-height:1.75;color:var(--muted);margin:0}
+.library-confirm-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:26px}
+.library-confirm-actions .btn{font-size:13px}
+@media(max-width:450px){.library-confirm-content{padding:24px}.library-confirm-actions .btn{flex:1}}
+@media(prefers-reduced-motion:reduce){.library-confirm-dialog[open]{animation:none}}

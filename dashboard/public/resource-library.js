@@ -141,19 +141,39 @@ export function createResourceLibrary(c) {
     catch {modal('Copy '+esc(label.toLowerCase()),'<p>Clipboard access is unavailable. Select and copy the text below.</p><textarea class="resource-copy-fallback" aria-label="Text to copy" readonly>'+esc(value)+'</textarea>');const field=document.querySelector('.resource-copy-fallback');field.focus();field.select();}
   }
 
+  const editingForm=()=>document.querySelector('#modal form[data-library-form="save"],#modal form[data-library-form="department"]');
+  function confirmAction({title,message,confirmLabel,onConfirm,destructive=false}){
+    if(document.querySelector('.library-confirm-dialog'))return;
+    const dialog=document.createElement('dialog');dialog.className='library-confirm-dialog';dialog.setAttribute('role','alertdialog');dialog.setAttribute('aria-labelledby','library-confirm-title');dialog.setAttribute('aria-describedby','library-confirm-message');
+    dialog.innerHTML='<div class="library-confirm-content"><span class="eyebrow">'+(destructive?'DISCARD EDITS':'CONFIRM CHANGES')+'</span><h2 id="library-confirm-title">'+esc(title)+'</h2><p id="library-confirm-message">'+esc(message)+'</p><div class="library-confirm-actions"><button class="btn secondary" type="button" data-confirm="no">Keep editing</button><button class="btn '+(destructive?'danger':'lime')+'" type="button" data-confirm="yes">'+esc(confirmLabel)+'</button></div></div>';
+    document.body.append(dialog);
+    function dismiss(){dialog.close();dialog.remove();}
+    dialog.addEventListener('click',e=>{const button=e.target.closest('[data-confirm]');if(!button)return;e.stopPropagation();const yes=button.dataset.confirm==='yes';dismiss();if(yes)onConfirm();});
+    dialog.addEventListener('cancel',e=>{e.preventDefault();dismiss();});
+    dialog.showModal();dialog.querySelector('[data-confirm="no"]').focus();
+  }
+  function cancelEditor(){
+    if(!editingForm()){if(managing)manage();else c.close();return;}
+    confirmAction({title:'Discard your changes?',message:'Are you sure you want to cancel? Your unsaved edits will be discarded.',confirmLabel:'Discard changes',destructive:true,onConfirm:()=>{if(managing)manage();else c.close();}});
+  }
+
   document.addEventListener('input',e=>{if(e.target.id==='library-search'){query=e.target.value;updateResults();}if(e.target.id==='manager-search'){managerSearch=e.target.value;document.querySelector('#manager-list').innerHTML=managerRows();}});
   document.addEventListener('change',e=>{if(e.target.id==='library-status'){status=e.target.value;updateResults();}});
-  document.querySelector('#modal').addEventListener('cancel',()=>{managing=false;});
+  document.querySelector('#modal').addEventListener('cancel',e=>{if(editingForm()){e.preventDefault();cancelEditor();}else managing=false;});
+  document.addEventListener('click',e=>{if(e.target.closest('#modal .close')&&editingForm()){e.preventDefault();e.stopImmediatePropagation();cancelEditor();}},true);
   document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const menu=document.querySelector('.resource-action-menu[open]');if(menu){e.preventDefault();e.stopPropagation();menu.open=false;menu.querySelector('summary').focus();}},true);
   document.addEventListener('submit',e=>{
     const form=e.target.closest('[data-library-form]');if(!form)return;e.preventDefault();
-    try{
-      const input=Object.fromEntries(new FormData(form));
+    const input=Object.fromEntries(new FormData(form));
+    function showError(error){const message=form.querySelector('.resource-form-error');message.textContent=error.message;message.hidden=false;message.setAttribute('tabindex','-1');message.focus();}
+    function persist(){try{
       if(form.dataset.libraryForm==='department'){const saved=saveDepartment(catalogue(),input,form.dataset.id||undefined);managerSearch='';query='';status='All';changed((form.dataset.id?'Updated department: ':'Added department: ')+saved.title,saved.id);return;}
       if(form.dataset.libraryForm==='department-delete'){const removed=deleteDepartment(catalogue(),form.dataset.id,input.destination);managerSearch='';changed('Deleted department: '+removed.title,removed.id);return;}
       const saved=saveResource(catalogue(),input,form.dataset.id||undefined);query='';status='All';changed(form.dataset.id?'MCP updated.':'MCP added.',saved.id);
-    }
-    catch(error){const message=form.querySelector('.resource-form-error');message.textContent=error.message;message.hidden=false;message.setAttribute('tabindex','-1');message.focus();}
+    }catch(error){showError(error);}}
+    if(form.dataset.libraryForm==='department-delete'){persist();return;}
+    try{const preview=structuredClone(catalogue());if(form.dataset.libraryForm==='department')saveDepartment(preview,input,form.dataset.id||undefined);else saveResource(preview,input,form.dataset.id||undefined);}catch(error){showError(error);return;}
+    confirmAction({title:form.dataset.id?'Save your changes?':'Add this entry?',message:'Are you sure? This will save your '+(form.dataset.libraryForm==='department'?'department':'MCP')+' details to this browser’s library.',confirmLabel:form.dataset.id?'Save changes':'Add entry',onConfirm:persist});
   });
   document.addEventListener('click',e=>{
     if(e.target.closest('#modal .close'))managing=false;
@@ -172,7 +192,7 @@ export function createResourceLibrary(c) {
     if(type==='add')edit(undefined,b.dataset.id);
     if(type==='edit'&&r)edit(r.id);
     if(type==='delete'&&r)confirmDelete(r.id);
-    if(type==='cancel'){if(managing)manage();else c.close();}
+    if(type==='cancel')cancelEditor();
     if(type==='trash')trash();
     if(type==='confirm-delete'){try{const deleted=deleteResource(catalogue(),b.dataset.id);changed('Deleted '+deleted.title+'. Restore it from Deleted entries.',deleted.id);}catch(error){toast(error.message);}}
     if(type==='restore'){try{const restored=restoreResource(catalogue(),b.dataset.id);changed('Restored '+restored.title+'.',restored.id);}catch(error){toast(error.message);}}
