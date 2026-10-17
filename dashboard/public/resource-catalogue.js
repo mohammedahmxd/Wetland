@@ -65,7 +65,7 @@ export const resources = [
     methods:['get_brand_system','list_assets','get_asset','get_ui_guidance','get_document_guidance'],
     prompt:'Read get_brand_system and get_ui_guidance before designing. Choose original artwork with list_assets and get_asset. For a PDF, read get_document_guidance. Use the exact colour tokens and Noto Sans; preserve logo proportions. Label proposed or fictional content and check the finished layout.',
     owner:'Wetland brand reference project', data:'Public reference material only. Independent research kit; not official WaterAid brand approval.',
-    status:'Available', endpoint:BRAND_ENDPOINT, permissions:'Read-only public reference. No authentication required.',
+    status:'Available', endpoint:BRAND_ENDPOINT, referenceUrl:'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/#agents',transport:'Streamable HTTP',authentication:'No authentication required.',permissions:'Read-only public reference. No authentication required.',
     setup:'Add this URL as a remote MCP server using Streamable HTTP in a compatible agent. Discover its tools, then use the example prompt. Client setup varies; this service does not provide access to donor or programme records.'
   },
   concept('media-rights','brand','Media assets & usage rights',
@@ -80,12 +80,63 @@ export const resources = [
     'Communications & Brand','Reviewed public messaging, source references and editorial guidance.')
 ];
 
-export function matchingResources(query='', status='All') {
+export function matchingResources(query='', status='All', catalogue=resources) {
   const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  return resources.filter(r => (status==='All' || r.status===status) && words.every(word =>
+  return catalogue.filter(r => (status==='All' || r.status===status) && words.every(word =>
     [r.title,r.description,r.owner,r.department,departments.find(d=>d.id===r.department).title,...r.methods].join(' ').toLowerCase().includes(word)));
 }
 
 export function connectionConfig(resource) {
-  return resource.endpoint ? {mcpServers:{[resource.id]:{type:'http',url:resource.endpoint}}} : null;
+  return resource.status==='Available' && resource.endpoint ? {mcpServers:{[resource.id]:{type:resource.transport==='SSE'?'sse':'http',url:resource.endpoint}}} : null;
+}
+
+export function seedCatalogue(){return {items:structuredClone(resources),deleted:[]};}
+
+function webUrl(value,label){
+  if(!value?.trim())return null;
+  let url;try{url=new URL(value.trim());}catch{throw Error(label+' must be a valid URL.');}
+  if(!['https:','http:'].includes(url.protocol)||url.username||url.password)throw Error(label+' must use HTTP or HTTPS without embedded credentials.');
+  return value.trim();
+}
+
+export function saveResource(catalogue,input,id){
+  const current=id?catalogue.items.find(r=>r.id===id):null;
+  if(id&&!current)throw Error('This MCP no longer exists. Reopen the library.');
+  const result={id:current?.id||crypto.randomUUID()};
+  for(const key of ['title','description','owner','data','permissions','setup','prompt']){
+    const value=String(input[key]??'').trim();
+    if(!value)throw Error('Complete the '+({data:'data scope',setup:'connection instructions',prompt:'example prompt',owner:'owner'}[key]||key)+' field.');
+    if(value.length>(['title','owner'].includes(key)?200:12000))throw Error('The '+key+' field is too long.');
+    result[key]=value;
+  }
+  if(!departments.some(d=>d.id===input.department))throw Error('Select a department.');
+  if(!['Available','Planned'].includes(input.status))throw Error('Select a valid availability.');
+  result.department=input.department;result.status=input.status;
+  result.endpoint=webUrl(input.endpoint,'Endpoint');
+  result.referenceUrl=webUrl(input.referenceUrl,'Reference link');
+  if(result.status==='Available'&&!result.endpoint)throw Error('An available MCP needs an endpoint URL.');
+  result.transport=input.transport||'Streamable HTTP';
+  if(!['Streamable HTTP','SSE'].includes(result.transport))throw Error('Select a supported transport.');
+  result.authentication=String(input.authentication||'Not specified').trim();
+  if(result.authentication.length>1000)throw Error('Authentication notes are too long.');
+  result.methods=Array.isArray(input.methods)?input.methods:String(input.methods||'').split(/[\n,]/);
+  result.methods=[...new Set(result.methods.map(m=>String(m).trim()).filter(Boolean))];
+  if(!result.methods.length||result.methods.length>100||result.methods.some(m=>!/^[a-zA-Z0-9_.-]{1,128}$/.test(m)))throw Error('Add up to 100 method names using letters, numbers, underscores, dots or hyphens.');
+  if(current)catalogue.items[catalogue.items.indexOf(current)]=result;else catalogue.items.push(result);
+  return result;
+}
+
+export function deleteResource(catalogue,id){
+  const index=catalogue.items.findIndex(r=>r.id===id);
+  if(index<0)throw Error('This MCP has already been deleted.');
+  const [resource]=catalogue.items.splice(index,1);
+  catalogue.deleted.unshift({resource,deletedAt:new Date().toISOString()});
+  return resource;
+}
+
+export function restoreResource(catalogue,id){
+  const index=catalogue.deleted.findIndex(r=>r.resource.id===id);
+  if(index<0)throw Error('This MCP is no longer in deleted entries.');
+  if(catalogue.items.some(r=>r.id===id))throw Error('An MCP with this ID already exists.');
+  const [entry]=catalogue.deleted.splice(index,1);catalogue.items.push(entry.resource);return entry.resource;
 }

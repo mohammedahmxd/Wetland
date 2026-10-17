@@ -119,3 +119,23 @@ h3{font-size:20px}
 .resource-card>.resource-methods{margin:18px 0 0;padding-top:16px;border-top:1px solid var(--line)}
 .resource-detail-methods{margin-top:28px;padding-top:4px;border-top:1px solid var(--line)}
 .resource-detail .resource-detail-methods .resource-methods{margin-bottom:0}
+.resource-management-bar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+.resource-management-bar>span{font-size:12px;color:var(--resource-muted)}
+.resource-management-bar>div,.resource-manage-actions,.resource-form-actions{display:flex;gap:10px;flex-wrap:wrap}
+.resource-management-bar .btn,.resource-manage-actions .btn{font-size:12px}
+.resource-manage-actions{margin-top:18px}
+.resource-manage-note{display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--cream);padding:16px 20px;border-radius:8px;margin-bottom:20px;font-size:13px;line-height:1.7}
+.resource-manage-note .btn{font-size:12px;flex-shrink:0}
+.resource-editor>p{font-size:14px;line-height:1.7;color:var(--resource-muted)}
+.resource-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.resource-editor-grid .field{margin:0;min-width:0}
+.resource-editor-grid label{font-size:13px;margin-bottom:8px}
+.resource-editor-grid input,.resource-editor-grid select,.resource-editor-grid textarea{font-size:14px;min-height:44px;width:100%;box-sizing:border-box}
+.resource-editor-grid textarea{resize:vertical}
+.resource-editor-grid h3{font-size:16px;padding:20px 0 0;border-top:1px solid var(--line);margin:8px 0 0}
+.resource-editor-grid .field-note{display:inline;font-size:11px;margin-left:6px}
+.resource-field-hint{font-size:12px;color:var(--resource-muted);line-height:1.6;margin:0 0 8px}
+.resource-form-actions{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+.resource-form-error{background:#fff0ee;color:#9c251a!important;border-radius:6px;padding:14px}
+.resource-trash-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);font-size:14px}
+@media(max-width:760px){.resource-management-bar,.resource-manage-note{align-items:flex-start;flex-direction:column}.resource-editor-grid{grid-template-columns:1fr}.resource-trash-row{flex-wrap:wrap}}
