@@ -35,7 +35,24 @@ assert.throws(() => resolveEmailPolicy({ AUTH_PROFILE: 'demo', AUTH_EMAIL_DOMAIN
 assert.deepEqual(resolveEmailPolicy({ AUTH_EMAIL_DOMAINS: 'wateraidflow.org, wateraid.org' }).domains, ['wateraidflow.org', 'wateraid.org']);
 assert.throws(() => loadMcpAuth({ AUTH_PROFILE: 'demo' }));
 assert.throws(() => loadMcpAuth({ ...policyEnv('demo'), K_SERVICE: 'wateraid-brand-hub' }));
+assert.throws(() => loadMcpAuth({ ...policyEnv('demo'), AUTH_TEST_MODE: 'false', FIREBASE_API_KEY: 'local-emulator', FIREBASE_AUTH_EMULATOR_HOST: '192.168.1.20:9099' }));
 assert.equal(loadMcpAuth({}), null);
+
+function unsignedFirebaseToken({ projectId: audience, email, provider }) {
+  const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url');
+  const now = Math.floor(Date.now() / 1000);
+  const payload = Buffer.from(JSON.stringify({
+    iss: `https://securetoken.google.com/${audience}`,
+    aud: audience,
+    sub: 'emulator-user',
+    iat: now,
+    exp: now + 300,
+    email,
+    email_verified: true,
+    firebase: { sign_in_provider: provider },
+  })).toString('base64url');
+  return `${header}.${payload}.`;
+}
 
 function request(method, target, { headers = {}, body } = {}) {
   const url = new URL(target);
@@ -61,7 +78,7 @@ function request(method, target, { headers = {}, body } = {}) {
   });
 }
 
-function childEnv(port, profile) {
+function childEnv(port, profile, extra = {}) {
   return {
     PATH: process.env.PATH,
     HOME: process.env.HOME,
@@ -71,11 +88,12 @@ function childEnv(port, profile) {
     AUTH_TEST_MODE: 'true',
     AUTH_SIGNING_SECRET: secret,
     FIREBASE_PROJECT_ID: projectId,
+    ...extra,
   };
 }
 
-async function start(port, profile) {
-  const child = spawn(process.execPath, ['server.mjs'], { env: childEnv(port, profile), stdio: ['ignore', 'pipe', 'inherit'] });
+async function start(port, profile, extra) {
+  const child = spawn(process.execPath, ['server.mjs'], { env: childEnv(port, profile, extra), stdio: ['ignore', 'pipe', 'inherit'] });
   await Promise.race([
     once(child.stdout, 'data'),
     once(child, 'exit').then(() => { throw new Error('Server exited'); }),
@@ -139,6 +157,9 @@ try {
   const page = await request('GET', `${demoBase}/oauth/authorize?response_type=code&client_id=cursor-test&redirect_uri=${encodeURIComponent('http://127.0.0.1:9/callback')}&code_challenge=${'a'.repeat(43)}&code_challenge_method=S256&state=state-123&scope=mcp`);
   assert.match(page.body, /wateraidflow\.org/);
   assert.match(page.body, /id="profile">demo</);
+  assert.match(page.body, /Continue with Google/);
+  assert.match(page.body, /Email fallback/);
+  assert.match(page.body, /Sign in with email/);
   const open = await request('GET', `${demoBase}/oauth/authorize?response_type=code&client_id=cursor-test&redirect_uri=${encodeURIComponent('https://evil.example/callback')}&code_challenge=${'a'.repeat(43)}&code_challenge_method=S256&state=state-123`);
   assert.equal(open.status, 400);
 
@@ -159,6 +180,19 @@ try {
     body: JSON.stringify({ transaction: page.body.match(/name="transaction" value="([^"]+)"/)[1], idToken: unverified }),
   });
   assert.equal(unverifiedResponse.status, 403);
+
+  const passwordToken = await mintTestFirebaseIdToken(demoEnv, { sub: 'password-user', email: 'flow-demo@wateraidflow.org', provider: 'password' });
+  const passwordSession = await request('POST', `${demoBase}/oauth/session`, {
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ transaction: page.body.match(/name="transaction" value="([^"]+)"/)[1], idToken: passwordToken }),
+  });
+  assert.equal(passwordSession.status, 302, passwordSession.body);
+  const unsigned = unsignedFirebaseToken({ projectId, email: 'flow-demo@wateraidflow.org', provider: 'password' });
+  const unsignedRejected = await request('POST', `${demoBase}/oauth/session`, {
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ transaction: page.body.match(/name="transaction" value="([^"]+)"/)[1], idToken: unsigned }),
+  });
+  assert.equal(unsignedRejected.status, 401);
 
   const tokens = await login(demoBase, demoEnv, 'person@wateraidflow.org');
   const client = new Client({ name: 'brand-auth-test', version: '1.0.0' });
@@ -210,6 +244,13 @@ try {
   const page = await request('GET', `${productionBase}/oauth/authorize?response_type=code&client_id=cursor-test&redirect_uri=${encodeURIComponent('http://127.0.0.1:9/callback')}&code_challenge=${'b'.repeat(43)}&code_challenge_method=S256&state=state-123`);
   assert.match(page.body, /wateraid\.org/);
   assert.doesNotMatch(page.body, /wateraidflow\.org/);
+  assert.doesNotMatch(page.body, /Sign in with email/);
+  const passwordToken = await mintTestFirebaseIdToken(childEnv(productionPort, 'production'), { sub: 'password-user', email: 'person@wateraid.org', provider: 'password' });
+  const passwordRejected = await request('POST', `${productionBase}/oauth/session`, {
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ transaction: page.body.match(/name="transaction" value="([^"]+)"/)[1], idToken: passwordToken }),
+  });
+  assert.equal(passwordRejected.status, 401);
   const tokens = await login(productionBase, childEnv(productionPort, 'production'), 'person@wateraid.org');
   const accepted = await request('GET', `${productionBase}/.well-known/oauth-authorization-server`);
   assert.equal(JSON.parse(accepted.body).token_endpoint, `${productionBase}/oauth/token`);
@@ -227,6 +268,29 @@ try {
   assert.equal(rejected.status, 403);
 } finally {
   production.kill('SIGTERM');
+}
+
+const emulatorPort = 8803;
+const emulatorServer = await start(emulatorPort, 'demo', { FIREBASE_AUTH_EMULATOR_HOST: '127.0.0.1:9099', FIREBASE_API_KEY: 'local-emulator' });
+const emulatorBase = `http://127.0.0.1:${emulatorPort}`;
+try {
+  const authorize = await request('GET', `${emulatorBase}/oauth/authorize?response_type=code&client_id=cursor-test&redirect_uri=${encodeURIComponent('http://127.0.0.1:9/callback')}&code_challenge=${'c'.repeat(43)}&code_challenge_method=S256&state=state-123`);
+  const transaction = authorize.body.match(/name="transaction" value="([^"]+)"/)[1];
+  const config = JSON.parse((await request('GET', `${emulatorBase}/auth/config`)).body);
+  assert.equal(config.demoUser, 'flow-demo@wateraidflow.org');
+  assert.equal(config.emulatorHost, 'http://127.0.0.1:9099');
+  const session = await request('POST', `${emulatorBase}/oauth/session`, {
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ transaction, idToken: unsignedFirebaseToken({ projectId, email: 'flow-demo@wateraidflow.org', provider: 'password' }) }),
+  });
+  assert.equal(session.status, 302, session.body);
+  const otherDomain = await request('POST', `${emulatorBase}/oauth/session`, {
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ transaction, idToken: unsignedFirebaseToken({ projectId, email: 'person@wateraid.org', provider: 'password' }) }),
+  });
+  assert.equal(otherDomain.status, 403);
+} finally {
+  emulatorServer.kill('SIGTERM');
 }
 
 console.log('PASS: Firebase audience switch, verified domain gate, OAuth PKCE, and authenticated MCP.');

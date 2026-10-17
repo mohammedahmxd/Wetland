@@ -1,6 +1,7 @@
 {
   "auth": {
     "providers": {
+      "emailPassword": true,
       "googleSignIn": {
         "oAuthBrandDisplayName": "WaterAid Flow",
         "supportEmail": "support@wateraidflow.org",
@@ -9,8 +10,19 @@
     },
     "authorizedDomains": [
       "localhost",
+      "wateraid-flow.firebaseapp.com",
+      "wateraid-flow.web.app",
       "wateraidflow.org",
       "wateraid-brand-hub-462504004653.northamerica-northeast2.run.app"
     ]
+  },
+  "emulators": {
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    },
+    "ui": {
+      "enabled": false
+    }
   }
 }
