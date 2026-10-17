@@ -8,15 +8,16 @@ export function createResourceLibrary(c) {
   const available=r=>r.status==='Available'&&!!r.endpoint;
   const action = (label, type, id, cls='secondary') => btn(label,'hub-library-'+type,'data-id="'+esc(id)+'"',cls);
   const statusLabel = r => '<span class="resource-status '+(available(r)?'available':'planned')+'"><span aria-hidden="true"></span>'+esc(r.status)+'</span>';
+  const actionIcon=name=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+(name==='edit'?'m16 3 5 5-12 12-6 1 1-6Z M14 5l5 5':'M3 6h18 M9 6V3h6v3 M5 6l1 15h12l1-15 M10 10v7 M14 10v7')+'"/></svg>';
+  const actionMenu=r=>'<details class="resource-action-menu"><summary aria-label="Actions for '+esc(r.title)+'"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></summary><div class="resource-action-popover">'+action(actionIcon('edit')+'Edit MCP','edit',r.id,'resource-menu-item')+action(actionIcon('delete')+'Delete MCP','delete',r.id,'resource-menu-item resource-menu-delete')+'</div></details>';
 
   function card(r) {
     return `<article class="resource-card" data-resource-id="${esc(r.id)}">
-      <div class="resource-card-top"><span class="resource-kind">${available(r)?'MCP RESOURCE':'CAPABILITY CONCEPT'}</span>${statusLabel(r)}</div>
+      <div class="resource-card-top"><span class="resource-kind">${available(r)?'MCP RESOURCE':'CAPABILITY CONCEPT'}</span><div class="resource-card-tools">${statusLabel(r)}${actionMenu(r)}</div></div>
       <h3>${esc(r.title)}</h3><p>${esc(r.description)}</p>
       <div class="resource-endpoint"><span>${available(r)?esc(r.transport||'Streamable HTTP'):'Connection pending'}</span>${r.endpoint?'<code>'+esc(r.endpoint)+'</code>':'<small>Endpoint not provisioned</small>'}</div>
       ${action('View details & agent prompt <span aria-hidden="true">↗</span>','details',r.id,'resource-open')}
       <div class="resource-methods" aria-label="${available(r)?'Available tools':'Proposed tools'}">${r.methods.slice(0,2).map(m=>'<code>'+esc(m)+'</code>').join('')}${r.methods.length>2?'<span>+'+(r.methods.length-2)+' tools</span>':''}</div>
-      ${managing?'<div class="resource-manage-actions">'+action('Edit MCP','edit',r.id)+action('Delete','delete',r.id,'danger')+'</div>':''}
     </article>`;
   }
 
@@ -35,7 +36,7 @@ export function createResourceLibrary(c) {
     const result=results();
     return `<div class="resource-library">
       <div class="resource-management-bar"><span>Library changes are saved in this browser.</span><div>${action(managing?'Done managing':'Manage MCPs','manage','','secondary')}${action('Add MCP','add','','lime')}</div></div>
-      ${managing?'<div class="resource-manage-note"><span>Edit each MCP’s details, methods, connection settings and agent prompt.</span>'+action('Deleted entries ('+catalogue().deleted.length+')','trash','','secondary')+'</div>':''}
+      ${managing?'<div class="resource-manage-note"><span>Use the three-dot menu on any card to edit or delete its entry.</span>'+action('Deleted entries ('+catalogue().deleted.length+')','trash','','secondary')+'</div>':''}
       <header class="resource-intro"><p class="eyebrow">RESOURCE LIBRARY / MCP DIRECTORY</p><h1>Shared tools.<br><span>Greater possibilities.</span></h1>
         <p class="resource-lead">Find the right knowledge for your next task. Explore resources by department, understand what each one does, and bring it to your approved AI agent.</p>
         <div class="resource-intro-links"><a href="#library" data-library-scroll="library-directory">Explore the directory <span aria-hidden="true">↓</span></a><a href="#library" data-library-scroll="library-guide">How to connect an agent <span aria-hidden="true">↗</span></a></div>
@@ -92,7 +93,6 @@ export function createResourceLibrary(c) {
     const r=resources().find(x=>x.id===id);if(!r)return;
     const config=connectionConfig(r);
     labelledModal(esc(r.title),`<div class="resource-detail"><div class="resource-detail-meta">${statusLabel(r)}<span>${esc(departments.find(d=>d.id===r.department).title)}</span></div>
-      <div class="resource-manage-actions">${action('Edit MCP','edit',r.id)}${action('Delete','delete',r.id,'danger')}</div>
       <p>${esc(r.description)}</p><dl><div><dt>Owner / maintainer</dt><dd>${esc(r.owner)}</dd></div><div><dt>Access & scope</dt><dd>${esc(r.permissions)}</dd></div><div><dt>Data</dt><dd>${esc(r.data)}</dd></div><div><dt>Transport</dt><dd>${esc(r.transport||'Streamable HTTP')}</dd></div><div><dt>Authentication</dt><dd>${esc(r.authentication||'Not specified')}</dd></div></dl>
       <h3>Connection</h3>${r.endpoint?'<div class="resource-code">'+esc(r.endpoint)+'</div><div class="actions">'+(available(r)?action('Copy endpoint','endpoint',r.id):'<p>Connection pending; this entry is marked Planned.</p>')+'</div>':'<div class="resource-pending">Endpoint not provisioned. This concept cannot be connected yet.</div>'}${r.referenceUrl?'<a class="btn secondary" href="'+esc(r.referenceUrl)+'" target="_blank" rel="noopener noreferrer">View reference / documentation ↗</a>':''}<p>${esc(r.setup)}</p>
       <div class="resource-detail-heading"><h3>Example agent prompt</h3>${action('Copy prompt','prompt',r.id)}</div><div class="resource-code prompt-example">${esc(r.prompt)}</div>
@@ -101,6 +101,7 @@ export function createResourceLibrary(c) {
       <h3>${available(r)?'Exposed tools':'Proposed tool methods'}</h3><div class="resource-methods">${r.methods.map(m=>'<code>'+esc(m)+'</code>').join('')}</div>
       </section>
       </div>`);
+    document.querySelector('#modal .modal-head .close').insertAdjacentHTML('beforebegin',actionMenu(r));
   }
 
   async function copy(value,label) {
@@ -110,12 +111,15 @@ export function createResourceLibrary(c) {
 
   document.addEventListener('input',e=>{if(e.target.id==='library-search'){query=e.target.value;updateResults();}});
   document.addEventListener('change',e=>{if(e.target.id==='library-status'){status=e.target.value;updateResults();}});
+  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const menu=document.querySelector('.resource-action-menu[open]');if(menu){e.preventDefault();e.stopPropagation();menu.open=false;menu.querySelector('summary').focus();}},true);
   document.addEventListener('submit',e=>{
     const form=e.target.closest('[data-library-form="save"]');if(!form)return;e.preventDefault();
     try{const saved=saveResource(catalogue(),Object.fromEntries(new FormData(form)),form.dataset.id||undefined);query='';status='All';changed(form.dataset.id?'MCP updated.':'MCP added.',saved.id);}
     catch(error){const message=form.querySelector('.resource-form-error');message.textContent=error.message;message.hidden=false;message.setAttribute('tabindex','-1');message.focus();}
   });
   document.addEventListener('click',e=>{
+    const activeMenu=e.target.closest('.resource-action-menu');
+    document.querySelectorAll('.resource-action-menu[open]').forEach(menu=>{if(menu!==activeMenu||e.target.closest('[data-action]'))menu.open=false;});
     const jump=e.target.closest('[data-library-scroll]');
     if(jump){e.preventDefault();let target=document.getElementById(jump.dataset.libraryScroll);if(!target){query='';status='All';document.querySelector('#library-search').value='';document.querySelector('#library-status').value='All';updateResults();target=document.getElementById(jump.dataset.libraryScroll);}if(target){target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}return;}
     const b=e.target.closest('[data-action^="hub-library-"]');if(!b)return;

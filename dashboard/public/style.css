@@ -186,3 +186,20 @@ dialog:has(.resource-editor) .modal-head,dialog:has(.resource-detail) .modal-hea
 @media(max-width:760px){.resource-filter-select{flex:1;width:auto}.resource-editor-grid{row-gap:20px}.resource-card:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){.resource-library *,.resource-detail *,.resource-editor *,dialog[open],dialog[open]::backdrop{animation:none!important;transition:none!important;scroll-behavior:auto!important}.resource-card:hover,.resource-library .btn:hover,.resource-detail .btn:hover,.resource-editor .btn:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){.resource-select-wrap:after,.resource-select-wrap select::picker(select){transition:none!important}}
+.resource-card-tools{display:flex;align-items:center;gap:8px;margin-left:auto}
+.resource-action-menu{position:relative;flex-shrink:0}
+.resource-action-menu>summary{width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;list-style:none;border:1px solid transparent;border-radius:7px;color:var(--muted);transition:background-color .16s ease,color .16s ease,border-color .16s ease}
+.resource-action-menu>summary::-webkit-details-marker{display:none}
+.resource-action-menu>summary svg{width:20px;height:20px}
+.resource-action-menu>summary:hover,.resource-action-menu[open]>summary{background:var(--cream);color:var(--ink);border-color:#e8e0d4}
+.resource-action-menu>summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.resource-action-popover{position:absolute;right:0;top:calc(100% + 6px);width:174px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px #15143518;z-index:6;animation:resource-reveal .15s ease both}
+.resource-action-popover .resource-menu-item{width:100%;justify-content:flex-start;gap:10px;min-height:42px;background:white;color:var(--ink);font-size:13px;font-weight:500;padding:10px 12px;border:0;border-radius:6px;box-shadow:none;transform:none}
+.resource-action-popover .resource-menu-item svg{width:17px;height:17px;flex-shrink:0}
+.resource-action-popover .resource-menu-item:hover{background:var(--cream);box-shadow:none;transform:none}
+.resource-action-popover .resource-menu-delete{color:#932e29;border-top:1px solid var(--line);margin-top:4px}
+.resource-action-popover .resource-menu-delete:hover{background:#fff2ef}
+.resource-card:has(.resource-action-menu[open]){position:relative;z-index:5}
+.modal-head>.resource-action-menu{margin-left:auto}
+.modal-head>.resource-action-menu+.close{margin-left:-10px}
+.resource-action-menu[open]>summary{position:relative;z-index:7}
