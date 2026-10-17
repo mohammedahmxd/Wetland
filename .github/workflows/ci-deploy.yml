@@ -33,7 +33,15 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: |
+            backend/package-lock.json
+            services/brand-mcp/package-lock.json
+      - run: npm ci --ignore-scripts
+        working-directory: services/brand-mcp
+      - run: npm run check
+        working-directory: services/brand-mcp
+      - run: npm test
+        working-directory: services/brand-mcp
       - run: npm test
         working-directory: dashboard
       - run: npm ci --ignore-scripts

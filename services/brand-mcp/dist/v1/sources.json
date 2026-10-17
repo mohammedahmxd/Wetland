@@ -1,0 +1,51 @@
+[
+  {
+    "id": "canada",
+    "title": "WaterAid Canada \u2014 current website",
+    "url": "https://www.wateraid.org/ca",
+    "status": "Official website; visual values observed 17 October 2026",
+    "use": "Current identity, homepage navigation, hero, cards, captions and UI colours."
+  },
+  {
+    "id": "logos",
+    "title": "WaterAid photos and logos",
+    "url": "https://www.wateraid.org/au/media/photos-and-logos",
+    "status": "Official regional guidance",
+    "use": "Logo-use and photography permissions. Regional rules are not a Canada licence."
+  },
+  {
+    "id": "reports",
+    "title": "WaterAid Canada annual reports",
+    "url": "https://www.wateraid.org/ca/our-annual-reports",
+    "status": "Official reference index",
+    "use": "Report hierarchy and evidence presentation; older editions may use a previous identity."
+  },
+  {
+    "id": "global",
+    "title": "WaterAid global",
+    "url": "https://www.wateraid.org/",
+    "status": "Official website",
+    "use": "Mission and editorial reference."
+  },
+  {
+    "id": "wash",
+    "title": "WASH Matters",
+    "url": "https://washmatters.wateraid.org/",
+    "status": "Official policy and practice site; reference link",
+    "use": "Technical content and resource-library reference."
+  },
+  {
+    "id": "halo",
+    "title": "Halo Brand System",
+    "url": "https://brand.halocompass.com/",
+    "status": "User-supplied structural reference, inspected in browser",
+    "use": "Human guide plus versioned machine-readable content, asset statuses, components and changelog."
+  },
+  {
+    "id": "halo-connect",
+    "title": "Halo \u2014 Connect an agent",
+    "url": "https://brand.halocompass.com/connect",
+    "status": "Inspected in browser",
+    "use": "Pattern for llms.txt, JSON, CSS and an eventual read-only MCP service."
+  }
+]

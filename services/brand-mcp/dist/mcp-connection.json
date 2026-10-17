@@ -1,0 +1,14 @@
+{
+  "name": "wateraid-brand-hub",
+  "transport": "streamable-http",
+  "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/mcp",
+  "authentication": "none",
+  "readOnly": true,
+  "tools": [
+    "get_brand_system",
+    "list_assets",
+    "get_asset",
+    "get_ui_guidance",
+    "get_document_guidance"
+  ]
+}
