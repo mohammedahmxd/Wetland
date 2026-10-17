@@ -102,4 +102,4 @@ jobs:
           service_account: wetland-github-deploy@wateraid-flow.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2
       - name: Build and deploy public sandbox
-        run: gcloud builds submit . --project=wateraid-flow --region=northamerica-northeast2 --config=deploy/cloudbuild.yaml --suppress-logs
+        run: gcloud builds submit . --project=wateraid-flow --region=northamerica-northeast2 --config=deploy/cloudbuild.yaml --gcs-source-staging-dir=gs://wateraid-flow_cloudbuild/source --suppress-logs
