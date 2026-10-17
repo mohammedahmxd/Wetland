@@ -1,0 +1,547 @@
+{
+  "metric": "Growth: first-time donors",
+  "definitionVersion": "growth-first-receipt-v1",
+  "synthetic": true,
+  "dataset": "synthetic-re-growth-v1",
+  "start": "2026-07-01",
+  "end": "2026-09-30",
+  "asOf": "2026-09-30",
+  "actual": 120,
+  "target": 150,
+  "attainmentPercent": 80,
+  "gapToTarget": 30,
+  "status": "Below target",
+  "monthly": {
+    "2026-07": 59,
+    "2026-08": 31,
+    "2026-09": 30
+  },
+  "newCrmRecords": 130,
+  "cohort": [
+    {
+      "constituentSystemId": "341",
+      "firstReceivedDate": "2026-07-01"
+    },
+    {
+      "constituentSystemId": "433",
+      "firstReceivedDate": "2026-07-01"
+    },
+    {
+      "constituentSystemId": "342",
+      "firstReceivedDate": "2026-07-02"
+    },
+    {
+      "constituentSystemId": "434",
+      "firstReceivedDate": "2026-07-02"
+    },
+    {
+      "constituentSystemId": "343",
+      "firstReceivedDate": "2026-07-03"
+    },
+    {
+      "constituentSystemId": "435",
+      "firstReceivedDate": "2026-07-03"
+    },
+    {
+      "constituentSystemId": "344",
+      "firstReceivedDate": "2026-07-04"
+    },
+    {
+      "constituentSystemId": "436",
+      "firstReceivedDate": "2026-07-04"
+    },
+    {
+      "constituentSystemId": "345",
+      "firstReceivedDate": "2026-07-05"
+    },
+    {
+      "constituentSystemId": "437",
+      "firstReceivedDate": "2026-07-05"
+    },
+    {
+      "constituentSystemId": "346",
+      "firstReceivedDate": "2026-07-06"
+    },
+    {
+      "constituentSystemId": "438",
+      "firstReceivedDate": "2026-07-06"
+    },
+    {
+      "constituentSystemId": "347",
+      "firstReceivedDate": "2026-07-07"
+    },
+    {
+      "constituentSystemId": "439",
+      "firstReceivedDate": "2026-07-07"
+    },
+    {
+      "constituentSystemId": "348",
+      "firstReceivedDate": "2026-07-08"
+    },
+    {
+      "constituentSystemId": "440",
+      "firstReceivedDate": "2026-07-08"
+    },
+    {
+      "constituentSystemId": "349",
+      "firstReceivedDate": "2026-07-09"
+    },
+    {
+      "constituentSystemId": "441",
+      "firstReceivedDate": "2026-07-09"
+    },
+    {
+      "constituentSystemId": "350",
+      "firstReceivedDate": "2026-07-10"
+    },
+    {
+      "constituentSystemId": "442",
+      "firstReceivedDate": "2026-07-10"
+    },
+    {
+      "constituentSystemId": "351",
+      "firstReceivedDate": "2026-07-11"
+    },
+    {
+      "constituentSystemId": "443",
+      "firstReceivedDate": "2026-07-11"
+    },
+    {
+      "constituentSystemId": "352",
+      "firstReceivedDate": "2026-07-12"
+    },
+    {
+      "constituentSystemId": "444",
+      "firstReceivedDate": "2026-07-12"
+    },
+    {
+      "constituentSystemId": "353",
+      "firstReceivedDate": "2026-07-13"
+    },
+    {
+      "constituentSystemId": "445",
+      "firstReceivedDate": "2026-07-13"
+    },
+    {
+      "constituentSystemId": "354",
+      "firstReceivedDate": "2026-07-14"
+    },
+    {
+      "constituentSystemId": "446",
+      "firstReceivedDate": "2026-07-14"
+    },
+    {
+      "constituentSystemId": "355",
+      "firstReceivedDate": "2026-07-15"
+    },
+    {
+      "constituentSystemId": "447",
+      "firstReceivedDate": "2026-07-15"
+    },
+    {
+      "constituentSystemId": "356",
+      "firstReceivedDate": "2026-07-16"
+    },
+    {
+      "constituentSystemId": "448",
+      "firstReceivedDate": "2026-07-16"
+    },
+    {
+      "constituentSystemId": "357",
+      "firstReceivedDate": "2026-07-17"
+    },
+    {
+      "constituentSystemId": "449",
+      "firstReceivedDate": "2026-07-17"
+    },
+    {
+      "constituentSystemId": "358",
+      "firstReceivedDate": "2026-07-18"
+    },
+    {
+      "constituentSystemId": "450",
+      "firstReceivedDate": "2026-07-18"
+    },
+    {
+      "constituentSystemId": "359",
+      "firstReceivedDate": "2026-07-19"
+    },
+    {
+      "constituentSystemId": "451",
+      "firstReceivedDate": "2026-07-19"
+    },
+    {
+      "constituentSystemId": "360",
+      "firstReceivedDate": "2026-07-20"
+    },
+    {
+      "constituentSystemId": "452",
+      "firstReceivedDate": "2026-07-20"
+    },
+    {
+      "constituentSystemId": "361",
+      "firstReceivedDate": "2026-07-21"
+    },
+    {
+      "constituentSystemId": "453",
+      "firstReceivedDate": "2026-07-21"
+    },
+    {
+      "constituentSystemId": "362",
+      "firstReceivedDate": "2026-07-22"
+    },
+    {
+      "constituentSystemId": "454",
+      "firstReceivedDate": "2026-07-22"
+    },
+    {
+      "constituentSystemId": "363",
+      "firstReceivedDate": "2026-07-23"
+    },
+    {
+      "constituentSystemId": "455",
+      "firstReceivedDate": "2026-07-23"
+    },
+    {
+      "constituentSystemId": "364",
+      "firstReceivedDate": "2026-07-24"
+    },
+    {
+      "constituentSystemId": "456",
+      "firstReceivedDate": "2026-07-24"
+    },
+    {
+      "constituentSystemId": "365",
+      "firstReceivedDate": "2026-07-25"
+    },
+    {
+      "constituentSystemId": "457",
+      "firstReceivedDate": "2026-07-25"
+    },
+    {
+      "constituentSystemId": "366",
+      "firstReceivedDate": "2026-07-26"
+    },
+    {
+      "constituentSystemId": "458",
+      "firstReceivedDate": "2026-07-26"
+    },
+    {
+      "constituentSystemId": "367",
+      "firstReceivedDate": "2026-07-27"
+    },
+    {
+      "constituentSystemId": "459",
+      "firstReceivedDate": "2026-07-27"
+    },
+    {
+      "constituentSystemId": "368",
+      "firstReceivedDate": "2026-07-28"
+    },
+    {
+      "constituentSystemId": "460",
+      "firstReceivedDate": "2026-07-28"
+    },
+    {
+      "constituentSystemId": "369",
+      "firstReceivedDate": "2026-07-29"
+    },
+    {
+      "constituentSystemId": "370",
+      "firstReceivedDate": "2026-07-30"
+    },
+    {
+      "constituentSystemId": "371",
+      "firstReceivedDate": "2026-07-31"
+    },
+    {
+      "constituentSystemId": "372",
+      "firstReceivedDate": "2026-08-01"
+    },
+    {
+      "constituentSystemId": "373",
+      "firstReceivedDate": "2026-08-02"
+    },
+    {
+      "constituentSystemId": "374",
+      "firstReceivedDate": "2026-08-03"
+    },
+    {
+      "constituentSystemId": "375",
+      "firstReceivedDate": "2026-08-04"
+    },
+    {
+      "constituentSystemId": "376",
+      "firstReceivedDate": "2026-08-05"
+    },
+    {
+      "constituentSystemId": "377",
+      "firstReceivedDate": "2026-08-06"
+    },
+    {
+      "constituentSystemId": "378",
+      "firstReceivedDate": "2026-08-07"
+    },
+    {
+      "constituentSystemId": "379",
+      "firstReceivedDate": "2026-08-08"
+    },
+    {
+      "constituentSystemId": "380",
+      "firstReceivedDate": "2026-08-09"
+    },
+    {
+      "constituentSystemId": "381",
+      "firstReceivedDate": "2026-08-10"
+    },
+    {
+      "constituentSystemId": "382",
+      "firstReceivedDate": "2026-08-11"
+    },
+    {
+      "constituentSystemId": "383",
+      "firstReceivedDate": "2026-08-12"
+    },
+    {
+      "constituentSystemId": "384",
+      "firstReceivedDate": "2026-08-13"
+    },
+    {
+      "constituentSystemId": "385",
+      "firstReceivedDate": "2026-08-14"
+    },
+    {
+      "constituentSystemId": "386",
+      "firstReceivedDate": "2026-08-15"
+    },
+    {
+      "constituentSystemId": "387",
+      "firstReceivedDate": "2026-08-16"
+    },
+    {
+      "constituentSystemId": "388",
+      "firstReceivedDate": "2026-08-17"
+    },
+    {
+      "constituentSystemId": "389",
+      "firstReceivedDate": "2026-08-18"
+    },
+    {
+      "constituentSystemId": "390",
+      "firstReceivedDate": "2026-08-19"
+    },
+    {
+      "constituentSystemId": "391",
+      "firstReceivedDate": "2026-08-20"
+    },
+    {
+      "constituentSystemId": "392",
+      "firstReceivedDate": "2026-08-21"
+    },
+    {
+      "constituentSystemId": "393",
+      "firstReceivedDate": "2026-08-22"
+    },
+    {
+      "constituentSystemId": "394",
+      "firstReceivedDate": "2026-08-23"
+    },
+    {
+      "constituentSystemId": "395",
+      "firstReceivedDate": "2026-08-24"
+    },
+    {
+      "constituentSystemId": "396",
+      "firstReceivedDate": "2026-08-25"
+    },
+    {
+      "constituentSystemId": "397",
+      "firstReceivedDate": "2026-08-26"
+    },
+    {
+      "constituentSystemId": "398",
+      "firstReceivedDate": "2026-08-27"
+    },
+    {
+      "constituentSystemId": "399",
+      "firstReceivedDate": "2026-08-28"
+    },
+    {
+      "constituentSystemId": "400",
+      "firstReceivedDate": "2026-08-29"
+    },
+    {
+      "constituentSystemId": "401",
+      "firstReceivedDate": "2026-08-30"
+    },
+    {
+      "constituentSystemId": "402",
+      "firstReceivedDate": "2026-08-31"
+    },
+    {
+      "constituentSystemId": "403",
+      "firstReceivedDate": "2026-09-01"
+    },
+    {
+      "constituentSystemId": "404",
+      "firstReceivedDate": "2026-09-02"
+    },
+    {
+      "constituentSystemId": "405",
+      "firstReceivedDate": "2026-09-03"
+    },
+    {
+      "constituentSystemId": "406",
+      "firstReceivedDate": "2026-09-04"
+    },
+    {
+      "constituentSystemId": "407",
+      "firstReceivedDate": "2026-09-05"
+    },
+    {
+      "constituentSystemId": "408",
+      "firstReceivedDate": "2026-09-06"
+    },
+    {
+      "constituentSystemId": "409",
+      "firstReceivedDate": "2026-09-07"
+    },
+    {
+      "constituentSystemId": "410",
+      "firstReceivedDate": "2026-09-08"
+    },
+    {
+      "constituentSystemId": "411",
+      "firstReceivedDate": "2026-09-09"
+    },
+    {
+      "constituentSystemId": "412",
+      "firstReceivedDate": "2026-09-10"
+    },
+    {
+      "constituentSystemId": "413",
+      "firstReceivedDate": "2026-09-11"
+    },
+    {
+      "constituentSystemId": "414",
+      "firstReceivedDate": "2026-09-12"
+    },
+    {
+      "constituentSystemId": "415",
+      "firstReceivedDate": "2026-09-13"
+    },
+    {
+      "constituentSystemId": "416",
+      "firstReceivedDate": "2026-09-14"
+    },
+    {
+      "constituentSystemId": "417",
+      "firstReceivedDate": "2026-09-15"
+    },
+    {
+      "constituentSystemId": "418",
+      "firstReceivedDate": "2026-09-16"
+    },
+    {
+      "constituentSystemId": "419",
+      "firstReceivedDate": "2026-09-17"
+    },
+    {
+      "constituentSystemId": "420",
+      "firstReceivedDate": "2026-09-18"
+    },
+    {
+      "constituentSystemId": "421",
+      "firstReceivedDate": "2026-09-19"
+    },
+    {
+      "constituentSystemId": "422",
+      "firstReceivedDate": "2026-09-20"
+    },
+    {
+      "constituentSystemId": "423",
+      "firstReceivedDate": "2026-09-21"
+    },
+    {
+      "constituentSystemId": "424",
+      "firstReceivedDate": "2026-09-22"
+    },
+    {
+      "constituentSystemId": "425",
+      "firstReceivedDate": "2026-09-23"
+    },
+    {
+      "constituentSystemId": "426",
+      "firstReceivedDate": "2026-09-24"
+    },
+    {
+      "constituentSystemId": "427",
+      "firstReceivedDate": "2026-09-25"
+    },
+    {
+      "constituentSystemId": "428",
+      "firstReceivedDate": "2026-09-26"
+    },
+    {
+      "constituentSystemId": "429",
+      "firstReceivedDate": "2026-09-27"
+    },
+    {
+      "constituentSystemId": "430",
+      "firstReceivedDate": "2026-09-28"
+    },
+    {
+      "constituentSystemId": "431",
+      "firstReceivedDate": "2026-09-29"
+    },
+    {
+      "constituentSystemId": "432",
+      "firstReceivedDate": "2026-09-30"
+    }
+  ],
+  "quality": {
+    "completeLifetimeHistory": true,
+    "mergedAliases": 1,
+    "exactDuplicatesIgnored": 0,
+    "nonqualifyingGiftRecords": 232
+  },
+  "definition": "Unique canonical direct donors (individuals and organizations) whose earliest positive received donation retained after refunds/voids as of period end falls within the inclusive period. Pledges, recurring commitments, failed/pending payments, fully refunded gifts, noncash gifts and soft credits do not qualify. Posting status does not determine receipt.",
+  "sourceHashes": {
+    "constituents.csv": {
+      "rows": 501,
+      "sha256": "e885b3f373446f836c64e12d22ac7527fdfc3b7f4cf5fa9a24bad8997af85924"
+    },
+    "gifts.csv": {
+      "rows": 1083,
+      "sha256": "3128b7358933b4a72a68ca299d6acd10d70ad8587e6318dc1007e50f1ab9ed54"
+    },
+    "gift_splits.csv": {
+      "rows": 2166,
+      "sha256": "fd48952698540ef8b4db5a568a9d3cdf44f05726cf45ada39a96cfa3ce6ea9a5"
+    },
+    "payment_events.csv": {
+      "rows": 882,
+      "sha256": "44332472ade5a9fbc42bb4ba829fde1f0cab2055433fda646e96243a4fa6ea85"
+    },
+    "soft_credits.csv": {
+      "rows": 10,
+      "sha256": "341de83c38333610c31c702512cb2d2168597d0551b2713568b606ffae08496b"
+    },
+    "constituent_merges.csv": {
+      "rows": 1,
+      "sha256": "c782ffbc2ce3e69fe593ab4f3669891d5bcc4b5bd1bf47e66a47af987733ced3"
+    },
+    "campaigns.csv": {
+      "rows": 1,
+      "sha256": "d20de906d295c3084fc8cb74d0fd6de8bd093f46b6743371235b7555c2efc0f7"
+    }
+  },
+  "comparison": {
+    "start": "2026-04-01",
+    "end": "2026-06-30",
+    "actual": 90,
+    "change": 30,
+    "changePercent": 33.33
+  },
+  "markdown": "# Growth KPI report\n\n**Synthetic demonstration — not WaterAid results.**\n\nPeriod: 2026-07-01 to 2026-09-30 (inclusive).\n\n| Measure | Result |\n|---|---:|\n| First-time donors | 120 |\n| Demo target | 150 |\n| Target achieved | 80% |\n| Donors still needed | 30 |\n| Status | Below target |\n| Previous period new donors | 90 |\n| Change vs previous period | 33.33% |\n\nUnique canonical direct donors (individuals and organizations) whose earliest positive received donation retained after refunds/voids as of period end falls within the inclusive period. Pledges, recurring commitments, failed/pending payments, fully refunded gifts, noncash gifts and soft credits do not qualify. Posting status does not determine receipt.\n\nCRM records created in this period: 130 (separate measure). Known merged aliases: 1. Complete synthetic lifetime history is verified against the manifest. Receipt date drives this KPI. Later refunds may change a restated result.\n\nDefinition: growth-first-receipt-v1. Dataset: synthetic-re-growth-v1. Target is a demo planning input, not a revenue goal.\n"
+}

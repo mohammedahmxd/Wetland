@@ -36,12 +36,19 @@ jobs:
           cache-dependency-path: |
             backend/package-lock.json
             services/brand-mcp/package-lock.json
+            services/growth-kpi/package-lock.json
       - run: npm ci --ignore-scripts
         working-directory: services/brand-mcp
       - run: npm run check
         working-directory: services/brand-mcp
       - run: npm test
         working-directory: services/brand-mcp
+      - run: npm ci --ignore-scripts
+        working-directory: services/growth-kpi
+      - run: npm run check
+        working-directory: services/growth-kpi
+      - run: npm test
+        working-directory: services/growth-kpi
       - run: npm test
         working-directory: dashboard
       - run: npm ci --ignore-scripts
