@@ -10,9 +10,9 @@ saveTool(h,t.id,{description:'A new candidate',documentId:d.id,includeGaps:false
 assert.equal(testTool(h,t.id).passed,false);assert.throws(()=>submitTool(h,t.id));
 saveTool(h,t.id,{description:'A passing candidate',documentId:d.id,includeGaps:true},2);
 assert.equal(testTool(h,t.id).passed,true);let r=submitTool(h,t.id);
-assert.throws(()=>releaseTool(h,r.id,'admin'));
+assert.throws(()=>releaseTool(h,r.id,'contributor'));
 saveTool(h,t.id,{description:'Changed after evaluation',documentId:d.id,includeGaps:true},3);
-assert.throws(()=>releaseTool(h,r.id,'reviewer'));assert.throws(()=>submitTool(h,t.id));
-testTool(h,t.id);r=submitTool(h,t.id);releaseTool(h,r.id,'reviewer');assert.equal(t.publishedVersion,2);assert.equal(runConfigured(h,t.published).heading,'New weekly heading');
-rollbackTool(h,t.id,'reviewer');assert.equal(t.publishedVersion,3);assert.equal(runConfigured(h,t.published).heading,'Programme update');
-console.log('PASS: document revisions, pinned dependencies, failed evaluations, stale-candidate rejection, reviewer gating, publish and rollback.');
+assert.throws(()=>releaseTool(h,r.id,'admin'));assert.throws(()=>submitTool(h,t.id));
+testTool(h,t.id);r=submitTool(h,t.id);releaseTool(h,r.id,'admin');assert.equal(t.publishedVersion,2);assert.equal(runConfigured(h,t.published).heading,'New weekly heading');
+rollbackTool(h,t.id,'admin');assert.equal(t.publishedVersion,3);assert.equal(runConfigured(h,t.published).heading,'Programme update');
+console.log('PASS: document revisions, pinned dependencies, failed evaluations, stale-candidate rejection, admin gating, publish and rollback.');
