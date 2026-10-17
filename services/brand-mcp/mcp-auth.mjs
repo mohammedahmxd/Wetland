@@ -16,6 +16,8 @@ const VERIFIER = /^[A-Za-z0-9._~-]{43,128}$/;
 const PROJECT_ID = /^[a-z0-9-]{6,30}$/;
 
 const clientJs = readFileSync(new URL('./auth-client.js', import.meta.url), 'utf8');
+const authCss = readFileSync(new URL('./auth.css', import.meta.url), 'utf8');
+const authCsp = "default-src 'none'; script-src 'self' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://www.gstatic.com data:; connect-src 'self' http://127.0.0.1:9099 http://localhost:9099 https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://apis.google.com; frame-src https://accounts.google.com https://*.google.com https://*.firebaseapp.com; base-uri 'none'; form-action 'self'";
 
 function publicOrigin(env) {
   const base = new URL(env.PUBLIC_BASE_URL || 'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app');
@@ -213,53 +215,52 @@ export function loadMcpAuth(env = process.env) {
     sendJson(res, 401, { error: invalid ? 'invalid_token' : 'invalid_request' }, { 'WWW-Authenticate': header });
   }
 
-  function page(res, status, title, message) {
-    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head><body><main><h1>${escapeHtml(title)}</h1><p>${escapeHtml(message)}</p></main></body></html>`;
-    send(res, status, html, { 'Content-Type': 'text/html; charset=utf-8' });
-  }
-
-  function renderLogin(res, transaction) {
-    const html = `<!doctype html>
+  function authDocument({ title, content, script = false }) {
+    return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<title>Sign in · WaterAid Flow MCP</title>
-<style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F8F0E4;color:#151435;font:16px/1.5 "Noto Sans",system-ui,sans-serif}
-  main{width:min(440px,calc(100% - 32px));background:#fff;padding:32px;border-radius:16px}
-  h1{font-size:1.4rem;line-height:1.3;margin:0 0 8px}
-  p{margin:0 0 16px}
-  button{background:#006BD9;color:#fff;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}
-  button:focus-visible,input:focus-visible{outline:3px solid #151435;outline-offset:2px}
-  button:disabled{opacity:.6;cursor:not-allowed}
-  label{display:block;font-size:.85rem;font-weight:700;margin-bottom:4px}
-  input{width:100%;box-sizing:border-box;margin:0 0 12px;padding:10px 12px;border:1px solid #151435;border-radius:8px;font:inherit}
-  h2{font-size:1rem;margin:20px 0 8px}
-  #password-sign-in{margin-bottom:16px}
-  #status{min-height:1.5em}
-</style>
+<title>${escapeHtml(title)}</title>
+<link rel="stylesheet" href="/v1/tokens.css">
+<link rel="stylesheet" href="/auth/auth.css">
 </head>
 <body>
-<main>
-  <h1>Sign in to the MCP server</h1>
-  <p>Use a verified <strong id="domains">${escapeHtml(policy.domains.join(' or '))}</strong> Google account. This server is set to the <span id="profile">${escapeHtml(policy.profile)}</span> audience.</p>
-  <form id="session" method="POST" action="/oauth/session">
-    <input type="hidden" name="transaction" value="${escapeHtml(transaction)}">
-    <input type="hidden" name="idToken" id="idToken" value="">
-    <button type="button" id="sign-in">Continue with Google</button>
-  </form>
-  ${policy.profile === 'demo' ? '<h2>Email fallback</h2><p>Use this when Google sign-in is not available for the account.</p><form id="password-sign-in"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button type="submit">Sign in with email</button></form>' : ''}
-  <p id="status" role="status"></p>
-</main>
-<script type="module" src="/auth/client.js"></script>
+<a class="skip" href="#main">Skip to content</a>
+<aside>
+  <div class="identity"><img src="/assets/png/wateraid-white-logo-640.png" alt="WaterAid"><span>SIGN IN</span></div>
+  <p class="kit-owner">Connect an agent for the<br><b>Wetland hackathon team.</b></p>
+  <p class="eyebrow">AUDIENCE</p>
+  <p class="audience"><span id="profile">${escapeHtml(policy.profile)}</span><span id="domains">${escapeHtml(policy.domains.join(' or '))}</span></p>
+  <p class="side-foot"><span class="dot"></span>Verified organization account</p>
+</aside>
+<main id="main">${content}</main>
+${script ? '<script type="module" src="/auth/client.js"></script>' : ''}
 </body>
 </html>`;
-    send(res, 200, html, {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Content-Security-Policy': "default-src 'none'; script-src 'self' https://www.gstatic.com; style-src 'unsafe-inline'; connect-src 'self' http://127.0.0.1:9099 http://localhost:9099 https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://apis.google.com; frame-src https://accounts.google.com https://*.google.com https://*.firebaseapp.com; img-src https://www.gstatic.com data:; base-uri 'none'; form-action 'self'",
+  }
+
+  function page(res, status, title, message) {
+    const html = authDocument({
+      title,
+      content: `<section class="hero done"><p class="eyebrow">CONNECT AN AGENT</p><h1>${escapeHtml(title)}</h1><p class="lead">${escapeHtml(message)}</p></section>`,
     });
+    send(res, status, html, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': authCsp });
+  }
+
+  function renderLogin(res, transaction) {
+    const fallback = policy.profile === 'demo'
+      ? `<div class="fallback"><h2>Email fallback</h2><p>Use this when Google sign-in is not available for the account.</p><form id="password-sign-in"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><button class="button primary" type="submit">Sign in with email</button></form></div>`
+      : '';
+    const html = authDocument({
+      title: 'Sign in · WaterAid Flow MCP',
+      script: true,
+      content: `<header><span>WATERAID FLOW <i>/</i> MCP</span><span>SAME CONTEXT FOR EVERY BUILDER</span></header>
+<section class="hero"><p class="eyebrow">09 / CONNECT AN AGENT</p><h1>The same context.<br><em>For your account.</em></h1><p class="lead">Sign in with a verified organization Google account. This server answers only after that check.</p></section>
+<section class="panel"><form id="session" method="POST" action="/oauth/session"><input type="hidden" name="transaction" value="${escapeHtml(transaction)}"><input type="hidden" name="idToken" id="idToken" value=""><button type="button" class="button lime" id="sign-in">Continue with Google</button></form>${fallback}<p id="status" role="status"></p></section>`,
+    });
+    send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': authCsp });
   }
 
   async function authorize(req, res) {
@@ -426,6 +427,11 @@ export function loadMcpAuth(env = process.env) {
           demoUser: policy.profile === 'demo' ? 'flow-demo@wateraidflow.org' : null,
           firebase: firebase.apiKey ? { apiKey: firebase.apiKey, authDomain: firebase.authDomain, projectId: firebase.projectId } : null,
         });
+        return true;
+      }
+      if (pathname === '/auth/auth.css') {
+        if (req.method !== 'GET' && req.method !== 'HEAD') sendJson(res, 405, { error: 'invalid_request' }, { Allow: 'GET, HEAD' });
+        else send(res, 200, req.method === 'HEAD' ? '' : authCss, { 'Content-Type': 'text/css; charset=utf-8' });
         return true;
       }
       if (pathname === '/auth/client.js') {
