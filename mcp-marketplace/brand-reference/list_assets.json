@@ -1,0 +1,153 @@
+{
+  "assets": [
+    {
+      "id": "white-logo",
+      "title": "Current white WaterAid wordmark",
+      "url": "https://www.wateraid.org/sites/default/files/2025-11/WaterAid_Logo_RGB_Primary%20White_0.svg",
+      "kind": "SVG",
+      "status": "Official artwork, converted to transparent PNG; original colours and proportions retained",
+      "usage": "Reference on dark background. Preserve artwork. Do not imply endorsement.",
+      "sourceSha256": "af02131aecba5a3bc7f7df7901854546489bfa746f90539e3da7a93e2229dd64",
+      "localSvg": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/svg/white-logo.svg",
+      "pngs": [
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-white-logo-320.png",
+          "width": 320,
+          "height": 99
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-white-logo-640.png",
+          "width": 640,
+          "height": 198
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-white-logo-1280.png",
+          "width": 1280,
+          "height": 395
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-white-logo-2560.png",
+          "width": 2560,
+          "height": 791
+        }
+      ],
+      "conversion": "SVG rasterisation, no AI redraw or recolouring",
+      "background": "blue or dark ink",
+      "preserveAspectRatio": true,
+      "recolor": false,
+      "recommendedDisplayWidth": 160,
+      "recommendedPng": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-white-logo-320.png"
+    },
+    {
+      "id": "tap",
+      "title": "Water icon",
+      "url": "https://www.wateraid.org/sites/default/files/icons/tap.svg",
+      "kind": "SVG",
+      "status": "Official artwork, converted to transparent PNG; original colours and proportions retained",
+      "sourceSha256": "91f4d44f033c417cad4ed1b4bb2fd11d9bd6e3f546eae12fd65c807db3cd4d87",
+      "localSvg": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/svg/tap.svg",
+      "pngs": [
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-tap-64.png",
+          "width": 64,
+          "height": 64
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-tap-128.png",
+          "width": 128,
+          "height": 128
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-tap-256.png",
+          "width": 256,
+          "height": 256
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-tap-512.png",
+          "width": 512,
+          "height": 512
+        }
+      ],
+      "conversion": "SVG rasterisation, no AI redraw or recolouring",
+      "background": "white or cream",
+      "preserveAspectRatio": true,
+      "recolor": false,
+      "recommendedDisplayWidth": 32,
+      "recommendedPng": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-tap-64.png"
+    },
+    {
+      "id": "toilet",
+      "title": "Sanitation icon",
+      "url": "https://www.wateraid.org/sites/default/files/icons/toilet_seat.svg",
+      "kind": "SVG",
+      "status": "Official artwork, converted to transparent PNG; original colours and proportions retained",
+      "sourceSha256": "dcb49ff775a2895c2a7c730f21048704904010902e467bb17a975c805e696cee",
+      "localSvg": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/svg/toilet.svg",
+      "pngs": [
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-toilet-64.png",
+          "width": 64,
+          "height": 64
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-toilet-128.png",
+          "width": 128,
+          "height": 128
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-toilet-256.png",
+          "width": 256,
+          "height": 256
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-toilet-512.png",
+          "width": 512,
+          "height": 512
+        }
+      ],
+      "conversion": "SVG rasterisation, no AI redraw or recolouring",
+      "background": "white or cream",
+      "preserveAspectRatio": true,
+      "recolor": false,
+      "recommendedDisplayWidth": 32,
+      "recommendedPng": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-toilet-64.png"
+    },
+    {
+      "id": "hygiene",
+      "title": "Hygiene icon",
+      "url": "https://www.wateraid.org/sites/default/files/icons/hygiene.svg",
+      "kind": "SVG",
+      "status": "Official artwork, converted to transparent PNG; original colours and proportions retained",
+      "sourceSha256": "a7dbcb3872d531ad3189a321608db548a4fce2914689fbecc8acf413593e19b6",
+      "localSvg": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/svg/hygiene.svg",
+      "pngs": [
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-hygiene-64.png",
+          "width": 64,
+          "height": 64
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-hygiene-128.png",
+          "width": 128,
+          "height": 128
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-hygiene-256.png",
+          "width": 256,
+          "height": 256
+        },
+        {
+          "url": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-hygiene-512.png",
+          "width": 512,
+          "height": 512
+        }
+      ],
+      "conversion": "SVG rasterisation, no AI redraw or recolouring",
+      "background": "white or cream",
+      "preserveAspectRatio": true,
+      "recolor": false,
+      "recommendedDisplayWidth": 32,
+      "recommendedPng": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/assets/png/wateraid-hygiene-64.png"
+    }
+  ]
+}

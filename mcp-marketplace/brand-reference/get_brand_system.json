@@ -1,0 +1,61 @@
+{
+  "tokens": {
+    "version": "0.2.0",
+    "status": "Research prototype; not WaterAid-approved",
+    "observedAt": "2026-10-17",
+    "source": "https://www.wateraid.org/ca",
+    "colors": {
+      "blue": {
+        "value": "#006BD9",
+        "status": "observed official website CSS",
+        "recommendedUse": "Links, headings and primary actions"
+      },
+      "ink": {
+        "value": "#151435",
+        "status": "observed official website CSS",
+        "recommendedUse": "Body text and dark surfaces"
+      },
+      "lime": {
+        "value": "#D6FF00",
+        "status": "observed official website CSS",
+        "recommendedUse": "Selective high-visibility accent with dark text"
+      },
+      "cream": {
+        "value": "#F8F0E4",
+        "status": "observed official website CSS",
+        "recommendedUse": "Warm supporting surface"
+      },
+      "white": {
+        "value": "#FFFFFF",
+        "status": "observed official website CSS",
+        "recommendedUse": "Main content surface"
+      },
+      "muted": {
+        "value": "#44435D",
+        "status": "observed official website CSS",
+        "recommendedUse": "Secondary text"
+      }
+    },
+    "typography": {
+      "heading": {
+        "observed": "RB Nylo Black",
+        "licence": "Not established; font files not bundled",
+        "prototypeFallback": "Self-hosted Noto Sans Black; open-licensed substitute, not RB Nylo"
+      },
+      "body": {
+        "observed": "Noto Sans",
+        "prototypeFallback": "Self-hosted Noto Sans, Arial, sans-serif",
+        "note": "Noto Sans bundled under SIL OFL 1.1; see /fonts/OFL.txt."
+      }
+    },
+    "product": {
+      "status": "Proposed Wetland conventions, not official brand rules",
+      "radius": "8px",
+      "spacingUnit": "4px",
+      "bodySize": "16px",
+      "minTarget": "44px"
+    }
+  },
+  "brief": "# Wetland / WaterAid reference kit\n\nVersion 0.2.0 · researched 17 October 2026 · research prototype, not official WaterAid brand guidance.\n\n## Start here\n\nUse the current WaterAid Canada website as the visual reference. Its observed styling is blue #006BD9, ink #151435, lime #D6FF00, cream #F8F0E4, white #FFFFFF and muted ink #44435D. These are computed CSS values observed on the live homepage, not an approved full brand palette. Avoid substituting old cyan values from generic brand directories. The current heading family is RB Nylo Black; body is Noto Sans. This kit self-hosts Noto Sans under the SIL Open Font License for body text and uses its Black weight as a proposed headline substitute. No RB Nylo redistribution/webfont licence was established.\n\n## Evidence levels\n\n1. Official guidance: explicit published statements from WaterAid, with region and date retained.\n2. Observed: assets and styling visible on an official website; useful evidence but not a universal usage rule.\n3. Proposed: Wetland-specific UI, slide and implementation decisions; editable team conventions.\n\n## Logo and photography\n\nThe asset manifest links to the current white SVG logo found in the Canadian homepage footer and the three official water/sanitation/hygiene icons. The source SVGs and faithful transparent PNG conversions are packaged locally with source hashes and URLs. Use original artwork without recolouring, distortion or extraction of its pieces. The public Australia media page asks companies to contact WaterAid for logo use, and asks photo users to make contact and credit photographers. Those are regional published conditions, not evidence of permission for this project. Get Canada-specific approval and an approved asset pack for external production. No published current clear-space or minimum-size specification was located; do not invent an official rule.\n\nUse documented, permission-cleared images of people actively operating, maintaining, learning or collaborating. Preserve photographer credits, captions and location context. Do not describe unrelated stock or generated imagery as evidence of WaterAid's work. This prototype uses no beneficiary photography.\n\n## Halo pattern to reuse\n\nHalo's live reference has 17 sections: foundations, typography, colour, visual language, voice, claims, patterns, icons, photography, applications, presentations, accessibility, web components, assets, agent connection, governance and changelog. Its agent page exposes versioned JSON, CSS, TypeScript, llms.txt and a read-only MCP service. Reuse this content architecture and evidence discipline. Do not carry over Halo's palette, visual thesis, product claims or dealer voice.\n\nThis first release implements foundations, colours, typography, assets, UI patterns, presentation layouts, references, agent files and governance. The same JSON powers machine-readable downloads and web views. A read-only MCP at /mcp queries these same brand files and returns asset URLs for agents.\n\n## Wetland UI conventions (proposed)\n\nUse a clear white workspace with ink text, blue links/actions and cream supporting areas. Reserve lime for one principal action or a deliberate emphasis. Status always has text and, when useful, an icon; never depend on colour alone. Preserve visible keyboard focus, descriptive links and reduced-motion preferences. Target WCAG 2.2 AA and test actual components. Use 16px body type, 44px minimum interactive targets and a 4px spacing scale as team defaults.\n\nPrioritise six components: request brief; tool stewardship card; evidence table; source citation; evaluation comparison; release approval. Each tool card names its sponsor, maintainer, version and next review. Each claim includes source, date, scope and evidence status. Separate the output state (draft/reviewed/approved) from the tool's release state. A blue button never implies an output is trustworthy.\n\n## Presentation conventions (proposed)\n\nUse 16:9 slides, one message per slide, restrained large headings, ample whitespace and a persistent source footnote. Suggested sequence: need; staff workflow; one working demonstration; accountable stewardship; measured benefit; phased delivery; decision required. Pair a process graphic with one concrete example. Keep table bodies readable in a room. Display estimates as estimates, and put the denominator and period next to every percentage.\n\n## Content boundary\n\nWetland is the hackathon project. WaterAid is the researched brand reference. Water Care Canada and Kijana are fictional challenge entities. Do not publish the organiser-only guide or turn fictional case metrics into WaterAid facts. No case-pack material is included in this hub.\n\n## Open items before official use\n\nObtain the current Canada/federation brand guide, the authorised logo set and precise logo rules, font licences, approved photography and attribution conditions, plus the relevant French language conventions. Assign a brand owner, review date and release approval. This kit makes research usable; it does not create approval.\n\n## Sources\n\n- [WaterAid Canada — current website](https://www.wateraid.org/ca) — Official website; visual values observed 17 October 2026. Current identity, homepage navigation, hero, cards, captions and UI colours.\n- [WaterAid photos and logos](https://www.wateraid.org/au/media/photos-and-logos) — Official regional guidance. Logo-use and photography permissions. Regional rules are not a Canada licence.\n- [WaterAid Canada annual reports](https://www.wateraid.org/ca/our-annual-reports) — Official reference index. Report hierarchy and evidence presentation; older editions may use a previous identity.\n- [WaterAid global](https://www.wateraid.org/) — Official website. Mission and editorial reference.\n- [WASH Matters](https://washmatters.wateraid.org/) — Official policy and practice site; reference link. Technical content and resource-library reference.\n- [Halo Brand System](https://brand.halocompass.com/) — User-supplied structural reference, inspected in browser. Human guide plus versioned machine-readable content, asset statuses, components and changelog.\n- [Halo — Connect an agent](https://brand.halocompass.com/connect) — Inspected in browser. Pattern for llms.txt, JSON, CSS and an eventual read-only MCP service.\n\n## Guide styling, release 0.2.0\n\nThe entire hub, print view and slide starter share WaterAid-blue, ink, cream and lime styling, original official-hosted logo references, and self-hosted Noto Sans. Typography and component choices remain proposed applications of the observed identity. Noto Sans licence: /fonts/OFL.txt.\n\n## Dashboard asset usage\n\nUse /assets/wateraid-dashboard-assets.zip for the complete pack. The white logo belongs on blue or dark ink. Blue icons belong on white or cream. Pick a PNG at least twice the displayed CSS width, retain its aspect ratio, and do not recolour or redraw it. The MCP asset catalogue supplies sizes, backgrounds, and exact file URLs.\n\n## PDF and document standard — release 0.3.0\n\nFor every PDF or document request, call get_document_guidance before authoring. Fetch and embed the actual logo; colours and fonts alone are insufficient. Use /documents/wetland-one-pager-reference.pdf as the default visual baseline and /documents/pdf-starter.zip as the reusable generator. Follow /documents/agent-document-instructions.txt for layout and export checks. Adapt longer documents without shrinking content. Render every page and verify embedded artwork and fonts before delivery. These are Wetland team requirements, not official WaterAid rules.\n",
+  "baseUrl": "https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/"
+}
