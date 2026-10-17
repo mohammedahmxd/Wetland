@@ -23,6 +23,8 @@ Required normalized inputs:
 
 Coverage requires a named operator and evidence reference affirming complete lifetime donation history through the export date. The software checks declared boundaries and relationships; it **cannot independently prove historical completeness**. An annual export alone is insufficient for first-ever donors. Accepted profiles retain that assertion in their manifest and show it as operator-attested.
 
+Unknown gift-type labels are rejected for explicit reconciliation. Receipt-eligible types are Cash, Pay-Cash, MG Pay-Cash and Recurring Gift Pay-Cash. Recognized nonqualifying types are Recurring Gift, Pledge, MG Pledge, Stock, Gift-in-Kind and Other.
+
 Validation rejects absent mappings, missing receipt data, mixed currencies, ambiguous IDs, invalid dates/amounts, impossible refunds, merge cycles and references outside supplied tables. Reads are bounded to 25 MiB / 100,000 records per CSV and to files inside the selected directory. Source and output hashes are recorded. Larger datasets need a streaming/warehouse import path; this tool makes no large-volume throughput claim.
 
 ## Remaining production gate

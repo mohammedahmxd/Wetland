@@ -16,7 +16,7 @@ test('Reject missing receipt ledger, unknown mappings, missing attestation and p
  const temp=await mkdtemp(path.join(os.tmpdir(),'wetland-import-link-'));try{await cp(sourceDir,temp,{recursive:true});await rm(path.join(temp,'gifts.csv'));await symlink(path.join(sourceDir,'gifts.csv'),path.join(temp,'gifts.csv'));await assert.rejects(validateExport({sourceDir:temp,config}),/escapes/);}finally{await rm(temp,{recursive:true,force:true});}
 });
 test('Real data classification stays private and date coverage cannot hide missing history',async()=>{
- const c={...config,synthetic:false};const r=await validateExport({sourceDir,config:c});assert.equal(r.summary.classification,'private');assert.equal(r.data.manifest.synthetic,false);
+ const c={...config,synthetic:false};const r=await validateExport({sourceDir,config:c});assert.equal(r.summary.classification,'private');assert.equal(r.data.manifest.synthetic,false);assert.equal(calculate(r.data,args).quality.historyAssurance,'operator-attested');
  await assert.rejects(validateExport({sourceDir,config:{...config,historyStart:'2026-01-01'}}),/outside/);
 });
 test('Explicit source header mapping works without assuming one CRM export layout',async()=>{

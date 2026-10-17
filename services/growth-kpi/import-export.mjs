@@ -30,7 +30,8 @@ export async function validateExport({sourceDir,config}){
  if(!tables['constituents.csv'].length||!tables['gifts.csv'].length||!tables['payment_events.csv'].length)throw Error('Constituents, gifts and receipt events must be supplied');
  // Completeness is an explicit human assertion. It cannot be inferred from a CSV.
  for(const event of tables['payment_events.csv'])if(day(event['Event date'])<c.historyStart||event['Event date']>c.exportedAt)throw Error('Receipt event outside declared history coverage');
- for(const gift of tables['gifts.csv'])if(day(gift['Gift date'])<c.historyStart||gift['Gift date']>c.exportedAt)throw Error('Gift outside declared history coverage');
+ const knownTypes=new Set(['Cash','Pay-Cash','MG Pay-Cash','Recurring Gift Pay-Cash','Recurring Gift','Pledge','MG Pledge','Stock','Gift-in-Kind','Other']);
+ for(const gift of tables['gifts.csv']){if(!knownTypes.has(gift['Gift type']))throw Error('Unrecognized gift type; reconcile export mapping before import');if(day(gift['Gift date'])<c.historyStart||gift['Gift date']>c.exportedAt)throw Error('Gift outside declared history coverage');}
  for(const donor of tables['constituents.csv'])if(day(donor['Date added'])>c.exportedAt)throw Error('Constituent created after export cutoff');
  const manifest={dataset_id:c.datasetId,synthetic:c.synthetic,currency:c.currency,history_start:c.historyStart,exported_at:c.exportedAt,complete_lifetime_history:true,history_note:'Operator-attested completeness; not independently verified by this importer.',history_attestation:c.historyAttestation,import_schema_version:1,source_hashes:sourceHashes,files};
  const data={manifest,tables};const validation=calculate(data,{start:c.historyStart,end:c.exportedAt,target:1});
