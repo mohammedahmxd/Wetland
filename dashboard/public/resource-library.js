@@ -119,7 +119,7 @@ export function createResourceLibrary(c) {
 
   function trash(){labelledModal('Deleted MCPs',catalogue().deleted.length?'<p>Restore an entry with all its saved details.</p>'+catalogue().deleted.map(({resource:r})=>'<div class="resource-trash-row"><strong>'+esc(r.title)+'</strong>'+action('Restore','restore',r.id)+'</div>').join(''):'<p>No deleted MCPs.</p>');}
 
-  function changed(message,id){const reopen=managing;c.record(c.state(),message,id);c.save();c.close();c.render();if(reopen)manage();toast(message);}
+  function changed(message,id,kind='MCP change'){const reopen=managing;const event=c.record(c.state(),message,id);event.kind=kind;c.save();c.close();c.render();if(reopen)manage();toast(message);}
 
   function details(id) {
     const r=resources().find(x=>x.id===id);if(!r)return;
@@ -167,9 +167,9 @@ export function createResourceLibrary(c) {
     const input=Object.fromEntries(new FormData(form));
     function showError(error){const message=form.querySelector('.resource-form-error');message.textContent=error.message;message.hidden=false;message.setAttribute('tabindex','-1');message.focus();}
     function persist(){try{
-      if(form.dataset.libraryForm==='department'){const saved=saveDepartment(catalogue(),input,form.dataset.id||undefined,c.state().role);managerSearch='';query='';status='All';changed((form.dataset.id?'Updated department: ':'Added department: ')+saved.title,saved.id);return;}
-      if(form.dataset.libraryForm==='department-delete'){const removed=deleteDepartment(catalogue(),form.dataset.id,c.state().role);managerSearch='';changed('Deleted department: '+removed.title,removed.id);return;}
-      const saved=saveResource(catalogue(),input,form.dataset.id||undefined,c.state().role);query='';status='All';changed(form.dataset.id?'MCP updated.':'MCP added.',saved.id);
+      if(form.dataset.libraryForm==='department'){const saved=saveDepartment(catalogue(),input,form.dataset.id||undefined,c.state().role);managerSearch='';query='';status='All';changed((form.dataset.id?'Updated department: ':'Added department: ')+saved.title,saved.id,'Department change');return;}
+      if(form.dataset.libraryForm==='department-delete'){const removed=deleteDepartment(catalogue(),form.dataset.id,c.state().role);managerSearch='';changed('Deleted department: '+removed.title,removed.id,'Department change');return;}
+      const saved=saveResource(catalogue(),input,form.dataset.id||undefined,c.state().role);query='';status='All';changed((form.dataset.id?'Updated MCP: ':'Added MCP: ')+saved.title,saved.id);
     }catch(error){showError(error);}}
     if(form.dataset.libraryForm==='department-delete'){persist();return;}
     try{const preview=structuredClone(catalogue());if(form.dataset.libraryForm==='department')saveDepartment(preview,input,form.dataset.id||undefined,c.state().role);else saveResource(preview,input,form.dataset.id||undefined,c.state().role);}catch(error){showError(error);return;}

@@ -54,3 +54,19 @@ This verifies the browser-local prototype. Roles remain a demo switcher, and per
 Admin now inherits contributor workflow permissions. Admin can claim challenges and tasks without contributor onboarding, submit implementation and maintenance evidence, and complete review and approval without switching roles. Task assignment uses the acting Admin's name. Contributor restrictions and required validation/review checks remain enforced.
 
 Verified in a separate workspace at port 8082: Admin claimed the scoped Evidence finder, submitted evidence, ran evaluations, acknowledged review, and approved pilot and live status. Admin also claimed, submitted and accepted a documentation task; assignment was Maya Chen and the final task status was Closed. No role switch was used and no console errors or warnings appeared. All three Node suites passed, including the new Admin workflow regression tests.
+
+## Minimal Contributor view, Roles and Change log follow-up
+
+Contributors now have three navigation items: Resource library, My work and Change log. My work shows their assigned work and available tasks, with a single onboarding action when needed. Removed the points/profile panel and extra card metadata. Admins retain all pages and gain the Roles tab.
+
+Roles manages the browser-local members Maya Chen, Alex Morgan and Jo Ellis. Existing workspace data migrates without resetting resources or departments. The demo selector switches members rather than assigning permissions; the selected member's saved role determines the interface. The Roles route and its mutation handler require Admin. The final Admin cannot be demoted. Self-demotion immediately hides management controls and leaves the Roles page. Task/project assignment and onboarding now belong to the individual member.
+
+Change log entries retain the acting person's name, ID and role at the time of the action. Role changes include old/new permissions. MCP edits include the resource name; department changes and role changes have distinct types. The table sorts newest first, supports search and empty results, survives reload and exports member roles and audit records. Cancelled, rejected and unchanged role updates do not create entries.
+
+QA found and fixed a default-button issue that made Cancel submit the role form. All generated action buttons now use `type="button"`; form submission buttons remain explicit. Retested cancelled role changes and MCP edits: neither saves data nor adds Change log entries. Generic dialog errors now appear inside the dialog.
+
+Final result: **63 passing browser assertions**, including **27 layout combinations** (six Admin pages and three Contributor pages at 390, 768 and 1440 pixels), plus narrow 320-pixel checks. No console errors or warnings. All **four** Node suites pass, including `members-test.mjs` for migration, last-admin protection, promotion/demotion, permission denial, no-op saves, actor snapshots, personal onboarding and assignment ownership.
+
+Browser checks covered both Contributors being denied the Roles URL, promotion taking effect, self-demotion, last-admin errors, Cancel/no-op logging, role persistence, onboarding, task claim/submission, Admin acceptance, MCP edit permissions, correct named/typed events, newest-first sorting, log search, export and reload. Tests used a separate origin at port 8083, leaving the user's port-8080 data unchanged. The initial Cancel failure and successful retests are recorded in `output/roles-qa-results.json`. Screenshots: `contributor-minimal.png`, `admin-roles.png` and `roles-changelog.png`.
+
+This remains a local demo with a demo member selector. It is not shared account authentication or server-enforced authorization.
