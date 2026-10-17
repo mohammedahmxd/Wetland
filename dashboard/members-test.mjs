@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import {initialState,claimTask,submitTask,transition,submitProject,record} from './public/model.js';
+import {ensureMembers,currentMember,selectMember,setMemberRole} from './public/members.js';
+
+const s=initialState();ensureMembers(s);
+assert.equal(s.members.length,3);assert.equal(currentMember(s).name,'Maya Chen');
+const original=JSON.stringify(s);
+assert.throws(()=>setMemberRole(s,'maya','contributor'),/at least one Admin/);
+assert.equal(JSON.stringify(s),original);
+assert.throws(()=>setMemberRole(s,'alex','reviewer'),/Choose/);
+assert.throws(()=>setMemberRole(s,'missing','admin'),/no longer exists/);
+assert.equal(setMemberRole(s,'alex','contributor'),false);assert.equal(JSON.stringify(s),original);
+setMemberRole(s,'alex','admin');
+assert.equal(s.events[0].kind,'Role change');assert.deepEqual(s.events[0].change,{memberId:'alex',from:'contributor',to:'admin'});
+assert.equal(s.events[0].actor,'Maya Chen');assert.equal(s.events[0].actorRole,'admin');
+setMemberRole(s,'maya','contributor');assert.equal(s.role,'contributor');
+assert.equal(s.events[0].actorRole,'admin');assert.equal(s.events[0].actor,'Maya Chen');
+const before=JSON.stringify(s);assert.throws(()=>setMemberRole(s,'maya','admin'),/Switch to Admin/);assert.equal(JSON.stringify(s),before);
+selectMember(s,'alex');assert.equal(s.role,'admin');
+assert.equal(s.events[1].actor,'Maya Chen'); // Historical identity remains unchanged.
+setMemberRole(s,'maya','admin');assert.equal(s.events[0].actor,'Alex Morgan');
+const reloaded=JSON.parse(JSON.stringify(s));ensureMembers(reloaded);assert.equal(reloaded.role,'admin');assert.equal(currentMember(reloaded).id,'alex');
+selectMember(s,'jo');assert.equal(s.role,'contributor');assert.equal(s.onboarded,false);
+assert.throws(()=>claimTask(s,'task-docs'),/onboarding/);currentMember(s).onboarded=true;s.onboarded=true;
+claimTask(s,'task-docs');assert.equal(s.tasks[0].assignee,'Jo Ellis');assert.equal(s.tasks[0].assigneeId,'jo');
+transition(s,'evidence','Building');assert.equal(s.projects[1].assigneeId,'jo');
+selectMember(s,'maya');setMemberRole(s,'alex','contributor');selectMember(s,'alex');
+const snapshot=JSON.stringify(s);assert.throws(()=>submitTask(s,'task-docs','Attempt to modify someone else’s assigned work.'),/another member/);
+assert.throws(()=>submitProject(s,'evidence','Attempt to modify someone else’s assigned project.'),/another member/);assert.equal(JSON.stringify(s),snapshot);
+selectMember(s,'jo');submitProject(s,'evidence','Documented implementation and synthetic regression evidence.');
+const e=record(s,'Jo edited an MCP','test');assert.equal(e.actor,'Jo Ellis');assert.equal(e.actorRole,'contributor');
+const legacy=initialState();legacy.role='contributor';legacy.onboarded=true;ensureMembers(legacy);assert.equal(currentMember(legacy).id,'alex');assert.equal(currentMember(legacy).onboarded,true);
+selectMember(legacy,'jo');assert.equal(legacy.onboarded,false);selectMember(legacy,'alex');assert.equal(legacy.onboarded,true);
+console.log('PASS: member migration, roles, last-admin guard, no-op changes, permission denial, self-demotion, persistence, actor snapshots, personal onboarding and assignment ownership.');
