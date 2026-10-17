@@ -159,7 +159,7 @@ h3{font-size:20px}
 .resource-editor input:hover,.resource-editor textarea:hover{border-color:#91b4dd}
 .resource-editor input:focus,.resource-editor textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #006bd912}
 .resource-library .btn,.resource-detail .btn,.resource-editor .btn,.resource-library .resource-open{transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease}
-.resource-library .btn:hover,.resource-detail .btn:hover,.resource-editor .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px #1514350d}
+.resource-library .btn:not(.resource-open):hover,.resource-detail .btn:hover,.resource-editor .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px #1514350d}
 .resource-library .btn:active,.resource-detail .btn:active,.resource-editor .btn:active{transform:translateY(0);box-shadow:none}
 .resource-card{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;animation:resource-reveal .3s ease both}
 .resource-card:nth-child(2){animation-delay:.035s}.resource-card:nth-child(3){animation-delay:.07s}
@@ -203,3 +203,5 @@ dialog:has(.resource-editor) .modal-head,dialog:has(.resource-detail) .modal-hea
 .modal-head>.resource-action-menu{margin-left:auto}
 .modal-head>.resource-action-menu+.close{margin-left:-10px}
 .resource-action-menu[open]>summary{position:relative;z-index:7}
+.resource-library .resource-open,.resource-library .resource-open:hover,.resource-library .resource-open:active{transform:none;box-shadow:none;transition:color .16s ease}
+.resource-library .resource-open:hover{color:#0054ab!important;text-decoration:none}
