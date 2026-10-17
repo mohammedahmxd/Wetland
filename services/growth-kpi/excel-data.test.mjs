@@ -25,6 +25,8 @@ test('Excel1900/1904 dates, numeric money/IDs and reordered rows retain full-cel
   const normalized=await canonicalizeExcelRows(fixture.headers,asExcelNumbers(fixture.rows,dateSystem).reverse(),{dateSystem});
   assert.deepEqual(normalized,receipt(fixture));
  }
+ const isoTimestamps=fixture.rows.map(row=>row.map((v,i)=>v&&[3,8].includes(i)?v+'T00:00:00.000Z':v));
+ assert.deepEqual(await canonicalizeExcelRows(fixture.headers,isoTimestamps),receipt(fixture));
  const decimalText=structuredClone(fixture.rows);decimalText[0][5]='150';assert.deepEqual(await canonicalizeExcelRows(fixture.headers,decimalText),receipt(fixture));
  const emptyNulls=fixture.rows.map(row=>row.map(v=>v===''?null:v));assert.deepEqual(await canonicalizeExcelRows(fixture.headers,emptyNulls),receipt(fixture));
 });
@@ -37,7 +39,7 @@ test('Valid but changed values and missing rows are rejected against the known f
 });
 test('Duplicates, malformed dates, sub-cent values, formulas and arbitrary PII cells fail locally',async()=>{
  await assert.rejects(canonicalizeExcelRows(fixture.headers,[...fixture.rows,fixture.rows[0]]),/duplicate/);
- for(const [index,value] of [[3,60],[3,45000.5],[3,'2026-02-30'],[5,150.001],[5,Infinity],[9,'private.person@example.com'],[5,'=SUM(A1:A2)'],[2,9007199254740992]]){
+ for(const [index,value] of [[3,'2026-07-01T12:00:00Z'],[3,'2026-07-01T00:00:00+01:00'],[3,60],[3,45000.5],[3,'2026-02-30'],[5,150.001],[5,Infinity],[9,'private.person@example.com'],[5,'=SUM(A1:A2)'],[2,9007199254740992]]){
   const rows=structuredClone(fixture.rows);rows[0][index]=value;await assert.rejects(canonicalizeExcelRows(fixture.headers,rows));
  }
  await assert.rejects(canonicalizeExcelRows([...fixture.headers,'Donor email'],fixture.rows),/headers/);
