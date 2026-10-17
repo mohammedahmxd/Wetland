@@ -25,10 +25,12 @@ The browser task-pane URL alone cannot read an Excel workbook. It must run insid
 
 1. Start on **Gift export**. Show the original synthetic records and state that this demonstration does not contain real donor data.
 2. Open the Wetland task pane. Use the reporting period **1 July–30 September 2026** and target **150** when prompted.
-3. Ask: “Generate a Growth report for Q3 2026 against a target of 150 first-time donors. Use first-ever received qualifying donations and include evidence.”
-4. Run the available workflow action. The pane should validate the supported fixture and call the MCP before writing a result worksheet. Do not describe a static worksheet as a live MCP result.
+3. Select **Read active Excel worksheet**. The pane reads the source sheet only when you request it. Use the supported prompt: “Generate a Growth report for Q3 2026 against a target of 150 first-time donors. Use first-ever received qualifying donations and include evidence.”
+4. Select **Verify data and run the MCP workflow**. The pane validates the supported fixture and calls the MCP. After a successful result, select **Add summary to a new Excel worksheet** for write-back. Do not describe a static worksheet as a live MCP result.
 5. Inspect the returned definition, period, data evidence and actual/target comparison. For the unchanged fixture and period, the expected result is **120 new donors, 80% attainment and a gap of 30**. These are acceptance expectations, not values prefilled in this workbook.
 6. If generating a finished PDF/HTML report, require the Brand-aware report tool and inspect its returned provenance and validation. An Excel summary is not automatically a Brand-approved document.
+
+Outside Excel, the task pane offers **Read selected CSV locally** as a browser-only demonstration. It accepts the CSV and can exercise the MCP workflow, but cannot write a result worksheet to Excel. The `.xlsx` route requires Excel itself.
 
 For another run, reactivate **Gift export** rather than the generated results sheet. Keep the original source sheet unchanged. Save the `.xlsx` after the live workflow has written its results.
 
