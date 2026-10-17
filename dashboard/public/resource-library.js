@@ -182,6 +182,8 @@ export function createResourceLibrary(c) {
     document.querySelectorAll('.resource-action-menu[open]').forEach(menu=>{if(menu!==activeMenu||e.target.closest('[data-action]'))menu.open=false;});
     const jump=e.target.closest('[data-library-scroll]');
     if(jump){e.preventDefault();let target=document.getElementById(jump.dataset.libraryScroll);if(!target){query='';status='All';document.querySelector('#library-search').value='';document.querySelector('#library-status').value='All';updateResults();target=document.getElementById(jump.dataset.libraryScroll);}if(target){target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}return;}
+    const card=e.target.closest('.resource-card[data-resource-id]');
+    if(card&&!e.target.closest('button,a,summary,.resource-action-menu,input,select,textarea')&&!window.getSelection()?.toString()){details(card.dataset.resourceId);return;}
     const b=e.target.closest('[data-action^="hub-library-"]');if(!b)return;
     const type=b.dataset.action.replace('hub-library-',''),r=resources().find(x=>x.id===b.dataset.id);
     if(['manage','manager-active','manager-deleted','manager-departments','department-add','department-edit','department-delete','add','edit','delete','confirm-delete','restore','trash'].includes(type)&&!canManage()){toast('Only staff can manage MCPs and departments.');return;}
