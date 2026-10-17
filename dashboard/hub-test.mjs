@@ -10,7 +10,7 @@ saveTool(h,t.id,{description:'A new candidate',documentId:d.id,includeGaps:false
 assert.equal(testTool(h,t.id).passed,false);assert.throws(()=>submitTool(h,t.id));
 saveTool(h,t.id,{description:'A passing candidate',documentId:d.id,includeGaps:true},2);
 assert.equal(testTool(h,t.id).passed,true);let r=submitTool(h,t.id);
-assert.throws(()=>releaseTool(h,r.id,'staff'));
+assert.throws(()=>releaseTool(h,r.id,'admin'));
 saveTool(h,t.id,{description:'Changed after evaluation',documentId:d.id,includeGaps:true},3);
 assert.throws(()=>releaseTool(h,r.id,'reviewer'));assert.throws(()=>submitTool(h,t.id));
 testTool(h,t.id);r=submitTool(h,t.id);releaseTool(h,r.id,'reviewer');assert.equal(t.publishedVersion,2);assert.equal(runConfigured(h,t.published).heading,'New weekly heading');

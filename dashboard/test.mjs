@@ -11,7 +11,7 @@ s.role='reviewer';assert.throws(()=>transition(s,p.id,'Pilot'));
 p.evals=evaluations(p);p.checks={scope:true,data:true,owner:true,quality:true};transition(s,p.id,'Pilot');transition(s,p.id,'Live');
 assert.equal(p.status,'Live');assert.equal(p.releases.length,1);
 let r=compose(SOURCE_DOCS);assert(r.conflict);assert(r.gaps.length>=2);assert.equal(compose([SOURCE_DOCS[0]]).conflict,false);assert.throws(()=>compose([]));assert(evaluations(s.projects[0]).every(x=>x.pass));
-s.role='staff';let t=reportIssue(s,'report','Date conflict','Synthetic reproduction of a date issue');assert.equal(t.status,'Triage');
+s.role='admin';let t=reportIssue(s,'report','Date conflict','Synthetic reproduction of a date issue');assert.equal(t.status,'Triage');
 s.role='contributor';assert.throws(()=>claimTask(s,t.id));t.status='Open';claimTask(s,t.id);submitTask(s,t.id,'Added a clearer conflict message and regression coverage.');
 s.role='reviewer';acceptTask(s,t.id);const tool=s.projects[0];assert.equal(tool.candidate.version,'1.0.1');assert.throws(()=>publishUpdate(s,tool.id));tool.candidate.evals=evaluations(tool);tool.candidate.checks={scope:true,data:true,owner:true,quality:true};publishUpdate(s,tool.id);assert.equal(tool.version,'1.0.1');assert.equal(t.status,'Closed');assert.equal(s.points,50);
 rollback(s,tool.id,'Restore prior release for review');assert.equal(tool.version,'1.0.0');assert.equal(tool.previous,null);assert.throws(()=>rollback(s,tool.id,'No version available'));

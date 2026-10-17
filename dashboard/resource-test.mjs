@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import {resources,departments,matchingResources,connectionConfig,BRAND_ENDPOINT,seedCatalogue,saveResource as writeResource,deleteResource as removeResource,restoreResource as recoverResource,catalogueDepartments,saveDepartment as writeDepartment,deleteDepartment as removeDepartment} from './public/resource-catalogue.js';
-const saveResource=(c,input,id)=>writeResource(c,input,id,'staff');
-const deleteResource=(c,id)=>removeResource(c,id,'staff');
-const restoreResource=(c,id)=>recoverResource(c,id,'staff');
-const saveDepartment=(c,input,id)=>writeDepartment(c,input,id,'staff');
-const deleteDepartment=(c,id,destination)=>removeDepartment(c,id,destination,'staff');
+const saveResource=(c,input,id)=>writeResource(c,input,id,'admin');
+const deleteResource=(c,id)=>removeResource(c,id,'admin');
+const restoreResource=(c,id)=>recoverResource(c,id,'admin');
+const saveDepartment=(c,input,id)=>writeDepartment(c,input,id,'admin');
+const deleteDepartment=(c,id,destination)=>removeDepartment(c,id,destination,'admin');
 
 assert.equal(new Set(resources.map(r=>r.id)).size,resources.length);
 assert.equal(resources.filter(r=>r.status==='Available').length,1);
@@ -74,12 +74,18 @@ console.log('PASS: department migration, CRUD, ordering, renamed search and safe
 
 for(const role of ['contributor','reviewer',undefined]){
  const state=seedCatalogue(),before=JSON.stringify(state);
- assert.throws(()=>writeResource(state,input,undefined,role),/Only staff/);
- assert.throws(()=>writeResource(state,input,'donor-crm',role),/Only staff/);
- assert.throws(()=>removeResource(state,'donor-crm',role),/Only staff/);
- assert.throws(()=>recoverResource(state,'donor-crm',role),/Only staff/);
- assert.throws(()=>writeDepartment(state,{title:'Blocked',position:1},undefined,role),/Only staff/);
- assert.throws(()=>removeDepartment(state,'fundraising','it',role),/Only staff/);
+ assert.throws(()=>writeResource(state,input,undefined,role),/Only admins/);
+ if(role!=='contributor')assert.throws(()=>writeResource(state,input,'donor-crm',role),/Only admins/);
+ assert.throws(()=>removeResource(state,'donor-crm',role),/Only admins/);
+ assert.throws(()=>recoverResource(state,'donor-crm',role),/Only admins/);
+ assert.throws(()=>writeDepartment(state,{title:'Blocked',position:1},undefined,role),/Only admins/);
+ assert.throws(()=>removeDepartment(state,'fundraising','it',role),/Only admins/);
  assert.equal(JSON.stringify(state),before);
 }
-console.log('PASS: non-staff and missing roles cannot mutate catalogue data.');
+console.log('PASS: non-admin roles cannot add, delete, restore or manage departments.');
+
+const contributorState=seedCatalogue();
+const edited=writeResource(contributorState,{...input,title:'Contributor edit'},'donor-crm','contributor');
+assert.equal(edited.title,'Contributor edit');
+assert.throws(()=>writeResource(contributorState,input,'missing','contributor'),/Only admins/);
+console.log('PASS: contributors can edit existing MCPs only.');
