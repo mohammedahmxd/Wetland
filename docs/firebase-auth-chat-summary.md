@@ -45,13 +45,8 @@ The local server was started with `npm run demo:auth`. Its health check reported
 
 ## Connection to `wateraid-flow`
 
-`m1lakdawala@torontomu.ca` can now see `wateraid-flow`. The account has Firebase Authentication Admin and Browser access. It does not have Firebase Admin, so creating a web app and an API key is still denied.
+`m1lakdawala@torontomu.ca` has Firebase Admin on `wateraid-flow`. The web app `WaterAid Flow MCP` (`1:462504004653:web:cf3ab8155d6ec90c32fca4`) exists. Email and password sign-in is enabled, and `localhost` is an authorized domain.
 
-Authentication is initialized on `wateraid-flow`:
+The verified user `flow-demo@wateraidflow.org` can sign in to `wateraid-flow`. A local server started with `npm run start:cloud` accepted that Firebase ID token and completed an MCP initialize call. The web API key and signing secret stay in the gitignored `.env.local`.
 
-- Email and password sign-in is enabled.
-- Authorized domains include `localhost`, `wateraid-flow.firebaseapp.com`, `wateraid-flow.web.app`, and the brand hub Cloud Run host.
-- The verified test user `flow-demo@wateraidflow.org` exists in that project. The local password is `local-development-only`.
-- `services/brand-mcp/.firebaserc` selects `wateraid-flow`.
-
-The local server is still the Auth emulator. The browser sign-in page needs a Firebase web API key, and this account cannot create the web app that issues that key. Grant `roles/firebase.admin` (Firebase Admin) to this account to finish that step.
+Google sign-in has not been provisioned. Deploying it stopped because the Firebase terms of service still need to be accepted at http://console.firebase.google.com/?authuser=0&forceCheckTos=true.

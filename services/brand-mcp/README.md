@@ -62,7 +62,15 @@ npm run demo:auth
 | Email | `flow-demo@wateraidflow.org` |
 | Password | `local-development-only` |
 
-The command prints a sign-in URL. Use that email and password on the page. The password is for local development. The same verified user also exists in the Firebase project `wateraid-flow`. Browser sign-in against that project still needs a web API key from a Firebase web app.
+The command prints a sign-in URL. Use that email and password on the page. The password is for local development. The same verified user exists in the Firebase project `wateraid-flow`.
+
+To run this server against that project, copy `.env.example` to `.env.local`, fill in the web API key and a signing secret of at least 32 characters, then run:
+
+```sh
+npm run start:cloud
+```
+
+Open the printed or local sign-in page at `http://localhost:8080`, not `127.0.0.1`. Firebase only treats `localhost` as an authorized domain. Google sign-in provisioning still requires the Firebase terms of service to be accepted in the console. Email and password sign-in is already enabled.
 
 `services/brand-mcp/firebase.json` enables Google sign-in for the Firebase project. Authorized domains are hosting names, not the email allowlist. After choosing the Firebase project, deploy that configuration from this directory:
 

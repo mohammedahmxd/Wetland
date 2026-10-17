@@ -422,7 +422,7 @@ export function loadMcpAuth(env = process.env) {
           hostedDomain: policy.domains[0],
           passwordSignIn: policy.profile === 'demo',
           emulatorHost: emulator,
-          demoUser: emulator && policy.profile === 'demo' ? 'flow-demo@wateraidflow.org' : null,
+          demoUser: policy.profile === 'demo' ? 'flow-demo@wateraidflow.org' : null,
           firebase: firebase.apiKey ? { apiKey: firebase.apiKey, authDomain: firebase.authDomain, projectId: firebase.projectId } : null,
         });
         return true;
