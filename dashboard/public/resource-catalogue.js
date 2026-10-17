@@ -113,13 +113,12 @@ export function saveDepartment(catalogue,input,id,role){
   return result;
 }
 
-export function deleteDepartment(catalogue,id,destination,role){
+export function deleteDepartment(catalogue,id,role){
   requireCatalogueAdmin(role);
   const groups=catalogueDepartments(catalogue),department=groups.find(d=>d.id===id);
   if(!department)throw Error('This department no longer exists.');
   const entries=[...catalogue.items,...catalogue.deleted.map(e=>e.resource)].filter(r=>r.department===id);
-  if(entries.length&&(!destination||destination===id||!groups.some(d=>d.id===destination)))throw Error('Choose another department for this department’s MCPs, including deleted entries.');
-  entries.forEach(r=>{r.department=destination;});
+  if(entries.length)throw Error("Can't delete this department because it contains MCPs, including any deleted entries. Only empty departments can be deleted.");
   catalogue.departments=groups.filter(d=>d.id!==id);renumber(catalogue.departments);
   return department;
 }

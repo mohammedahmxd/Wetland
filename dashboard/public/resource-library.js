@@ -93,8 +93,7 @@ export function createResourceLibrary(c) {
   function confirmDeleteDepartment(id){
     const d=departments().find(x=>x.id===id);if(!d)return;
     managing=true;managerTab='departments';
-    const entries=[...resources(),...catalogue().deleted.map(e=>e.resource)].filter(r=>r.department===id),targets=departments().filter(x=>x.id!==id);
-    labelledModal('Delete department?',`<form class="resource-editor" data-library-form="department-delete" data-id="${esc(id)}"><p>Delete <strong>${esc(d.title)}</strong> from the library? ${entries.length?entries.length+' MCP entries, including any deleted entries, must be moved to another department.':'This department has no MCP entries.'}</p><p class="resource-form-error" role="alert" hidden></p>${entries.length?(targets.length?'<div class="resource-editor-grid"><div class="field full"><label for="department-destination">Move MCPs to</label><div class="resource-select-wrap"><select id="department-destination" name="destination" required><option value="">Choose a department</option>'+targets.map(t=>'<option value="'+esc(t.id)+'">'+esc(t.title)+'</option>').join('')+'</select></div></div></div>':'<p>Create another department before deleting this one so its MCPs have somewhere to go.</p>'):''}<div class="resource-form-actions"><button class="btn danger" type="submit" ${entries.length&&!targets.length?'disabled':''}>Delete department</button>${action('Cancel','cancel','','secondary')}</div></form>`);
+    labelledModal('Are you sure?',`<form class="resource-editor" data-library-form="department-delete" data-id="${esc(id)}"><p>Are you sure you want to delete <strong>${esc(d.title)}</strong>? Only empty departments can be deleted.</p><p class="resource-form-error" role="alert" hidden></p><div class="resource-form-actions"><button class="btn danger" type="submit">Yes</button>${action('No','cancel','','secondary')}</div></form>`);
   }
 
   function edit(id,departmentId){
@@ -169,7 +168,7 @@ export function createResourceLibrary(c) {
     function showError(error){const message=form.querySelector('.resource-form-error');message.textContent=error.message;message.hidden=false;message.setAttribute('tabindex','-1');message.focus();}
     function persist(){try{
       if(form.dataset.libraryForm==='department'){const saved=saveDepartment(catalogue(),input,form.dataset.id||undefined,c.state().role);managerSearch='';query='';status='All';changed((form.dataset.id?'Updated department: ':'Added department: ')+saved.title,saved.id);return;}
-      if(form.dataset.libraryForm==='department-delete'){const removed=deleteDepartment(catalogue(),form.dataset.id,input.destination,c.state().role);managerSearch='';changed('Deleted department: '+removed.title,removed.id);return;}
+      if(form.dataset.libraryForm==='department-delete'){const removed=deleteDepartment(catalogue(),form.dataset.id,c.state().role);managerSearch='';changed('Deleted department: '+removed.title,removed.id);return;}
       const saved=saveResource(catalogue(),input,form.dataset.id||undefined,c.state().role);query='';status='All';changed(form.dataset.id?'MCP updated.':'MCP added.',saved.id);
     }catch(error){showError(error);}}
     if(form.dataset.libraryForm==='department-delete'){persist();return;}

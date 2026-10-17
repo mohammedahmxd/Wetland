@@ -4,7 +4,7 @@ const saveResource=(c,input,id)=>writeResource(c,input,id,'admin');
 const deleteResource=(c,id)=>removeResource(c,id,'admin');
 const restoreResource=(c,id)=>recoverResource(c,id,'admin');
 const saveDepartment=(c,input,id)=>writeDepartment(c,input,id,'admin');
-const deleteDepartment=(c,id,destination)=>removeDepartment(c,id,destination,'admin');
+const deleteDepartment=(c,id)=>removeDepartment(c,id,'admin');
 
 assert.equal(new Set(resources.map(r=>r.id)).size,resources.length);
 assert.equal(resources.filter(r=>r.status==='Available').length,1);
@@ -57,12 +57,16 @@ assert.equal(matchingResources('research evidence','All',legacy.items,legacy.dep
 assert.throws(()=>saveDepartment(legacy,{title:'research & evidence',position:1}),/already exists/);
 assert.throws(()=>saveDepartment(legacy,{title:'',position:1}),/name/);
 assert.throws(()=>saveDepartment(legacy,{title:'Invalid position',position:99}),/position/);
-assert.throws(()=>deleteDepartment(legacy,group.id),/Choose another department/);
+assert.throws(()=>deleteDepartment(legacy,group.id),/contains MCPs/);
 assert.equal(legacy.items.find(r=>r.id===moved.id).department,group.id);
 deleteResource(legacy,moved.id);
-assert.throws(()=>deleteDepartment(legacy,group.id),/Choose another department/);
-deleteDepartment(legacy,group.id,'support');
+assert.throws(()=>deleteDepartment(legacy,group.id),/contains MCPs/);
+const blockedSnapshot=JSON.stringify(legacy);
+assert.throws(()=>deleteDepartment(legacy,group.id),/contains MCPs/);
+assert.equal(JSON.stringify(legacy),blockedSnapshot);
 restoreResource(legacy,moved.id);
+saveResource(legacy,{...legacy.items.find(r=>r.id===moved.id),department:'support'},moved.id);
+deleteDepartment(legacy,group.id);
 assert.equal(legacy.items.find(r=>r.id===moved.id).department,'support');
 assert.deepEqual(legacy.departments.map(d=>d.number),['01','02','03','04']);
 const empty={items:[],deleted:[],departments:[]};
@@ -70,7 +74,7 @@ const first=saveDepartment(empty,{title:'First',position:1});
 assert.equal(first.number,'01');deleteDepartment(empty,first.id);assert.equal(empty.departments.length,0);
 assert.equal(JSON.parse(JSON.stringify(legacy)).departments.length,4);
 assert.equal(departments[0].title,'Fundraising & donor relations');
-console.log('PASS: department migration, CRUD, ordering, renamed search and safe reassignment of active/deleted MCPs.');
+console.log('PASS: department migration, CRUD, ordering, renamed search and deletion blocked for active/deleted MCPs and empty-department deletion.');
 
 for(const role of ['contributor','reviewer',undefined]){
  const state=seedCatalogue(),before=JSON.stringify(state);
@@ -79,7 +83,7 @@ for(const role of ['contributor','reviewer',undefined]){
  assert.throws(()=>removeResource(state,'donor-crm',role),/Only admins/);
  assert.throws(()=>recoverResource(state,'donor-crm',role),/Only admins/);
  assert.throws(()=>writeDepartment(state,{title:'Blocked',position:1},undefined,role),/Only admins/);
- assert.throws(()=>removeDepartment(state,'fundraising','it',role),/Only admins/);
+ assert.throws(()=>removeDepartment(state,'fundraising',role),/Only admins/);
  assert.equal(JSON.stringify(state),before);
 }
 console.log('PASS: non-admin roles cannot add, delete, restore or manage departments.');
