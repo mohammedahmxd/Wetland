@@ -2,7 +2,7 @@ import {departments, matchingResources, connectionConfig,seedCatalogue,saveResou
 
 export function createResourceLibrary(c) {
   const {esc,btn,link,modal,toast} = c;
-  let query='', status='All',managing=false;
+  let query='', status='All',managing=false,managerSearch='',managerTab='active';
   const catalogue=()=>c.state().resourceCatalogue??(c.state().resourceCatalogue=seedCatalogue());
   const resources=()=>catalogue().items;
   const available=r=>r.status==='Available'&&!!r.endpoint;
@@ -35,8 +35,7 @@ export function createResourceLibrary(c) {
   function render() {
     const result=results();
     return `<div class="resource-library">
-      <div class="resource-management-bar"><span>Library changes are saved in this browser.</span><div>${action(managing?'Done managing':'Manage MCPs','manage','','secondary')}${action('Add MCP','add','','lime')}</div></div>
-      ${managing?'<div class="resource-manage-note"><span>Use the three-dot menu on any card to edit or delete its entry.</span>'+action('Deleted entries ('+catalogue().deleted.length+')','trash','','secondary')+'</div>':''}
+      <div class="resource-management-bar"><span>Library changes are saved in this browser.</span><div>${action('Manage MCPs','manage','','secondary')}${action('Add MCP','add','','lime')}</div></div>
       <header class="resource-intro"><p class="eyebrow">RESOURCE LIBRARY / MCP DIRECTORY</p><h1>Shared tools.<br><span>Greater possibilities.</span></h1>
         <p class="resource-lead">Find the right knowledge for your next task. Explore resources by department, understand what each one does, and bring it to your approved AI agent.</p>
         <div class="resource-intro-links"><a href="#library" data-library-scroll="library-directory">Explore the directory <span aria-hidden="true">↓</span></a><a href="#library" data-library-scroll="library-guide">How to connect an agent <span aria-hidden="true">↗</span></a></div>
@@ -65,6 +64,17 @@ export function createResourceLibrary(c) {
 
   function labelledModal(title,body){modal(title,body);const dialog=document.querySelector('#modal');dialog.querySelector('h2').id='library-dialog-title';dialog.setAttribute('aria-labelledby','library-dialog-title');dialog.scrollTop=0;}
 
+  function managerRows(){
+    const list=managerTab==='active'?resources():catalogue().deleted.map(entry=>entry.resource);
+    const matches=list.filter(r=>(r.title+' '+r.owner+' '+departments.find(d=>d.id===r.department).title).toLowerCase().includes(managerSearch.toLowerCase().trim()));
+    return matches.length?matches.map(r=>'<div class="resource-manager-row"><div><strong>'+esc(r.title)+'</strong><small>'+esc(departments.find(d=>d.id===r.department).title)+' · '+esc(r.status)+'</small></div><div class="resource-manager-row-actions">'+(managerTab==='active'?action(actionIcon('edit')+'Edit','edit',r.id,'secondary')+action(actionIcon('delete')+'Trash','delete',r.id,'resource-trash-button'):action('Restore','restore',r.id,'secondary'))+'</div></div>').join(''):'<p class="resource-manager-empty">'+(managerSearch?'No MCPs match your search.':managerTab==='deleted'?'Trash is empty.':'No MCPs in the library yet.')+'</p>';
+  }
+
+  function manage(){
+    managing=true;
+    labelledModal('Manage MCPs','<div class="resource-manager"><p>Edit MCP details or move entries to Trash. Changes are saved in this browser.</p><div class="resource-manager-toolbar"><div class="resource-manager-tabs" aria-label="Library entries">'+btn('MCPs ('+resources().length+')','hub-library-manager-active','aria-pressed="'+(managerTab==='active')+'"','secondary')+btn('Trash ('+catalogue().deleted.length+')','hub-library-manager-deleted','aria-pressed="'+(managerTab==='deleted')+'"','secondary')+'</div>'+action('Add MCP','add','','lime')+'</div><label class="sr-only" for="manager-search">Search MCPs</label><input type="search" id="manager-search" placeholder="Search by name, department or owner…" aria-label="Search MCPs" value="'+esc(managerSearch)+'"><div id="manager-list">'+managerRows()+'</div><div class="resource-form-actions">'+action('Done','manager-done','','secondary')+'</div></div>');
+  }
+
   function edit(id){
     const r=resources().find(x=>x.id===id)||{department:'fundraising',status:'Planned',methods:[],transport:'Streamable HTTP'};
     const field=(name,label,{area=false,optional=false,hint=''}={})=>'<div class="field '+(area?'full':'')+'"><label for="mcp-'+name+'">'+label+(optional?' <span class="field-note">Optional</span>':'')+'</label>'+(area?'<textarea id="mcp-'+name+'" name="'+name+'" rows="3" maxlength="12000" '+(optional?'':'required')+'>'+esc(r[name]||'')+'</textarea>':'<input id="mcp-'+name+'" name="'+name+'" maxlength="'+(name==='endpoint'||name==='referenceUrl'?'2000':'200')+'" '+(optional?'':'required')+' value="'+esc(r[name]||'')+'">')+(hint?'<p class="resource-field-hint">'+hint+'</p>':'')+'</div>';
@@ -86,7 +96,7 @@ export function createResourceLibrary(c) {
 
   function trash(){labelledModal('Deleted MCPs',catalogue().deleted.length?'<p>Restore an entry with all its saved details.</p>'+catalogue().deleted.map(({resource:r})=>'<div class="resource-trash-row"><strong>'+esc(r.title)+'</strong>'+action('Restore','restore',r.id)+'</div>').join(''):'<p>No deleted MCPs.</p>');}
 
-  function changed(message,id){c.record(c.state(),message,id);c.save();c.close();c.render();toast(message);}
+  function changed(message,id){const reopen=managing;c.record(c.state(),message,id);c.save();c.close();c.render();if(reopen)manage();toast(message);}
 
   function details(id) {
     const r=resources().find(x=>x.id===id);if(!r)return;
@@ -108,8 +118,9 @@ export function createResourceLibrary(c) {
     catch {modal('Copy '+esc(label.toLowerCase()),'<p>Clipboard access is unavailable. Select and copy the text below.</p><textarea class="resource-copy-fallback" aria-label="Text to copy" readonly>'+esc(value)+'</textarea>');const field=document.querySelector('.resource-copy-fallback');field.focus();field.select();}
   }
 
-  document.addEventListener('input',e=>{if(e.target.id==='library-search'){query=e.target.value;updateResults();}});
+  document.addEventListener('input',e=>{if(e.target.id==='library-search'){query=e.target.value;updateResults();}if(e.target.id==='manager-search'){managerSearch=e.target.value;document.querySelector('#manager-list').innerHTML=managerRows();}});
   document.addEventListener('change',e=>{if(e.target.id==='library-status'){status=e.target.value;updateResults();}});
+  document.querySelector('#modal').addEventListener('cancel',()=>{managing=false;});
   document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const menu=document.querySelector('.resource-action-menu[open]');if(menu){e.preventDefault();e.stopPropagation();menu.open=false;menu.querySelector('summary').focus();}},true);
   document.addEventListener('submit',e=>{
     const form=e.target.closest('[data-library-form="save"]');if(!form)return;e.preventDefault();
@@ -117,17 +128,20 @@ export function createResourceLibrary(c) {
     catch(error){const message=form.querySelector('.resource-form-error');message.textContent=error.message;message.hidden=false;message.setAttribute('tabindex','-1');message.focus();}
   });
   document.addEventListener('click',e=>{
+    if(e.target.closest('#modal .close'))managing=false;
     const activeMenu=e.target.closest('.resource-action-menu');
     document.querySelectorAll('.resource-action-menu[open]').forEach(menu=>{if(menu!==activeMenu||e.target.closest('[data-action]'))menu.open=false;});
     const jump=e.target.closest('[data-library-scroll]');
     if(jump){e.preventDefault();let target=document.getElementById(jump.dataset.libraryScroll);if(!target){query='';status='All';document.querySelector('#library-search').value='';document.querySelector('#library-status').value='All';updateResults();target=document.getElementById(jump.dataset.libraryScroll);}if(target){target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}return;}
     const b=e.target.closest('[data-action^="hub-library-"]');if(!b)return;
     const type=b.dataset.action.replace('hub-library-',''),r=resources().find(x=>x.id===b.dataset.id);
-    if(type==='manage'){managing=!managing;c.render();}
+    if(type==='manage'){managerSearch='';managerTab='active';manage();}
+    if(type==='manager-active'||type==='manager-deleted'){managerTab=type==='manager-active'?'active':'deleted';managerSearch='';manage();}
+    if(type==='manager-done'){managing=false;c.close();}
     if(type==='add')edit();
     if(type==='edit'&&r)edit(r.id);
     if(type==='delete'&&r)confirmDelete(r.id);
-    if(type==='cancel')c.close();
+    if(type==='cancel'){if(managing)manage();else c.close();}
     if(type==='trash')trash();
     if(type==='confirm-delete'){try{const deleted=deleteResource(catalogue(),b.dataset.id);changed('Deleted '+deleted.title+'. Restore it from Deleted entries.',deleted.id);}catch(error){toast(error.message);}}
     if(type==='restore'){try{const restored=restoreResource(catalogue(),b.dataset.id);changed('Restored '+restored.title+'.',restored.id);}catch(error){toast(error.message);}}

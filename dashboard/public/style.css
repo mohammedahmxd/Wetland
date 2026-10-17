@@ -205,3 +205,23 @@ dialog:has(.resource-editor) .modal-head,dialog:has(.resource-detail) .modal-hea
 .resource-action-menu[open]>summary{position:relative;z-index:7}
 .resource-library .resource-open,.resource-library .resource-open:hover,.resource-library .resource-open:active{transform:none;box-shadow:none;transition:color .16s ease}
 .resource-library .resource-open:hover{color:#0054ab!important;text-decoration:none}
+.resource-manager>p{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:20px}
+.resource-manager-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.resource-manager-tabs{display:flex;gap:6px;padding:4px;background:var(--cream);border-radius:8px}
+.resource-manager-tabs .btn{background:transparent;border-color:transparent;font-size:12px;min-height:38px;padding:8px 12px}
+.resource-manager-tabs .btn[aria-pressed="true"]{background:white;border-color:var(--line);box-shadow:0 2px 5px #15143508;color:var(--blue)}
+.resource-manager-toolbar>.btn{font-size:12px}
+.resource-manager label.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+#manager-search{font-size:14px;margin-bottom:14px;min-height:46px;border-radius:8px}
+.resource-manager-row{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}
+.resource-manager-row>div:first-child{min-width:0}
+.resource-manager-row strong{display:block;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.resource-manager-row small{display:block;font-size:11px;color:var(--muted);line-height:1.6;margin-top:5px}
+.resource-manager-row-actions{display:flex;gap:8px;flex-shrink:0}
+.resource-manager-row-actions .btn{min-height:38px;padding:8px 10px;font-size:12px;gap:7px}
+.resource-manager-row-actions svg{width:15px;height:15px}
+.resource-trash-button{color:#932e29;background:#fff4f1;border:1px solid #f0ded9}
+.resource-trash-button:hover{background:#fcebea}
+.resource-manager-empty{padding:32px 12px;text-align:center;font-size:14px;color:var(--muted)}
+dialog:has(.resource-manager) .modal-head{position:sticky;top:0;background:white;z-index:2}
+@media(max-width:550px){.resource-manager-row{align-items:flex-start;flex-direction:column;gap:12px}.resource-manager-row-actions{align-self:flex-end}}
