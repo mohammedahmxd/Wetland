@@ -31,7 +31,7 @@ test('Tokens reject tampering and another authenticated subject',async()=>{
 });
 test('MCP exposes reviewed skill discovery and workflow with original tools',async()=>{
  const server=await createServer({reportGenerator:goodReport,workflowSigningSecret:secret});const [clientTransport,serverTransport]=InMemoryTransport.createLinkedPair();const client=new Client({name:'workflow-test',version:'1'});
- try{await server.connect(serverTransport);await client.connect(clientTransport);const list=(await client.listTools()).tools.map(t=>t.name);assert.equal(list.length,10);assert.ok(list.includes('generate_growth_report'));
+ try{await server.connect(serverTransport);await client.connect(clientTransport);const list=(await client.listTools()).tools.map(t=>t.name);assert.equal(list.length,11);assert.ok(list.includes('generate_growth_report'));
  const call=async(name,input)=>{const r=await client.callTool({name,arguments:input});assert.ok(!r.isError,r.content?.[0]?.text);return r.structuredContent||JSON.parse(r.content[0].text);};
  const found=await call('find_skills',{query:'Growth'});assert.equal(found.skills[0].id,'growth-reporting');const read=await call('get_skill',{id:'growth-reporting'});assert.equal(read.version,found.skills[0].version);assert.ok(read.instructions);
  const state=await call('start_workflow',{});assert.equal(state.status,'needs_input');
