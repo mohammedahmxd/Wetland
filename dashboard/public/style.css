@@ -269,3 +269,8 @@ dialog:has(.resource-manager) .modal-head{position:sticky;top:0;background:white
 .resource-readonly{display:inline-flex;align-items:center;padding:9px 12px;border-radius:6px;background:var(--cream);color:var(--muted);font-size:12px;line-height:1.6}
 .resource-card[data-resource-id]{cursor:pointer}
 .resource-card:focus-within{border-color:var(--blue)}
+.project-review{width:100%;margin-top:12px}
+.project-review .review-check{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6;margin:10px 0}
+.project-review .review-check input{flex:0 0 18px;width:18px;min-height:18px;height:18px;margin-top:3px}
+.project-review .checklist .split-note{display:block;margin:4px 0 0;line-height:1.6}
+dialog:has(.project-review) .modal-head{position:sticky;top:0;background:white;z-index:2}

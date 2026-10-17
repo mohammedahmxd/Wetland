@@ -19,3 +19,17 @@ transition(s,tool.id,'Retired');assert.equal(tool.status,'Retired');assert.throw
 console.log('PASS: request-to-release gates, roles, onboarding, evidence extraction, conflict detection, maintenance-to-release, recognition, rollback and retirement.');
 
 assert.deepEqual(Object.keys((await import('./public/model.js')).ROLES),['admin','contributor']);
+
+const regression=initialState();
+const review=createRequest(regression,{title:'Re-review',problem:'Check revised evidence',success:'New review required'});
+transition(regression,review.id,'Scoped');regression.role='contributor';regression.onboarded=true;
+transition(regression,review.id,'Building');review.submission='Initial synthetic implementation evidence';transition(regression,review.id,'Review');regression.role='admin';
+review.evals=[];review.checks={scope:true,data:true,owner:true,quality:true};
+assert.throws(()=>transition(regression,review.id,'Pilot'),/evaluation/);
+review.evals=evaluations(review);transition(regression,review.id,'Building');
+assert.equal(review.evals,null);assert.deepEqual(review.checks,{});
+regression.role='contributor';review.submission='Revised synthetic implementation evidence';transition(regression,review.id,'Review');regression.role='admin';
+assert.throws(()=>transition(regression,review.id,'Pilot'),/evaluation/);
+const candidate=regression.projects[0];candidate.candidate={version:'1.0.1',notes:'Regression',evals:[],checks:{scope:true,data:true,owner:true,quality:true}};
+assert.throws(()=>publishUpdate(regression,candidate.id),/evaluations/);
+console.log('PASS: revised evidence resets approval and empty evaluation lists cannot authorize releases.');
