@@ -1,3 +1,5 @@
+# Bootstrap recipe for an explicitly configured service; does not configure MCP authentication.
+# For existing services prefer copilot-build.yaml + release.mjs (preserves all configuration).
 # Run from repository root; explicit, separately authorized build/runtime identities required.
 substitutions:
   _PACKAGE: growth-kpi
@@ -17,8 +19,8 @@ steps:
     args: ['ci', '--ignore-scripts']
   - name: node:22-alpine
     dir: services/${_PACKAGE}
-    entrypoint: npm
-    args: ['test']
+    entrypoint: sh
+    args: ['-c', 'apk add --no-cache python3 py3-reportlab py3-pypdf py3-pillow poppler-utils && REPORT_RENDER_TESTS=true npm test']
   - name: node:22-alpine
     dir: packages/mcp-runtime
     entrypoint: npm
@@ -29,7 +31,7 @@ steps:
     args: ['push', '${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID']
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     entrypoint: gcloud
-    args: ['run', 'deploy', '${_SERVICE}', '--project=$PROJECT_ID', '--region=${_REGION}', '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID', '--service-account=${_RUNTIME_SA}', '--set-env-vars=PUBLIC_BASE_URL=${_PUBLIC_BASE_URL}', '--port=8080', '--min-instances=0', '--max-instances=2', '--memory=256Mi', '--quiet']
+    args: ['run', 'deploy', '${_SERVICE}', '--project=$PROJECT_ID', '--region=${_REGION}', '--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID', '--service-account=${_RUNTIME_SA}', '--update-env-vars=PUBLIC_BASE_URL=${_PUBLIC_BASE_URL}', '--port=8080', '--min-instances=0', '--max-instances=2', '--memory=256Mi', '--quiet']
 images: ['${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID']
 serviceAccount: projects/$PROJECT_ID/serviceAccounts/${_BUILD_SA}
 options:
