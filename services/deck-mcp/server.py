@@ -141,7 +141,25 @@ def make_handler(root, brand_loader):
             if urlparse(self.path).path != "/mcp":
                 self.send_error(404)
                 return
-            length = int(self.headers.get("Content-Length") or 0)
+            # This local writer must not accept browser cross-origin or DNS-rebinding requests.
+            port = self.server.server_address[1]
+            allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
+            host = self.headers.get("Host", "")
+            origin = self.headers.get("Origin")
+            if host not in allowed_hosts or (origin and origin != f"http://{host}"):
+                self.send_error(403)
+                return
+            if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
+                self.send_error(415)
+                return
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                self.send_error(400)
+                return
+            if length <= 0:
+                self.send_error(400)
+                return
             if length > 1_000_000:
                 self.send_error(413)
                 return

@@ -1,10 +1,10 @@
 {
   "title": "Wetland MCP marketplace",
-  "footer": "Independent Wetland project  ·  Not official WaterAid guidance",
+  "footer": "Independent Wetland project  \u00b7  Not official WaterAid guidance",
   "slides": [
     {
       "layout": "title",
-      "kicker": "WETLAND  ·  MCP MARKETPLACE",
+      "kicker": "WETLAND  \u00b7  MCP MARKETPLACE",
       "headline": "The catalogue that can\nbuild the deck",
       "body": "A home for shared helpers, plus the MCP that turns a brief into slides. This file is one of those slides."
     },
@@ -17,27 +17,59 @@
     {
       "layout": "bullets",
       "kicker": "THE MARKETPLACE",
-      "headline": "Find the helper. Paste the link. Then decide.",
+      "headline": "Find a capability. Open the approved agent.",
       "bullets": [
-        "Search by the task: a grant draft, a brand token, a retention question.",
-        "Live and Pilot can be used. Proposed stays labelled as an idea.",
-        "Copy the MCP link into the assistant you already use. One helper per chat.",
-        "Read the answer, open the source, and check it before it leaves your desk."
+        "Browse Wetland by task and try the synthetic Growth demo.",
+        "Open the approved Copilot agent after IT configures its MCP connections.",
+        "Copy the example prompt. Pasting an MCP URL alone does not connect Copilot.",
+        "Review the report, source and definition before sharing."
       ]
     },
     {
       "layout": "catalogue",
       "kicker": "ON THE SHELF",
-      "headline": "One live endpoint. Seven honest concepts.",
+      "headline": "Brand and Growth are live demos",
       "items": [
-        {"name": "Brand & design system", "meta": "Knowledge & brand", "status": "Live"},
-        {"name": "Programme reporting", "meta": "International Programmes", "status": "Concept"},
-        {"name": "Supporter care", "meta": "Supporter Care", "status": "Concept"},
-        {"name": "Water point insights", "meta": "Programme & MERL", "status": "Concept"},
-        {"name": "Fundraising intelligence", "meta": "Fundraising", "status": "Concept"},
-        {"name": "Grant reconciliation", "meta": "Grants Finance", "status": "Concept"},
-        {"name": "Policy & evidence library", "meta": "Policy & Advocacy", "status": "Concept"},
-        {"name": "Team knowledge", "meta": "IT & Operations", "status": "Concept"}
+        {
+          "name": "Brand & design system",
+          "meta": "Knowledge & brand",
+          "status": "Live"
+        },
+        {
+          "name": "Growth KPI reporting",
+          "meta": "Synthetic donor reporting",
+          "status": "Live"
+        },
+        {
+          "name": "Programme reporting",
+          "meta": "International Programmes",
+          "status": "Concept"
+        },
+        {
+          "name": "Supporter care",
+          "meta": "Supporter Care",
+          "status": "Concept"
+        },
+        {
+          "name": "Water point insights",
+          "meta": "Programme & MERL",
+          "status": "Concept"
+        },
+        {
+          "name": "Fundraising intelligence",
+          "meta": "Fundraising",
+          "status": "Concept"
+        },
+        {
+          "name": "Grant reconciliation",
+          "meta": "Grants Finance",
+          "status": "Concept"
+        },
+        {
+          "name": "Policy & evidence library",
+          "meta": "Policy & Advocacy",
+          "status": "Concept"
+        }
       ]
     },
     {
@@ -45,7 +77,7 @@
       "kicker": "THE DECK MCP",
       "headline": "We built the MCP that builds the deck.",
       "bullets": [
-        "An agent sends a brief: the message, the points, and the layout.",
+        "An agent sends a brief to the locally run Deck MCP.",
         "build_deck asks the Brand MCP for colour, type, and the wordmark.",
         "The tool returns a 16:9 PowerPoint a person can open and edit.",
         "The person who presents it still owns every claim on the slide."
@@ -56,9 +88,18 @@
       "kicker": "THIS FILE",
       "headline": "You are looking at an MCP output.",
       "steps": [
-        {"title": "Read the hub", "body": "The story is the Wetland marketplace: status, owner, and a link you can paste."},
-        {"title": "Read the brand", "body": "Colour, Noto Sans, and the white wordmark came from the live Brand MCP."},
-        {"title": "build_deck", "body": "The Deck MCP composed these slides. This deck was built with an MCP too."}
+        {
+          "title": "Read the hub",
+          "body": "Find capabilities, demo links and connection instructions in Wetland."
+        },
+        {
+          "title": "Read the brand",
+          "body": "Colour, Noto Sans, and the white wordmark came from the live Brand MCP."
+        },
+        {
+          "title": "build_deck",
+          "body": "The Deck MCP composed these slides. This deck was built with an MCP too."
+        }
       ]
     },
     {
@@ -76,7 +117,7 @@
       "layout": "close",
       "kicker": "NEXT DECK, SAME PATH",
       "headline": "Find the tool. Ask for the deck.",
-      "body": "The marketplace is the front door. The Deck MCP is how a presentation comes back out.",
+      "body": "Try Growth and Brand live. Deck generation runs locally; a published Copilot agent still requires tenant setup.",
       "link": "https://wetland-ai-workspace-462504004653.northamerica-northeast2.run.app"
     }
   ]

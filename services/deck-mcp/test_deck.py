@@ -153,8 +153,14 @@ class McpTests(unittest.TestCase):
                 with urllib.request.urlopen(request, timeout=5) as response:
                     body = json.loads(response.read().decode())
                 self.assertEqual(body["result"]["serverInfo"]["name"], "wetland-deck-mcp")
+                for headers in [{"Origin": "https://untrusted.example"}, {"Host": "untrusted.example"}]:
+                    request = urllib.request.Request(f"http://127.0.0.1:{port}/mcp", data=payload, headers={"Content-Type": "application/json", **headers})
+                    with self.assertRaises(urllib.error.HTTPError) as caught:
+                        urllib.request.urlopen(request, timeout=5)
+                    self.assertEqual(caught.exception.code, 403)
             finally:
                 server.shutdown()
+                server.server_close()
 
 
 if __name__ == "__main__":

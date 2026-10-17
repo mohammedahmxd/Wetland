@@ -14,3 +14,5 @@ python3 server.py
 ```
 
 `build_deck` takes a brief and an `outputPath` ending in `.pptx`. The path must stay inside the repository root. The caller owns the claims in the brief. This service is a research tool, not official WaterAid guidance.
+
+The HTTP server is local-only and checks the Host and Origin on write requests. It has no user authentication or production deployment configuration. Do not expose it through a public tunnel or deploy it as a hosted service without adding the shared framework's authentication, artifact delivery and release controls.
