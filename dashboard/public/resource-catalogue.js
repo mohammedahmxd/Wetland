@@ -10,7 +10,7 @@ export const departments = [
 const concept = (id, department, title, description, methods, prompt, owner, data) => ({
   id, department, title, description, methods, prompt, owner, data,
   status:'Planned', endpoint:null, permissions:'Proposed read-only access. No service is connected.',
-  setup:'This is a capability concept. An owner, approved data sources, access controls and a deployed MCP endpoint are needed before connection.'
+  setup:'This is a capability concept. An owner, approved data sources, access controls and a deployed MCP are needed before connection.'
 });
 
 export const resources = [
@@ -144,9 +144,9 @@ export function saveResource(catalogue,input,id,role){
   if(!catalogueDepartments(catalogue).some(d=>d.id===input.department))throw Error('Select a department.');
   if(!['Available','Planned'].includes(input.status))throw Error('Select a valid availability.');
   result.department=input.department;result.status=input.status;
-  result.endpoint=webUrl(input.endpoint,'Endpoint');
+  result.endpoint=webUrl(input.endpoint,'MCP');
   result.referenceUrl=webUrl(input.referenceUrl,'Reference link');
-  if(result.status==='Available'&&!result.endpoint)throw Error('An available MCP needs an endpoint URL.');
+  if(result.status==='Available'&&!result.endpoint)throw Error('An available MCP needs an MCP URL.');
   result.transport=input.transport||'Streamable HTTP';
   if(!['Streamable HTTP','SSE'].includes(result.transport))throw Error('Select a supported transport.');
   result.authentication=String(input.authentication||'Not specified').trim();

@@ -4,7 +4,7 @@ import {setupMethodTags} from './method-tags.js';
 export function createResourceLibrary(c) {
   const {esc,btn,link,modal,toast} = c;
   let query='', status='All',managing=false,managerSearch='',managerTab='active';
-  const catalogue=()=>c.state().resourceCatalogue??(c.state().resourceCatalogue=seedCatalogue());
+  const catalogue=()=>{const data=c.state().resourceCatalogue??(c.state().resourceCatalogue=seedCatalogue());for(const r of [...data.items,...data.deleted.map(e=>e.resource)]){if(r.setup==='This is a capability concept. An owner, approved data sources, access controls and a deployed MCP endpoint are needed before connection.')r.setup='This is a capability concept. An owner, approved data sources, access controls and a deployed MCP are needed before connection.';}return data;};
   const resources=()=>catalogue().items;
   const departments=()=>catalogueDepartments(catalogue());
   const canManage=()=>c.state().role==='admin';
@@ -19,7 +19,7 @@ export function createResourceLibrary(c) {
     return `<article class="resource-card" data-resource-id="${esc(r.id)}" tabindex="0" aria-label="Open details for ${esc(r.title)}">
       <div class="resource-card-top"><span class="resource-kind">${available(r)?'MCP RESOURCE':'CAPABILITY CONCEPT'}</span><div class="resource-card-tools">${statusLabel(r)}${actionMenu(r)}</div></div>
       <h3>${esc(r.title)}</h3><p>${esc(r.description)}</p>
-      <div class="resource-endpoint"><span>${available(r)?esc(r.transport||'Streamable HTTP'):'Connection pending'}</span>${r.endpoint?'<code>'+esc(r.endpoint)+'</code>':'<small>Endpoint not provisioned</small>'}</div>
+      <div class="resource-endpoint"><span>${available(r)?esc(r.transport||'Streamable HTTP'):'Connection pending'}</span>${r.endpoint?'<code>'+esc(r.endpoint)+'</code>':'<small>MCP not provisioned</small>'}</div>
       <div class="resource-methods" aria-label="${available(r)?'Available tools':'Proposed tools'}">${r.methods.slice(0,2).map(m=>'<code>'+esc(m)+'</code>').join('')}${r.methods.length>2?'<span>+'+(r.methods.length-2)+' tools</span>':''}</div>
     </article>`;
   }
@@ -48,7 +48,7 @@ export function createResourceLibrary(c) {
       <p class="resource-scope" id="library-scope">${scopeSummary()}</p>
       <div id="library-results">${result.html}</div></section>
       <section class="resource-guide" id="library-guide" aria-labelledby="library-guide-title"><p class="eyebrow">BRING YOUR OWN APPROVED AGENT</p><h2 id="library-guide-title">From discovery to your first prompt.</h2><p>Model Context Protocol (MCP) lets a compatible AI agent discover tools and retrieve information from a connected service.</p>
-        <div class="resource-guide-grid"><div><span class="resource-step">01 / CHOOSE</span><h3>Find a useful resource.</h3><p>Open its details to check availability, data access and purpose. Only available services have a connection URL.</p></div><div><span class="resource-step">02 / CONNECT</span><h3>Add the MCP server.</h3><p>In your agent’s MCP settings, add the endpoint as a remote Streamable HTTP server. Follow your client’s setup instructions.</p></div><div><span class="resource-step">03 / ASK & REVIEW</span><h3>Start with a clear prompt.</h3><p>Copy the resource’s example, adapt it to your task and review the answer against its sources before using it.</p></div></div>
+        <div class="resource-guide-grid"><div><span class="resource-step">01 / CHOOSE</span><h3>Find a useful resource.</h3><p>Open its details to check availability, data access and purpose. Only available services have a connection URL.</p></div><div><span class="resource-step">02 / CONNECT</span><h3>Add the MCP server.</h3><p>In your agent’s MCP settings, add the MCP as a remote Streamable HTTP server. Follow your client’s setup instructions.</p></div><div><span class="resource-step">03 / ASK & REVIEW</span><h3>Start with a clear prompt.</h3><p>Copy the resource’s example, adapt it to your task and review the answer against its sources before using it.</p></div></div>
         <div class="resource-prompt-panel"><div><span class="resource-step">A SHARED STARTING POINT</span><h3>Keep people and evidence in the loop.</h3></div>${action('Copy starter prompt','starter','','secondary')}<p id="library-starter">Use only connected, approved tools and permitted data for this task. Cite sources and versions, flag uncertainty or missing information, and prepare a draft for human review. Do not make decisions about people or take external action without authorisation.</p></div>
       </section>
       <p class="resource-footnote">Independent Wetland prototype. Departmental concepts are illustrative, not live WaterAid systems. Availability describes connection readiness, not a real-time health check.</p>
@@ -106,7 +106,7 @@ export function createResourceLibrary(c) {
       <p class="resource-form-error" role="alert" hidden></p><div class="resource-editor-grid">
       ${field('title','Name')}${select('department','Department',departments().map(d=>[d.id,d.title]))}
       ${field('description','Description',{area:true})}${field('owner','Owner / maintainer')}${select('status','Availability',[['Planned','Planned'],['Available','Available']])}
-      <h3 class="full">Connection settings</h3>${field('endpoint','Endpoint URL',{optional:true,hint:'Required for Available entries. HTTP or HTTPS; do not include passwords or tokens.'})}${select('transport','Transport',[['Streamable HTTP','Streamable HTTP'],['SSE','SSE']])}
+      <h3 class="full">Connection settings</h3>${field('endpoint','MCP URL',{optional:true,hint:'Required for Available entries. HTTP or HTTPS; do not include passwords or tokens.'})}${select('transport','Transport',[['Streamable HTTP','Streamable HTTP'],['SSE','SSE']])}
       ${field('authentication','Authentication instructions',{area:true,optional:true,hint:'Describe the authentication process. Do not store credentials here.'})}${field('referenceUrl','Reference / documentation URL',{optional:true})}
       ${field('permissions','Permissions & access scope',{area:true})}${field('data','Data scope',{area:true})}${field('setup','Connection instructions',{area:true})}
       <h3 class="full">Tools & agent guidance</h3><div class="field full"><label for="mcp-methods">Tool methods</label><p class="resource-field-hint" id="method-tags-help">Press Enter or comma to add a tag. Use × to remove one.</p><div class="method-tag-field" data-method-tags><div class="method-tag-list" data-method-list role="group" aria-label="Tool method tags"></div><input id="mcp-methods" data-method-input type="text" autocomplete="off" spellcheck="false" aria-describedby="method-tags-help method-tags-error"><input type="hidden" name="methods" data-method-value><p id="method-tags-error" data-method-error role="alert"></p><span class="sr-only" data-method-status role="status" aria-live="polite"></span></div></div>
@@ -126,7 +126,7 @@ export function createResourceLibrary(c) {
     const config=connectionConfig(r);
     labelledModal(esc(r.title),`<div class="resource-detail"><div class="resource-detail-meta">${statusLabel(r)}<span>${esc(departments().find(d=>d.id===r.department).title)}</span></div>
       <p>${esc(r.description)}</p><dl><div><dt>Owner / maintainer</dt><dd>${esc(r.owner)}</dd></div><div><dt>Access & scope</dt><dd>${esc(r.permissions)}</dd></div><div><dt>Data</dt><dd>${esc(r.data)}</dd></div><div><dt>Transport</dt><dd>${esc(r.transport||'Streamable HTTP')}</dd></div><div><dt>Authentication</dt><dd>${esc(r.authentication||'Not specified')}</dd></div></dl>
-      <h3>Connection</h3>${r.endpoint?'<div class="resource-code">'+esc(r.endpoint)+'</div><div class="actions">'+(available(r)?action('Copy endpoint','endpoint',r.id):'<p>Connection pending; this entry is marked Planned.</p>')+'</div>':'<div class="resource-pending">Endpoint not provisioned. This concept cannot be connected yet.</div>'}${r.referenceUrl?'<a class="btn secondary" href="'+esc(r.referenceUrl)+'" target="_blank" rel="noopener noreferrer">View reference / documentation ↗</a>':''}<p>${esc(r.setup)}</p>
+      <h3>Connection</h3>${r.endpoint?'<div class="resource-code">'+esc(r.endpoint)+'</div><div class="actions">'+(available(r)?action('Copy MCP','endpoint',r.id):'<p>Connection pending; this entry is marked Planned.</p>')+'</div>':'<div class="resource-pending">MCP not provisioned. This concept cannot be connected yet.</div>'}${r.referenceUrl?'<a class="btn secondary" href="'+esc(r.referenceUrl)+'" target="_blank" rel="noopener noreferrer">View reference / documentation ↗</a>':''}<p>${esc(r.setup)}</p>
       <div class="resource-detail-heading"><h3>Example agent prompt</h3>${action('Copy prompt','prompt',r.id)}</div><div class="resource-code prompt-example">${esc(r.prompt)}</div>
       ${config?'<details class="resource-config"><summary>Example remote MCP configuration</summary><p>For clients that support this configuration shape. Check your agent’s documentation; setup is client-specific.</p><pre class="resource-code">'+esc(JSON.stringify(config,null,2))+'</pre>'+action('Copy configuration','config',r.id)+'</details>':''}
       <section class="resource-detail-methods">
@@ -206,7 +206,7 @@ export function createResourceLibrary(c) {
     if(type==='reset'){query='';status='All';document.querySelector('#library-search').value='';document.querySelector('#library-status').value='All';updateResults();document.querySelector('#library-search').focus();}
     if(type==='starter')copy(document.querySelector('#library-starter').textContent,'Starter prompt');
     if(type==='prompt'&&r)copy(r.prompt,'Prompt');
-    if(type==='endpoint'&&r&&available(r))copy(r.endpoint,'Endpoint');
+    if(type==='endpoint'&&r&&available(r))copy(r.endpoint,'MCP');
     if(type==='config'&&r&&available(r))copy(JSON.stringify(connectionConfig(r),null,2),'Configuration');
   });
   return {render};
