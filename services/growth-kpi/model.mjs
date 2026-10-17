@@ -1,7 +1,7 @@
 import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 const base=new URL('./data/',import.meta.url);
-export function parseCSV(text){
+export function parseCSV(text,{withHeaders=false}={}){
  const rows=[];let row=[],value='',quoted=false,closed=false;
  for(let i=0,s=text.replace(/^\uFEFF/,'');i<s.length;i++){
   const c=s[i];
@@ -12,7 +12,8 @@ export function parseCSV(text){
  }
  if(quoted)throw Error('Unclosed CSV quote');if(value||row.length||closed){row.push(value);rows.push(row);}
  const h=rows.shift();if(!h||new Set(h).size!==h.length)throw Error('Missing or duplicate headers');
- return rows.map(r=>{if(r.length!==h.length)throw Error('CSV row width mismatch');return Object.fromEntries(h.map((k,i)=>[k,r[i]]));});
+ const records=rows.map(r=>{if(r.length!==h.length)throw Error('CSV row width mismatch');return Object.fromEntries(h.map((k,i)=>[k,r[i]]));});
+ return withHeaders?{headers:h,rows:records}:records;
 }
 export function day(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s)||!Number.isFinite(Date.parse(s))||new Date(s).toISOString().slice(0,10)!==s)throw Error('Use a valid YYYY-MM-DD date');return s;}
 function cents(s){if(!/^\d+\.\d{2}$/.test(s))throw Error('Invalid monetary amount');const n=Math.round(Number(s)*100);if(!Number.isSafeInteger(n))throw Error('Amount out of range');return n;}
