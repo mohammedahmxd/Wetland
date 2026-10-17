@@ -10,9 +10,9 @@ export function createResourceLibrary(c) {
     return `<article class="resource-card" data-resource-id="${r.id}">
       <div class="resource-card-top"><span class="resource-kind">${r.endpoint?'PUBLIC REFERENCE':'CAPABILITY CONCEPT'}</span>${statusLabel(r)}</div>
       <h3>${esc(r.title)}</h3><p>${esc(r.description)}</p>
-      <div class="resource-methods" aria-label="${r.endpoint?'Available tools':'Proposed tools'}">${r.methods.slice(0,2).map(m=>'<code>'+esc(m)+'</code>').join('')}${r.methods.length>2?'<span>+'+(r.methods.length-2)+' tools</span>':''}</div>
       <div class="resource-endpoint"><span>${r.endpoint?'Streamable HTTP · Read-only':'Endpoint not provisioned'}</span>${r.endpoint?'<code>'+esc(r.endpoint)+'</code>':'<small>Proposed capability · connection pending</small>'}</div>
       ${action('View details & agent prompt <span aria-hidden="true">↗</span>','details',r.id,'resource-open')}
+      <div class="resource-methods" aria-label="${r.endpoint?'Available tools':'Proposed tools'}">${r.methods.slice(0,2).map(m=>'<code>'+esc(m)+'</code>').join('')}${r.methods.length>2?'<span>+'+(r.methods.length-2)+' tools</span>':''}</div>
     </article>`;
   }
 
@@ -59,9 +59,11 @@ export function createResourceLibrary(c) {
     modal(esc(r.title),`<div class="resource-detail"><div class="resource-detail-meta">${statusLabel(r)}<span>${esc(departments.find(d=>d.id===r.department).title)}</span></div>
       <p>${esc(r.description)}</p><dl><div><dt>Proposed steward</dt><dd>${esc(r.owner)}</dd></div><div><dt>Access & scope</dt><dd>${esc(r.permissions)}</dd></div><div><dt>Data</dt><dd>${esc(r.data)}</dd></div></dl>
       <h3>Connection</h3>${r.endpoint?'<div class="resource-code">'+esc(r.endpoint)+'</div><div class="actions">'+action('Copy endpoint','endpoint',r.id)+ '<a class="btn secondary" href="https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/#agents" target="_blank" rel="noopener noreferrer">View reference hub ↗</a></div>':'<div class="resource-pending">Endpoint not provisioned. This concept cannot be connected yet.</div>'}<p>${esc(r.setup)}</p>
-      <h3>${r.endpoint?'Exposed tools':'Proposed tool methods'}</h3><div class="resource-methods">${r.methods.map(m=>'<code>'+esc(m)+'</code>').join('')}</div>
       <div class="resource-detail-heading"><h3>Example agent prompt</h3>${action('Copy prompt','prompt',r.id)}</div><div class="resource-code prompt-example">${esc(r.prompt)}</div>
       ${config?'<details class="resource-config"><summary>Example remote MCP configuration</summary><p>For clients that support this configuration shape. Check your agent’s documentation; setup is client-specific.</p><pre class="resource-code">'+esc(JSON.stringify(config,null,2))+'</pre>'+action('Copy configuration','config',r.id)+'</details>':''}
+      <section class="resource-detail-methods">
+      <h3>${r.endpoint?'Exposed tools':'Proposed tool methods'}</h3><div class="resource-methods">${r.methods.map(m=>'<code>'+esc(m)+'</code>').join('')}</div>
+      </section>
       </div>`);
     const dialog=document.querySelector('#modal');
     dialog.querySelector('h2').id='library-dialog-title';dialog.setAttribute('aria-labelledby','library-dialog-title');
