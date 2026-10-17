@@ -4,6 +4,6 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --check public/app.js && node --check public/hub-studio.js && node test.mjs && node hub-test.mjs"
+    "test": "node --check public/app.js && node --check public/hub-studio.js && node test.mjs && node hub-test.mjs && node resource-test.mjs && node members-test.mjs"
   }
 }
