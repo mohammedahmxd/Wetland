@@ -5,11 +5,11 @@ export const BRAND_ENDPOINT = 'https://wateraid-brand-hub-462504004653.northamer
 const growthOrigin = 'https://wetland-growth-kpi-demo-462504004653.northamerica-northeast2.run.app';
 const examplesOrigin = 'https://wetland-examples-mcp-462504004653.northamerica-northeast2.run.app';
 export const GROWTH_ENDPOINT = growthOrigin+'/mcp';
-// Bump when the seed list changes so browsers holding an older saved library pick up the new one.
-export const CATALOGUE_VERSION = 5;
+// Defaults are upgraded conservatively by resource-migration.js; local edits survive.
+export const CATALOGUE_VERSION = 6;
 
 export const departments = [
-  {id:'live', number:'01', title:'Ready to use', description:'Working MCPs you can use in your AI assistant today.'},
+  {id:'live', number:'01', title:'Ready to use', description:'Try a working demonstration or connect a resource to your approved AI assistant.'},
   {id:'examples', number:'02', title:'Demonstration examples', description:'Examples showing what future MCPs could do. They run on fictional data and illustrative guidance.'}
 ];
 
@@ -17,36 +17,36 @@ const workflowMethods = ['find_skills','get_skill','start_workflow','get_workflo
 
 // What each demonstration MCP supplies and what an agent could do with it, keyed by example scope.
 const exampleDescriptions = {
-  grants:'Supplies funder requirements, approved programme facts, budgets and past reviewer feedback so an agent can draft proposals, identify missing evidence and check eligibility.',
-  'programme-reporting':'Supplies indicator definitions, reporting templates and validated results so an agent can produce consistent reports and flag conflicting figures.',
-  governance:'Supplies policies, decision rights and approval thresholds so an agent can identify who must approve a pilot, purchase or release.',
-  maintenance:'Supplies tool owners, versions, known issues, tests and support documentation so an agent can diagnose problems, propose fixes and prepare handovers.',
-  onboarding:'Supplies role guides, procedures, terminology and training resources so an agent can answer practical questions and create role-specific learning plans.',
-  communications:'Supplies approved claims, messaging, terminology and English/French conventions so an agent can draft consistent updates with traceable sources.',
-  'developer-standards':'Supplies API contracts, architecture decisions, security requirements and reusable components so an agent can build features that fit the existing platform.',
-  learning:'Supplies evaluated pilots, lessons learned and retired approaches so an agent can find relevant experience before anyone proposes another tool.'
+  grants:'Compare a fictional grant call with a sample project brief, identify missing evidence and prepare a cited outline for human eligibility review.',
+  'programme-reporting':'Calculate fictional site connection progress against targets and return cited draft material with gaps and limitations.',
+  governance:'Check declared release evidence against an illustrative checklist and identify remaining review steps. Does not grant approval.',
+  maintenance:'Prioritise issues in a fictional maintenance log and propose tests and review steps without changing tools.',
+  onboarding:'Prepare an illustrative onboarding checklist for staff, contributors or reviewers. Does not grant accounts or access.',
+  communications:'Prepare a cited communications outline from fictional programme figures, with unsupported claims and human review requirements.',
+  'developer-standards':'Compare a self-declared checklist with illustrative developer standards and identify missing checks. Does not inspect a repository.',
+  learning:'Retrieve fictional retrospective lessons and suggested next steps for reporting, maintenance or onboarding.'
 };
 
 export const resources = [
   {
     id:'branding', department:'live', title:'Branding',
-    description:'Gives your assistant the shared brand system: colour tokens, typography, approved logos and assets, and guidance for documents and interfaces.',
+    description:'Gives your assistant the shared brand system: colour tokens, typography, reference logos and assets, and guidance for documents and interfaces.',
     methods:['get_brand_system','list_assets','get_asset','get_ui_guidance','get_document_guidance'],
-    prompt:'Retrieve the document guidance and approved brand assets for a quarterly fundraising report. Summarise the typography, colours and logo requirements and cite the guidance used.',
+    prompt:'Retrieve the document guidance and reference brand assets for a quarterly fundraising report. Summarise the typography, colours and logo requirements and cite the guidance used.',
     owner:'Wetland brand reference project', data:'Public reference material only. Independent research kit; not official WaterAid brand approval.',
     status:'Available', endpoint:BRAND_ENDPOINT, referenceUrl:'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/#agents', transport:'Streamable HTTP', authentication:'No authentication required.', permissions:'Read-only public reference. No authentication required.',
-    setup:'Paste the MCP URL into your prompt. This service does not provide access to donor or programme records.'
+    setup:'Add this Streamable HTTP URL once in your approved assistant’s MCP connection settings, or ask its administrator to connect it. Then use the example prompt with the connected tools. This reference service does not provide access to donor or programme records.'
   },
   {
     id:'growth-reporting', department:'live', title:'Growth Report',
-    description:'Counts first-time donors for a period, compares the result with a target and generates a branded PDF or HTML report with its definition and evidence.',
-    methods:['inspect_growth_dataset','get_metric_definition','calculate_growth','generate_growth_report','explain_growth_result',...workflowMethods],
+    description:'Counts synthetic first-time donors for a period, compares the result with a target and generates a branded PDF or HTML report with its definition and evidence.',
+    methods:['verify_excel_demo_input','inspect_growth_dataset','get_metric_definition','calculate_growth','generate_growth_report','explain_growth_result',...workflowMethods],
     prompt:'Find and read the growth-reporting skill. Generate a branded Growth report for 1 July–30 September 2026 against a target of 150 new donors. Use first-ever received qualifying donations, include the definition and evidence, and return the generated PDF and HTML links. Clearly label the data as synthetic.',
     owner:'Wetland Growth demo project', data:'Fixed synthetic donor dataset. No live supporter or CRM records.', synthetic:true,
-    status:'Available', endpoint:GROWTH_ENDPOINT, demoUrl:growthOrigin+'/', skillIds:['growth-reporting'],
+    status:'Available', endpoint:GROWTH_ENDPOINT, demoUrl:growthOrigin+'/', referenceUrl:growthOrigin+'/excel.html', skillIds:['growth-reporting'],
     transport:'Streamable HTTP', authentication:'No authentication required for this public synthetic demo.',
     permissions:'Synthetic reporting only. Generates demo documents; does not change donor records.',
-    setup:'Paste the MCP URL into your prompt. Finished reports use the Branding MCP for their styling.'
+    setup:'Connect this Streamable HTTP URL once in your approved assistant, then use the example prompt. Discover and read the growth-reporting skill with find_skills and get_skill; start_workflow begins guided reporting. Finished reports require the Branding MCP for rendering and validation. Calculations remain available independently. The Excel demo matches only the supplied synthetic workbook; it does not ingest arbitrary spreadsheets.'
   },
   ...scenarios.map(s=>({
     id:'example-'+s.scope, department:'examples', title:s.name,
@@ -55,7 +55,7 @@ export const resources = [
     status:'Available', endpoint:examplesOrigin+'/mcp/'+s.scope, demoUrl:examplesOrigin+'/?capability='+s.scope, skillIds:[s.scope],
     transport:'Streamable HTTP', authentication:'No authentication required for this public synthetic example.',
     permissions:'Advisory drafts only. No approvals, publication, account changes or live tool changes.',
-    setup:'Paste the MCP URL into your prompt. This endpoint exposes only this example and its workflow tools.'
+    setup:'Connect this scoped Streamable HTTP URL once in your approved assistant, then use the example prompt. Discover and read the playbook with find_skills and get_skill. Use start_workflow for guided checks. This endpoint exposes only this synthetic example and its workflow tools; it does not produce finished branded documents.'
   }))
 ];
 
