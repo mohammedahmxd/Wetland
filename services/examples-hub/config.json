@@ -1,0 +1,84 @@
+{
+  "heading": "Explore eight capabilities with synthetic evidence",
+  "sources": [
+    {
+      "id": "grant-call",
+      "title": "Fictional River Fund call",
+      "text": "The demo call requires a water-access project, a budget, a delivery schedule, and a safeguarding plan. Maximum request: GBP 50000."
+    },
+    {
+      "id": "project-brief",
+      "title": "Fictional Riverbend project brief",
+      "text": "Riverbend is a fictional water-access project. A draft budget of GBP 42000 and a six-month delivery schedule exist. No safeguarding evidence is supplied in this fixture."
+    },
+    {
+      "id": "programme-ledger",
+      "title": "Fictional Q3 programme ledger",
+      "text": "Three fictional sites: A delivered 40 connections of target 50; B delivered 30 of 40; C delivered 20 of 30. Unique site IDs; connections are not people. Outcomes or lasting impact have not been measured."
+    },
+    {
+      "id": "approval-policy",
+      "title": "Illustrative approval procedure",
+      "text": "Example only: require a named owner, passing checks, and an independent reviewer. Private-data releases additionally require a data-access review. Tool advice cannot grant approval or publish a release."
+    },
+    {
+      "id": "maintenance-log",
+      "title": "Fictional service maintenance log",
+      "text": "Brand guidance version change awaits compatibility review (high). Growth dependency patch awaits tests (medium). Example hub description typo awaits review (low). No automatic production modifications."
+    },
+    {
+      "id": "onboarding-guide",
+      "title": "Illustrative onboarding guide",
+      "text": "Staff: learn approved capability scope, run a synthetic example, inspect sources. Contributors: clone source, use fixtures, run tests, submit a pull request. Reviewers: inspect exact-version evidence, check permissions, record an independent decision. Access is granted by an administrator."
+    },
+    {
+      "id": "communications-brief",
+      "title": "Fictional Riverbend communications brief",
+      "text": "Verified fixture fact: 90 water connections delivered against target 120 during Q3 2026. Do not equate connections with people or claim long-term health outcomes. No personal story, consent, or quotation is provided."
+    },
+    {
+      "id": "developer-standard",
+      "title": "Illustrative developer checklist",
+      "text": "MCP packages require a manifest, strict input validation, cited sources, contract tests, no secrets in source, and fail-closed private HTTP authentication. A checked self-assessment is not a code audit."
+    },
+    {
+      "id": "learning-retro",
+      "title": "Fictional pilot retrospective",
+      "text": "Reporting pilot: a shared metric definition prevented CRM-created dates being counted as first gifts. Maintenance pilot: pinned guidance exposed a breaking template change before release. Onboarding pilot: a synthetic example helped contributors reproduce results. These are fictional observations, not measured organisational outcomes."
+    }
+  ],
+  "programme": [
+    {
+      "id": "A",
+      "actual": 40,
+      "target": 50
+    },
+    {
+      "id": "B",
+      "actual": 30,
+      "target": 40
+    },
+    {
+      "id": "C",
+      "actual": 20,
+      "target": 30
+    }
+  ],
+  "maintenance": [
+    {
+      "id": "brand-guidance",
+      "severity": "high",
+      "action": "Review guidance compatibility and run report regression tests before adopting the new version."
+    },
+    {
+      "id": "growth-patch",
+      "severity": "medium",
+      "action": "Test the dependency patch in an isolated branch before review."
+    },
+    {
+      "id": "examples-copy",
+      "severity": "low",
+      "action": "Correct description and review source changes."
+    }
+  ]
+}

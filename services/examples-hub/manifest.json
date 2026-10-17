@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "wetland-examples-hub",
+  "name": "Wetland capability examples",
+  "description": "Eight source-backed synthetic examples: grants, programmes, governance, maintenance, onboarding, communications, developer standards and organisational learning.",
+  "version": "0.1.0",
+  "type": "knowledge",
+  "owner": "Wetland demo maintainers",
+  "dataClassification": "synthetic"
+}
