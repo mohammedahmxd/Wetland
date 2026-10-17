@@ -1,19 +1,31 @@
+import {scenarios} from './example-scenarios.js';
+
 export const BRAND_ENDPOINT = 'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/mcp';
 
-export const GROWTH_ENDPOINT = 'https://wetland-growth-kpi-demo-462504004653.northamerica-northeast2.run.app/mcp';
+const growthOrigin = 'https://wetland-growth-kpi-demo-462504004653.northamerica-northeast2.run.app';
+const examplesOrigin = 'https://wetland-examples-mcp-462504004653.northamerica-northeast2.run.app';
+export const GROWTH_ENDPOINT = growthOrigin+'/mcp';
 // Bump when the seed list changes so browsers holding an older saved library pick up the new one.
-export const CATALOGUE_VERSION = 4;
+export const CATALOGUE_VERSION = 5;
 
 export const departments = [
   {id:'live', number:'01', title:'Ready to use', description:'Working MCPs you can use in your AI assistant today.'},
-  {id:'examples', number:'02', title:'Demonstration examples', description:'Placeholders showing what future MCPs could do. They are not connected to a service yet.'}
+  {id:'examples', number:'02', title:'Demonstration examples', description:'Examples showing what future MCPs could do. They run on fictional data and illustrative guidance.'}
 ];
 
-const example = (id, title, description, methods, prompt, data) => ({
-  id, department:'examples', title, description, methods, prompt, data,
-  owner:'Demonstration placeholder', status:'Planned', endpoint:null, permissions:'Proposed read-only access. No service is connected.',
-  setup:'This is a demonstration placeholder. An owner, approved data sources, access controls and a deployed MCP are needed before connection.'
-});
+const workflowMethods = ['find_skills','get_skill','start_workflow','get_workflow_step','advance_workflow'];
+
+// What each demonstration MCP supplies and what an agent could do with it, keyed by example scope.
+const exampleDescriptions = {
+  grants:'Supplies funder requirements, approved programme facts, budgets and past reviewer feedback so an agent can draft proposals, identify missing evidence and check eligibility.',
+  'programme-reporting':'Supplies indicator definitions, reporting templates and validated results so an agent can produce consistent reports and flag conflicting figures.',
+  governance:'Supplies policies, decision rights and approval thresholds so an agent can identify who must approve a pilot, purchase or release.',
+  maintenance:'Supplies tool owners, versions, known issues, tests and support documentation so an agent can diagnose problems, propose fixes and prepare handovers.',
+  onboarding:'Supplies role guides, procedures, terminology and training resources so an agent can answer practical questions and create role-specific learning plans.',
+  communications:'Supplies approved claims, messaging, terminology and English/French conventions so an agent can draft consistent updates with traceable sources.',
+  'developer-standards':'Supplies API contracts, architecture decisions, security requirements and reusable components so an agent can build features that fit the existing platform.',
+  learning:'Supplies evaluated pilots, lessons learned and retired approaches so an agent can find relevant experience before anyone proposes another tool.'
+};
 
 export const resources = [
   {
@@ -26,60 +38,31 @@ export const resources = [
     setup:'Paste the MCP URL into your prompt. This service does not provide access to donor or programme records.'
   },
   {
-    id:'growth-report', department:'live', title:'Growth Report',
-    description:'Counts first-time donors for a period, compares the result with a target and generates a branded PDF or HTML report with its definition and evidence. Uses synthetic data.',
-    methods:['get_metric_definition','inspect_growth_dataset','calculate_growth','explain_growth_result','generate_growth_report'],
-    prompt:'Generate a branded Growth report for 1 July–30 September 2026 against a target of 150 new donors. Use first-ever received qualifying donations, include the definition and evidence, and provide the PDF and HTML report links.',
-    owner:'Wetland growth reporting project', data:'Synthetic donor records only. Returns totals and trends, never names or contact details.',
-    status:'Available', endpoint:GROWTH_ENDPOINT, referenceUrl:'https://wetland-growth-kpi-demo-462504004653.northamerica-northeast2.run.app/', transport:'Streamable HTTP', authentication:'No authentication required.', permissions:'Read-only access to a synthetic dataset. No authentication required.',
-    setup:'Paste the MCP URL into your prompt. Reports use the Branding MCP for their styling.'
+    id:'growth-reporting', department:'live', title:'Growth Report',
+    description:'Counts first-time donors for a period, compares the result with a target and generates a branded PDF or HTML report with its definition and evidence.',
+    methods:['inspect_growth_dataset','get_metric_definition','calculate_growth','generate_growth_report','explain_growth_result',...workflowMethods],
+    prompt:'Find and read the growth-reporting skill. Generate a branded Growth report for 1 July–30 September 2026 against a target of 150 new donors. Use first-ever received qualifying donations, include the definition and evidence, and return the generated PDF and HTML links. Clearly label the data as synthetic.',
+    owner:'Wetland Growth demo project', data:'Fixed synthetic donor dataset. No live supporter or CRM records.', synthetic:true,
+    status:'Available', endpoint:GROWTH_ENDPOINT, demoUrl:growthOrigin+'/', skillIds:['growth-reporting'],
+    transport:'Streamable HTTP', authentication:'No authentication required for this public synthetic demo.',
+    permissions:'Synthetic reporting only. Generates demo documents; does not change donor records.',
+    setup:'Paste the MCP URL into your prompt. Finished reports use the Branding MCP for their styling.'
   },
-  example('grant-applications','Grant applications',
-    'Supplies funder requirements, approved programme facts, budgets and past reviewer feedback so an agent can draft proposals, identify missing evidence and check eligibility.',
-    ['get_funder_requirements','find_programme_facts','get_reviewer_feedback','check_eligibility'],
-    'Draft a proposal outline for this funder using approved programme facts and budgets. Check eligibility against the funder requirements, list any missing evidence and note past reviewer feedback that applies.',
-    'Funder requirements, approved programme facts, budgets and past reviewer feedback.'),
-  example('programme-reporting','Programme reporting',
-    'Supplies indicator definitions, reporting templates and validated results so an agent can produce consistent reports and flag conflicting figures.',
-    ['get_indicator_definition','get_reporting_template','get_validated_results'],
-    'Produce a programme report for this period using the standard template and validated results. Use the agreed indicator definitions and flag any figures that conflict.',
-    'Indicator definitions, reporting templates and validated results.'),
-  example('governance-approvals','Governance and approvals',
-    'Supplies policies, decision rights and approval thresholds so an agent can identify who must approve a pilot, purchase or release.',
-    ['find_policy','get_decision_rights','get_approval_threshold'],
-    'Who needs to approve this pilot? Check the relevant policy, decision rights and approval thresholds, and list the approvers in order with the policy each one comes from.',
-    'Policies, decision rights and approval thresholds.'),
-  example('tool-maintenance','Tool maintenance',
-    'Supplies tool owners, versions, known issues, tests and support documentation so an agent can diagnose problems, propose fixes and prepare handovers.',
-    ['get_tool_owner','list_known_issues','get_test_results','get_support_docs'],
-    'This tool is returning an error. Check its version, known issues and test results, suggest a likely cause and a fix, and tell me who owns it.',
-    'Tool owners, versions, known issues, tests and support documentation.'),
-  example('staff-onboarding','Staff onboarding',
-    'Supplies role guides, procedures, terminology and training resources so an agent can answer practical questions and create role-specific learning plans.',
-    ['get_role_guide','find_procedure','define_term','list_training'],
-    'I am starting as a Supporter Care Officer. Create a two-week learning plan from my role guide and training resources, and explain the terms I will hear most often.',
-    'Role guides, procedures, terminology and training resources.'),
-  example('communications','Communications',
-    'Supplies approved claims, messaging, terminology and English/French conventions so an agent can draft consistent updates with traceable sources.',
-    ['find_approved_claims','get_messaging','get_terminology','get_language_conventions'],
-    'Draft a short supporter update in English and French about our clean water work. Use only approved claims and messaging, and cite the source of each claim.',
-    'Approved claims, messaging, terminology and English/French conventions.'),
-  example('developer-standards','Developer standards',
-    'Supplies API contracts, architecture decisions, security requirements and reusable components so an agent can build features that fit the existing platform.',
-    ['get_api_contract','find_architecture_decision','get_security_requirements','list_components'],
-    'I need to add a donation export feature. Which API contracts, architecture decisions, security requirements and reusable components apply?',
-    'API contracts, architecture decisions, security requirements and reusable components.'),
-  example('organisational-learning','Organisational learning',
-    'Supplies evaluated pilots, lessons learned and retired approaches so an agent can find relevant experience before anyone proposes another tool.',
-    ['find_evaluated_pilots','get_lessons_learned','list_retired_approaches'],
-    'Before I propose a chatbot for supporter questions, have we tried anything similar? Summarise relevant pilots, lessons learned and retired approaches.',
-    'Evaluated pilots, lessons learned and retired approaches.')
+  ...scenarios.map(s=>({
+    id:'example-'+s.scope, department:'examples', title:s.name,
+    description:exampleDescriptions[s.scope], methods:[s.tool,...workflowMethods], prompt:s.prompt,
+    owner:'Wetland synthetic examples project', data:'Invented demonstration fixtures and illustrative guidance. No live organisational records.', synthetic:true,
+    status:'Available', endpoint:examplesOrigin+'/mcp/'+s.scope, demoUrl:examplesOrigin+'/?capability='+s.scope, skillIds:[s.scope],
+    transport:'Streamable HTTP', authentication:'No authentication required for this public synthetic example.',
+    permissions:'Advisory drafts only. No approvals, publication, account changes or live tool changes.',
+    setup:'Paste the MCP URL into your prompt. This endpoint exposes only this example and its workflow tools.'
+  }))
 ];
 
 export function matchingResources(query='', status='All', catalogue=resources, groups=departments) {
   const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
   return catalogue.filter(r => (status==='All' || r.status===status) && words.every(word =>
-    [r.title,r.description,r.owner,r.department,groups.find(d=>d.id===r.department)?.title||'',...r.methods].join(' ').toLowerCase().includes(word)));
+    [r.title,r.description,r.owner,r.department,r.synthetic?'synthetic':'',...(r.skillIds||[]),groups.find(d=>d.id===r.department)?.title||'',...r.methods].join(' ').toLowerCase().includes(word)));
 }
 
 export function connectionConfig(resource) {
@@ -113,8 +96,9 @@ export function deleteDepartment(catalogue,id,role){
   requireCatalogueAdmin(role);
   const groups=catalogueDepartments(catalogue),department=groups.find(d=>d.id===id);
   if(!department)throw Error('This department no longer exists.');
-  const entries=[...catalogue.items,...catalogue.deleted.map(e=>e.resource)].filter(r=>r.department===id);
-  if(entries.length)throw Error("Can't delete this department because it contains MCPs, including any deleted entries. Only empty departments can be deleted.");
+  if(catalogue.items.some(r=>r.department===id))throw Error("Can't delete this department because it still contains MCPs. Delete or move its MCPs first.");
+  // Deleted entries can't be restored without their department, so they go with it.
+  catalogue.deleted=catalogue.deleted.filter(e=>e.resource.department!==id);
   catalogue.departments=groups.filter(d=>d.id!==id);renumber(catalogue.departments);
   return department;
 }
@@ -142,6 +126,11 @@ export function saveResource(catalogue,input,id,role){
   result.department=input.department;result.status=input.status;
   result.endpoint=webUrl(input.endpoint,'MCP');
   result.referenceUrl=webUrl(input.referenceUrl,'Reference link');
+  result.demoUrl=webUrl(input.demoUrl??current?.demoUrl,'Demo link');
+  const skillInput=input.skillIds??current?.skillIds??[];
+  result.skillIds=[...new Set((Array.isArray(skillInput)?skillInput:String(skillInput).split(/[\n,]/)).map(x=>String(x).trim()).filter(Boolean))];
+  if(result.skillIds.length>50||result.skillIds.some(id=>!/^[a-z][a-z0-9-]{2,63}$/.test(id)))throw Error('Use skill IDs of 3–64 lowercase letters, numbers or hyphens.');
+  result.synthetic=input.synthetic===undefined?!!current?.synthetic:input.synthetic===true||input.synthetic==='true';
   if(result.status==='Available'&&!result.endpoint)throw Error('An available MCP needs an MCP URL.');
   result.transport=input.transport||'Streamable HTTP';
   if(!['Streamable HTTP','SSE'].includes(result.transport))throw Error('Select a supported transport.');

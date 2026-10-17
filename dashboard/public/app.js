@@ -2,13 +2,14 @@ import {ensureMembers,currentMember,selectMember,roleLabel} from './members.js';
 import {createRoleManager} from './roles.js';
 import {enhanceDropdowns} from './dropdowns.js';
 import {createStudio} from './hub-studio.js';
+import {bindDashboardAuth, signOutSession} from './auth.js';
 import{ROLES,STAGES,uid,initialState,record,requireRole,createRequest,transition,submitProject,claimTask,submitTask,acceptTask,publishUpdate,rollback,reportIssue,SOURCE_DOCS,compose,evaluations}from'./model.js';
 const KEY='wetland-demo-v1';let storageError=false;let s;
 try{s=JSON.parse(localStorage.getItem(KEY));if(s?.schema!==1)s=initialState()}catch{s=initialState();storageError=true}
 if(s.role==='staff'||s.role==='reviewer')s.role='admin';
 ensureMembers(s);
 let sidebarCollapsed=false;try{sidebarCollapsed=localStorage.getItem('wetland-sidebar-collapsed')==='true';}catch{}
-let route='overview',selected='',query='',filter='All',selectedSources=['A','B','C'],draft=null,editing=false,changeQuery='';
+let route='overview',selected='',query='',filter='All',selectedSources=['A','B','C'],draft=null,editing=false,changeQuery='',sessionEmail='',admitted=false;
 const $=q=>document.querySelector(q);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={home:'M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z',grid:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',file:'M14 2H5v20h14V7z M14 2v5h5 M8 12h8 M8 16h8',users:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M16 3a4 4 0 0 1 0 8 M22 21v-2a4 4 0 0 0-3-3.87 M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',shield:'M12 3 3 7v5c0 5 9 10 9 10s9-5 9-10V7z M8 12l3 3 5-6',tool:'m14 6 4 4 M6 14l-3 3a3 3 0 0 0 4 4l3-3 M8 16l8-8 M14 3a6 6 0 0 0-7 8l6 6a6 6 0 0 0 8-7l-4 4-7-7Z',box:'m12 2 9 5v10l-9 5-9-5V7z M3 7l9 5 9-5 M12 12v10',activity:'M3 12h4l3-8 4 16 3-8h4',arrow:'M4 12h16 M14 6l6 6-6 6',plus:'M12 5v14 M5 12h14',check:'m5 12 4 4L19 6',clock:'M12 8v5l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',menu:'M3 6h18 M3 12h18 M3 18h18',search:'M21 21l-5-5 M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0',download:'M12 3v12 M7 10l5 5 5-5 M4 16v5h16v-5',heart:'M20 4c-3-3-7-1-8 2-1-3-5-5-8-2-6 6 8 16 8 16S26 10 20 4',code:'m8 5-7 7 7 7 M16 5l7 7-7 7 M14 3l-4 18'};
@@ -31,14 +32,15 @@ function empty(title,body){return'<div class="empty"><h3>'+title+'</h3><p>'+body
 function timeline(events,limit=6){return'<ul class="timeline">'+events.slice(0,limit).map(e=>'<li>'+esc(e.message)+'<small>'+esc(e.actor)+' · '+nowLabel(e.at)+(e.kind==='Seeded demo'?' · Seeded example':'')+'</small></li>').join('')+'</ul>'}
 function shell(content){let nav=[['overview','Hub overview','home'],['library','Resource library','grid'],['changelog','Change log','activity']];if(s.role==='admin')nav.push(['roles','Roles','shield']);else nav=nav.filter(([id])=>['overview','library','changelog'].includes(id));
 const active=['run','stewardship'].includes(route)?'tools':route==='project'?'requests':route==='review'?'governance':route==='document'?'documents':route;
-$('#app').innerHTML='<aside class="sidebar" id="workspace-sidebar"><div class="brand"><img src="assets/wateraid-logo.png" alt="WaterAid brand reference"><span class="project">WETLAND</span><small>MCP hub & resource library</small></div><div class="nav-label">WORK TOGETHER</div><nav aria-label="Main navigation">'+nav.map(([r,l,i])=>'<a class="nav-item '+(r===active?'active':'')+'" href="#'+r+'" '+(r===active?'aria-current="page"':'')+' aria-label="'+esc(l)+'" title="'+esc(l)+'">'+icon(i)+'<span class="nav-item-label">'+l+'</span>'+(r==='governance'?'<span class="nav-count">'+(s.projects.filter(p=>['Review','Pilot'].includes(p.status)||p.candidate).length+s.tasks.filter(t=>t.status==='Review').length)+'</span>':'')+'</a>').join('')+'</nav><div class="side-bottom"><button class="sidebar-toggle" data-action="toggle-sidebar" aria-controls="workspace-sidebar" aria-label="Collapse sidebar" title="Collapse sidebar" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button></div></aside><div class="shell"><header class="topbar"><button class="mobile-menu" data-action="menu" aria-label="Toggle navigation" aria-controls="workspace-sidebar" aria-expanded="false">'+icon('arrow')+'</button><div class="breadcrumb">Wetland <span style="padding:0 8px">/</span><b>'+esc(nav.find(x=>x[0]===active)?.[1]||'Workspace')+'</b></div><div class="top-actions"><span class="demo-pill">SYNTHETIC DATA · DEMO</span><label for="role" class="sr-only" style="margin:0;font-size:10px">View as</label><select id="role" class="role-select" aria-label="Demo user">'+s.members.map(m=>'<option value="'+esc(m.id)+'" '+(s.activeMemberId===m.id?'selected':'')+'>'+esc(m.name)+' · '+roleLabel(m.role)+'</option>').join('')+'</select><span class="avatar">'+esc(currentMember(s).name.split(' ').map(n=>n[0]).join(''))+'</span></div></header><main id="main" tabindex="-1">'+(storageError?'<div class="notice warning">Storage is unavailable. Changes last only for this visit; export your session to retain them.</div>':'')+content+'<footer class="bottom-note"><span>Hub sandbox v0.3 · Synthetic data · Browser-local editing</span><a href="https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/" target="_blank" rel="noopener noreferrer">Brand reference ↗</a></footer></main></div>';enhanceDropdowns($('#app'));syncSidebar();}
+$('#app').innerHTML='<aside class="sidebar" id="workspace-sidebar"><div class="brand"><img src="assets/wateraid-logo.png" alt="WaterAid brand reference"><span class="project">WETLAND</span><small>MCP hub & resource library</small></div><div class="nav-label">WORK TOGETHER</div><nav aria-label="Main navigation">'+nav.map(([r,l,i])=>'<a class="nav-item '+(r===active?'active':'')+'" href="#'+r+'" '+(r===active?'aria-current="page"':'')+' aria-label="'+esc(l)+'" title="'+esc(l)+'">'+icon(i)+'<span class="nav-item-label">'+l+'</span>'+(r==='governance'?'<span class="nav-count">'+(s.projects.filter(p=>['Review','Pilot'].includes(p.status)||p.candidate).length+s.tasks.filter(t=>t.status==='Review').length)+'</span>':'')+'</a>').join('')+'</nav><div class="side-bottom"><button class="sidebar-toggle" data-action="toggle-sidebar" aria-controls="workspace-sidebar" aria-label="Collapse sidebar" title="Collapse sidebar" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button></div></aside><div class="shell"><header class="topbar"><button class="mobile-menu" data-action="menu" aria-label="Toggle navigation" aria-controls="workspace-sidebar" aria-expanded="false">'+icon('arrow')+'</button><div class="breadcrumb">Wetland <span style="padding:0 8px">/</span><b>'+esc(nav.find(x=>x[0]===active)?.[1]||'Workspace')+'</b></div><div class="top-actions"><span class="demo-pill">SYNTHETIC DATA · DEMO</span><span class="signed-in">'+esc(sessionEmail)+'</span><button class="btn secondary small" type="button" data-action="sign-out">Sign out</button><label for="role" class="sr-only" style="margin:0;font-size:10px">View as</label><select id="role" class="role-select" aria-label="Demo user">'+s.members.map(m=>'<option value="'+esc(m.id)+'" '+(s.activeMemberId===m.id?'selected':'')+'>'+esc(m.name)+' · '+roleLabel(m.role)+'</option>').join('')+'</select><span class="avatar">'+esc(currentMember(s).name.split(' ').map(n=>n[0]).join(''))+'</span></div></header><main id="main" tabindex="-1">'+(storageError?'<div class="notice warning">Storage is unavailable. Changes last only for this visit; export your session to retain them.</div>':'')+content+'<footer class="bottom-note"><span>Hub sandbox v0.3 · Synthetic data · Browser-local editing</span><a href="https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/" target="_blank" rel="noopener noreferrer">Brand reference ↗</a></footer></main></div>';enhanceDropdowns($('#app'));syncSidebar();}
 function syncSidebar(){
+const sidebar=$('.sidebar');if(!sidebar)return;
 $('#app').classList.toggle('sidebar-collapsed',sidebarCollapsed);
-const mobile=matchMedia('(max-width:760px)').matches,expanded=mobile?$('.sidebar').classList.contains('open'):!sidebarCollapsed;
-$('.sidebar').inert=mobile&&!expanded;
-const button=$('.sidebar-toggle'),label=expanded?(mobile?'Close sidebar':'Collapse sidebar'):'Expand sidebar';
-button.setAttribute('aria-expanded',String(expanded));button.setAttribute('aria-label',label);button.title=label;
-$('.mobile-menu').setAttribute('aria-expanded',String(mobile&&expanded));
+const mobile=matchMedia('(max-width:760px)').matches,expanded=mobile?sidebar.classList.contains('open'):!sidebarCollapsed;
+sidebar.inert=mobile&&!expanded;
+const button=$('.sidebar-toggle');
+if(button){const label=expanded?(mobile?'Close sidebar':'Collapse sidebar'):'Expand sidebar';button.setAttribute('aria-expanded',String(expanded));button.setAttribute('aria-label',label);button.title=label;}
+const menu=$('.mobile-menu');if(menu)menu.setAttribute('aria-expanded',String(mobile&&expanded));
 }
 window.addEventListener('resize',()=>{if($('.sidebar'))syncSidebar();});
 function closeMobileSidebar(){if(!matchMedia('(max-width:760px)').matches||!$('.sidebar')?.classList.contains('open'))return;$('.sidebar').classList.remove('open');syncSidebar();$('.mobile-menu').focus();}
@@ -83,6 +85,7 @@ function download(name,text,type='text/plain'){const u=URL.createObjectURL(new B
 function updateDraft(){if(!draft)return;let i=s.runs.findIndex(r=>r.id===draft.id);if(i>=0)s.runs[i]=structuredClone(draft);save()}
 document.addEventListener('click',e=>{let b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;if(a.startsWith('hub-'))return;
 try{
+if(a==='sign-out'){signOutSession();return}
 if(a==='menu'){$('.sidebar').classList.toggle('open');syncSidebar();return}
 if(a==='toggle-sidebar'){if(matchMedia('(max-width:760px)').matches){$('.sidebar').classList.remove('open');syncSidebar();$('.mobile-menu').focus();}else{sidebarCollapsed=!sidebarCollapsed;try{localStorage.setItem('wetland-sidebar-collapsed',String(sidebarCollapsed));}catch{}syncSidebar();}return}
 if(a==='close'){close();return}
@@ -139,5 +142,8 @@ document.addEventListener('input',e=>{if(e.target.id==='change-search'){changeQu
 document.addEventListener('click',e=>{if(e.target.closest('a.skip')){e.preventDefault();$('#main').focus();$('#main').scrollIntoView();return;}if(e.target.closest('a[href^="#"]')&&$('#modal').open)close()});
 const roleManager=createRoleManager({state:()=>s,esc,btn,modal,close,toast,save,render,pageHead,reportError});
 const studio=createStudio({state:()=>s,esc,btn,link,badge,pageHead,modal,close,toast,save,record,download,render});
-window.addEventListener('hashchange',navigate);
-navigate();
+window.addEventListener('hashchange',()=>{if(admitted)navigate()});
+bindDashboardAuth({
+  onAdmit(user){admitted=true;sessionEmail=user.email;navigate()},
+  onReject(){admitted=false;sessionEmail=''}
+});

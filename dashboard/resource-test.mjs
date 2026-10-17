@@ -7,25 +7,27 @@ const saveDepartment=(c,input,id)=>writeDepartment(c,input,id,'admin');
 const deleteDepartment=(c,id)=>removeDepartment(c,id,'admin');
 
 assert.equal(new Set(resources.map(r=>r.id)).size,resources.length);
-assert.equal(resources.filter(r=>r.status==='Available').length,2);
+assert.equal(resources.filter(r=>r.status==='Available').length,10);
+assert.equal(resources.length,10);
 for(const r of resources){
   assert(departments.some(d=>d.id===r.department));
-  if(r.status==='Planned'){assert.equal(r.endpoint,null);assert.equal(connectionConfig(r),null);}
-  else {assert([BRAND_ENDPOINT,GROWTH_ENDPOINT].includes(r.endpoint));assert.equal(connectionConfig(r).mcpServers[r.id].url,r.endpoint);}
+  assert.ok(r.endpoint.startsWith('https://'));assert.equal(connectionConfig(r).mcpServers[r.id].url,r.endpoint);
 }
+assert.deepEqual(resources.filter(r=>r.department==='live').map(r=>r.id),['branding','growth-reporting']);
+assert.equal(resources.find(r=>r.id==='branding').endpoint,BRAND_ENDPOINT);
+assert.equal(resources.find(r=>r.id==='growth-reporting').endpoint,GROWTH_ENDPOINT);
 assert.equal(matchingResources('DEMONSTRATION').length,8);
-assert.deepEqual(matchingResources('  approval threshold  ').map(r=>r.id),['governance-approvals']);
-assert.equal(matchingResources('grant','Available').length,0);
-assert.equal(matchingResources('','Planned').length,8);
+assert.deepEqual(matchingResources('  approval thresholds  ').map(r=>r.id),['example-governance']);
+assert.equal(matchingResources('','Planned').length,0);
 assert.equal(matchingResources('no-such-resource').length,0);
 console.log('PASS: departmental search, status filters and connection configs exclude unprovisioned concepts.');
 let catalogue=seedCatalogue();
 const input={title:'Test service',department:'examples',description:'Find reviewed operational guidance.',owner:'IT team',data:'Public guidance',permissions:'Read only',setup:'Connect with the MCP.',prompt:'Find a source.',methods:'find_source, get_version\nfind_source',status:'Planned',endpoint:'',authentication:'No authentication',transport:'Streamable HTTP',referenceUrl:''};
 const added=saveResource(catalogue,input);
-assert.equal(catalogue.items.length,11);assert.deepEqual(added.methods,['find_source','get_version']);
+assert.equal(catalogue.items.length,resources.length+1);assert.deepEqual(added.methods,['find_source','get_version']);
 assert.equal(matchingResources('test service','All',catalogue.items).length,1);
 const updated=saveResource(catalogue,{...input,title:'Updated service',status:'Available',endpoint:'https://example.org/mcp',transport:'SSE'},added.id);
-assert.equal(updated.id,added.id);assert.equal(catalogue.items.length,11);
+assert.equal(updated.id,added.id);assert.equal(catalogue.items.length,resources.length+1);
 assert.equal(connectionConfig(updated).mcpServers[added.id].type,'sse');
 catalogue=JSON.parse(JSON.stringify(catalogue));
 assert.equal(catalogue.items.find(r=>r.id===added.id).title,'Updated service');
@@ -34,8 +36,8 @@ assert.throws(()=>saveResource(catalogue,{...input,endpoint:'javascript:alert(1)
 assert.throws(()=>saveResource(catalogue,{...input,referenceUrl:'https://secret:password@example.org'}),/credentials/);
 assert.throws(()=>saveResource(catalogue,{...input,department:'unknown'}),/department/);
 assert.throws(()=>saveResource(catalogue,{...input,methods:'<script>'}),/method names/);
-assert.equal(catalogue.items.length,11);
-deleteResource(catalogue,added.id);assert.equal(catalogue.items.length,10);
+assert.equal(catalogue.items.length,resources.length+1);
+deleteResource(catalogue,added.id);assert.equal(catalogue.items.length,resources.length);
 assert.equal(matchingResources('updated service','All',catalogue.items).length,0);
 assert.equal(catalogue.deleted[0].resource.prompt,input.prompt);
 assert.throws(()=>deleteResource(catalogue,added.id),/already been deleted/);
@@ -59,12 +61,16 @@ assert.throws(()=>saveDepartment(legacy,{title:'',position:1}),/name/);
 assert.throws(()=>saveDepartment(legacy,{title:'Invalid position',position:99}),/position/);
 assert.throws(()=>deleteDepartment(legacy,group.id),/contains MCPs/);
 assert.equal(legacy.items.find(r=>r.id===moved.id).department,group.id);
-deleteResource(legacy,moved.id);
-assert.throws(()=>deleteDepartment(legacy,group.id),/contains MCPs/);
 const blockedSnapshot=JSON.stringify(legacy);
 assert.throws(()=>deleteDepartment(legacy,group.id),/contains MCPs/);
 assert.equal(JSON.stringify(legacy),blockedSnapshot);
-restoreResource(legacy,moved.id);
+// Once its MCPs are deleted the department can go, taking its unrestorable deleted entries with it.
+const purge=structuredClone(legacy);
+removeResource(purge,moved.id,'admin');
+assert.equal(purge.deleted.length,1);
+removeDepartment(purge,group.id,'admin');
+assert.equal(purge.departments.some(d=>d.id===group.id),false);
+assert.equal(purge.deleted.length,0);
 saveResource(legacy,{...legacy.items.find(r=>r.id===moved.id),department:'examples'},moved.id);
 deleteDepartment(legacy,group.id);
 assert.equal(legacy.items.find(r=>r.id===moved.id).department,'examples');
@@ -74,14 +80,14 @@ const first=saveDepartment(empty,{title:'First',position:1});
 assert.equal(first.number,'01');deleteDepartment(empty,first.id);assert.equal(empty.departments.length,0);
 assert.equal(JSON.parse(JSON.stringify(legacy)).departments.length,2);
 assert.equal(departments[0].title,'Ready to use');
-console.log('PASS: department migration, CRUD, ordering, renamed search and deletion blocked for active/deleted MCPs and empty-department deletion.');
+console.log('PASS: department migration, CRUD, ordering, renamed search, deletion blocked while MCPs remain and allowed once they are deleted.');
 
 for(const role of ['contributor','reviewer',undefined]){
  const state=seedCatalogue(),before=JSON.stringify(state);
  assert.throws(()=>writeResource(state,input,undefined,role),/Only admins/);
- if(role!=='contributor')assert.throws(()=>writeResource(state,input,'grant-applications',role),/Only admins/);
- assert.throws(()=>removeResource(state,'grant-applications',role),/Only admins/);
- assert.throws(()=>recoverResource(state,'grant-applications',role),/Only admins/);
+ if(role!=='contributor')assert.throws(()=>writeResource(state,input,'example-grants',role),/Only admins/);
+ assert.throws(()=>removeResource(state,'example-grants',role),/Only admins/);
+ assert.throws(()=>recoverResource(state,'example-grants',role),/Only admins/);
  assert.throws(()=>writeDepartment(state,{title:'Blocked',position:1},undefined,role),/Only admins/);
  assert.throws(()=>removeDepartment(state,'examples',role),/Only admins/);
  assert.equal(JSON.stringify(state),before);
@@ -89,7 +95,7 @@ for(const role of ['contributor','reviewer',undefined]){
 console.log('PASS: non-admin roles cannot add, delete, restore or manage departments.');
 
 const contributorState=seedCatalogue();
-const edited=writeResource(contributorState,{...input,title:'Contributor edit'},'grant-applications','contributor');
+const edited=writeResource(contributorState,{...input,title:'Contributor edit'},'example-grants','contributor');
 assert.equal(edited.title,'Contributor edit');
 assert.throws(()=>writeResource(contributorState,input,'missing','contributor'),/Only admins/);
 console.log('PASS: contributors can edit existing MCPs only.');

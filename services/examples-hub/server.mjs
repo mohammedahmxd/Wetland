@@ -9,6 +9,7 @@ if(process.argv.includes('--http')){
  if(!process.env.MCP_AUTH_MODE)throw Error('Set MCP_AUTH_MODE=none explicitly for synthetic demos, or entra for private access');
  if(process.env.MCP_DEMO_UI==='true'&&process.env.MCP_AUTH_MODE!=='none')throw Error('Public presenter requires explicit synthetic mode none');
  const authorize=authorizationFromEnv();
+ if(Buffer.byteLength(process.env.MCP_WORKFLOW_SECRET||'')<32)throw Error('HTTP workflows require MCP_WORKFLOW_SECRET of at least 32 bytes');
  const handlerFor=scope=>createMcpHandler({authorize,createServer:options=>createServer({...options,scope}),Transport:StreamableHTTPServerTransport,publicBaseUrl:process.env.PUBLIC_BASE_URL||`http://localhost:${process.env.PORT||8080}`,dataClassification:pkg.manifest.dataClassification});
  const scopedHandlers=Object.fromEntries(Object.keys(scopes).map(scope=>['/mcp/'+scope,handlerFor(scope)]));
  startHttp({beforeRequest:async(req,res,pathname)=>{if(!pathname.startsWith('/mcp/'))return false;const handler=scopedHandlers[pathname];if(!handler){res.writeHead(404);res.end('Unknown capability');return true;}await handler(req,res);return true;},staticRoot:process.env.MCP_DEMO_UI==='true'?fileURLToPath(new URL('./demo',import.meta.url)):undefined,manifest:pkg.manifest,handler:handlerFor()});

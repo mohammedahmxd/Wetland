@@ -25,6 +25,8 @@ h3{font-size:20px}
 .source-link{min-width:44px;min-height:44px}
 .topbar{min-height:88px;height:auto;padding-top:14px;padding-bottom:14px}
 .role-select{min-height:44px;font-size:13px}
+.signed-in{font-size:13px;color:var(--muted);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.auth-status{min-height:1.5em;margin:14px 0 0}
 .card,.stat,.hero,.notice,.column,.source,.report{border-radius:8px}
 .sponsor-line{font-size:13px;color:var(--muted);padding-top:8px}
 .resource-library{--resource-muted:#44435D;max-width:1320px;margin:0 auto}

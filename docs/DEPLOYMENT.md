@@ -22,8 +22,37 @@ A main-branch push runs those checks and then submits deploy/cloudbuild.yaml. A 
 
 Manual deploy from repository root:
 ```sh
-gcloud builds submit . --project=wateraid-flow --region=northamerica-northeast2 --config=deploy/cloudbuild.yaml
+gcloud builds submit . --project=wateraid-flow --region=northamerica-northeast2 --config=deploy/cloudbuild.yaml --gcs-source-staging-dir=gs://wateraid-flow_cloudbuild/source
 ```
+
+## Source bucket permission repair
+
+GitHub Actions run [39072148111](https://github.com/mohammedahmxd/Wetland/actions/runs/39072148111) passed verification and authenticated successfully, then failed before build submission because `wateraid-flow_cloudbuild` was inaccessible. The generic error suggested `serviceusage.services.use`, but the deployment identity already had `roles/serviceusage.serviceUsageConsumer`. Its bucket-level `roles/storage.objectUser` binding permits source-object uploads but does not include `storage.buckets.get`, which the source-staging bucket check needs.
+
+An administrator can add the missing bucket-metadata access on this bucket only. This command preserves existing IAM bindings:
+
+```sh
+gcloud storage buckets add-iam-policy-binding gs://wateraid-flow_cloudbuild \
+  --member=serviceAccount:wetland-github-deploy@wateraid-flow.iam.gserviceaccount.com \
+  --role=roles/storage.legacyBucketReader \
+  --account=stephen@blacktydemusic.com
+```
+
+The workflow explicitly sets `--gcs-source-staging-dir=gs://wateraid-flow_cloudbuild/source`. This is the same staging location as the default, and its bucket was verified to belong to project number `462504004653`. When the location is inferred, the CLI additionally lists project buckets to check default-bucket ownership; that requires project-level `storage.buckets.list`, which the narrowly scoped deployment identity does not have. Explicitly selecting the verified existing bucket avoids that extra list operation while retaining the bucket metadata check and source upload. Keep this flag in both automated and manual submissions; the bucket-level reader grant alone does not fix the inferred-default path. Reverify ownership before changing the staging bucket.
+
+Keep the existing `roles/storage.objectUser` binding. Do not grant project-wide Storage Admin or broaden GitHub's workload-identity trust to repair this error. The submitter must also retain `roles/cloudbuild.builds.editor` and `roles/serviceusage.serviceUsageConsumer` on the project, plus `roles/iam.serviceAccountUser` on `wateraid-build@wateraid-flow.iam.gserviceaccount.com`.
+
+Verify the bucket binding without deploying:
+
+```sh
+gcloud storage buckets get-iam-policy gs://wateraid-flow_cloudbuild \
+  --account=stephen@blacktydemusic.com
+gcloud iam service-accounts get-iam-policy \
+  wateraid-build@wateraid-flow.iam.gserviceaccount.com \
+  --project=wateraid-flow --account=stephen@blacktydemusic.com
+```
+
+IAM inspection verifies the grants, not a successful end-to-end deployment. Re-running the failed main workflow deploys its original commit; do that only when that revision is intended for release. Otherwise, verify the next reviewed main release through its Actions run and resulting Cloud Build/Cloud Run revision. A manual submission under an administrator's credentials does not prove GitHub's deployment identity works.
 
 ## Rollback
 List service revisions and choose the last known working one:

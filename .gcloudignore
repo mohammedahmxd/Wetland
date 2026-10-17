@@ -5,6 +5,9 @@ node_modules
 backend/dist
 .env
 **/.env
+.env.*
+**/.env.*
+*.log
 gha-creds-*.json
 
 **/.mcp

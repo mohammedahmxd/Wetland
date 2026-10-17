@@ -1,3 +1,4 @@
+import {skillToolNames} from './skill-tools.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
@@ -30,7 +31,7 @@ test('Invalid and duplicate inputs cannot inflate or invent evidence',()=>{
  const privateP=structuredClone(p);privateP.manifest.dataClassification='private';assert.throws(()=>validateDraft(privateP),/Synthetic/);
 });
 test('Stdio discovers all eight tools and twelve resources and calls every preset',async()=>{
- const client=new Client({name:'example-contract',version:'1.0.0'});try{await client.connect(new StdioClientTransport({command:process.execPath,args:[fileURLToPath(new URL('./server.mjs',import.meta.url))]}));const listed=await client.listTools();assert.deepEqual(listed.tools.map(x=>x.name).sort(),Object.keys(definitions).sort());assert.ok(listed.tools.every(t=>t.annotations.readOnlyHint));assert.equal((await client.listResources()).resources.length,12);
+ const client=new Client({name:'example-contract',version:'1.0.0'});try{await client.connect(new StdioClientTransport({command:process.execPath,args:[fileURLToPath(new URL('./server.mjs',import.meta.url))]}));const listed=await client.listTools();assert.deepEqual(listed.tools.map(x=>x.name).sort(),[...Object.keys(definitions),...skillToolNames].sort());assert.ok(listed.tools.every(t=>t.annotations.readOnlyHint));assert.equal((await client.listResources()).resources.length,12);
  for(const s of scenarios){const r=await client.callTool({name:s.tool,arguments:s.args});assert.ok(!r.isError,s.tool);assert.equal(r.structuredContent.classification,'synthetic');}
  const invalid=await client.callTool({name:'plan_staff_onboarding',arguments:{role:'root'}});assert.ok(invalid.isError);
  }finally{await client.close();}
@@ -45,7 +46,7 @@ test('HTTP startup fails closed without explicit mode or with incomplete Entra s
  for(const mode of ['', 'entra']){const env={...process.env,MCP_AUTH_MODE:mode,ENTRA_TENANT_ID:'',ENTRA_API_CLIENT_ID:''};const r=spawnSync(process.execPath,[fileURLToPath(new URL('./server.mjs',import.meta.url)),'--http'],{env,encoding:'utf8',timeout:5000});assert.notEqual(r.status,0);assert.match(r.stderr,mode?/Entra requires/:/Set MCP_AUTH_MODE/);}
 });
 test('Each scoped endpoint exposes only its tool and relevant source resources',async()=>{
- for(const s of scenarios){const client=new Client({name:'scoped-test',version:'1.0.0'});const server=startHttp({manifest:p.manifest,host:'127.0.0.1',port:0,handler:createMcpHandler({createServer:()=>createServer({scope:s.scope}),Transport:StreamableHTTPServerTransport,publicBaseUrl:'http://localhost',dataClassification:'synthetic'})});await once(server,'listening');try{await client.connect(new StreamableHTTPClientTransport(new URL('http://127.0.0.1:'+server.address().port+'/mcp')));assert.deepEqual((await client.listTools()).tools.map(x=>x.name),[s.tool]);const out=await client.callTool({name:s.tool,arguments:s.args});assert.ok(!out.isError);const available=(await client.listResources()).resources.map(x=>x.uri);for(const source of out.structuredContent.sources)assert.ok(available.includes(source.uri));const other=scenarios.find(x=>x.tool!==s.tool);const unavailable=await client.callTool({name:other.tool,arguments:other.args});assert.ok(unavailable.isError);}finally{await client.close();server.closeAllConnections();await new Promise(r=>server.close(r));}}
+ for(const s of scenarios){const client=new Client({name:'scoped-test',version:'1.0.0'});const server=startHttp({manifest:p.manifest,host:'127.0.0.1',port:0,handler:createMcpHandler({createServer:()=>createServer({scope:s.scope}),Transport:StreamableHTTPServerTransport,publicBaseUrl:'http://localhost',dataClassification:'synthetic'})});await once(server,'listening');try{await client.connect(new StreamableHTTPClientTransport(new URL('http://127.0.0.1:'+server.address().port+'/mcp')));assert.deepEqual((await client.listTools()).tools.map(x=>x.name),[s.tool,...skillToolNames]);const out=await client.callTool({name:s.tool,arguments:s.args});assert.ok(!out.isError);const available=(await client.listResources()).resources.map(x=>x.uri);for(const source of out.structuredContent.sources)assert.ok(available.includes(source.uri));const other=scenarios.find(x=>x.tool!==s.tool);const unavailable=await client.callTool({name:other.tool,arguments:other.args});assert.ok(unavailable.isError);}finally{await client.close();server.closeAllConnections();await new Promise(r=>server.close(r));}}
 });
 test('Edited structured facts drive grant checks, communications and cited sources together',()=>{
  const candidate=structuredClone(p);candidate.config.grant.maximumRequestGbp=30000;candidate.config.programme[0].actual=45;candidate.config.programme[0].target=60;validateDraft(candidate);
@@ -53,4 +54,19 @@ test('Edited structured facts drive grant checks, communications and cited sourc
  const communications=evaluateTool('prepare_communications_outline',{channel:'email'},candidate);assert.match(communications.facts[0].claim,/95 connections against a target of 130/);for(const source of communications.sources){assert.match(source.text,/95/);assert.match(source.text,/130/);}
  const programme=evaluateTool('analyse_programme_progress',{siteIds:['A','B','C']},candidate);assert.equal(programme.actual,95);assert.equal(programme.target,130);assert.match(programme.sources[0].text,/Total 95 connections against target 130/);
  candidate.config.sources.find(x=>x.id==='communications-brief').text='Stale 90/120 prose';assert.throws(()=>validateDraft(candidate),/Derived source text/);
+});
+
+test('Scoped skills are retrieved as tool output and workflows enforce unchanged server evidence',async()=>{
+ for(const s of scenarios){const client=new Client({name:'skill-workflow-test',version:'1.0.0'});const server=startHttp({manifest:p.manifest,host:'127.0.0.1',port:0,handler:createMcpHandler({createServer:()=>createServer({scope:s.scope}),Transport:StreamableHTTPServerTransport,publicBaseUrl:'http://localhost',dataClassification:'synthetic'})});await once(server,'listening');
+ try{await client.connect(new StreamableHTTPClientTransport(new URL('http://127.0.0.1:'+server.address().port+'/mcp')));
+ const call=async(name,args)=>{const r=await client.callTool({name,arguments:args});assert.ok(!r.isError,r.content?.[0]?.text);return r.structuredContent;};
+ const found=await call('find_skills',{query:''});assert.equal(found.skills.length,1);assert.equal(found.skills[0].id,s.scope);
+ const skill=await call('get_skill',{id:s.scope});assert.ok(skill.instructions.length);assert.deepEqual(skill.tools,[s.tool]);
+ const missing=await call('start_workflow',{skillId:s.scope});assert.equal(missing.status,'needs-input');
+ let flow=await call('start_workflow',{skillId:s.scope,inputsJson:JSON.stringify(s.args)});assert.equal(flow.step,'check-evidence');
+ const forged=await client.callTool({name:'advance_workflow',arguments:{skillId:s.scope,token:flow.token+'x'}});assert.ok(forged.isError);
+ const wrong=await client.callTool({name:'get_skill',arguments:{id:scenarios.find(x=>x.scope!==s.scope).scope}});assert.ok(wrong.isError);
+ flow=await call('advance_workflow',{skillId:s.scope,token:flow.token});assert.equal(flow.step,'return-advice');assert.equal(flow.result.classification,'synthetic');
+ flow=await call('advance_workflow',{skillId:s.scope,token:flow.token});assert.equal(flow.status,'completed');assert.deepEqual(flow.result,evaluateTool(s.tool,s.args,p));
+ }finally{await client.close();server.closeAllConnections();await new Promise(r=>server.close(r));}}
 });

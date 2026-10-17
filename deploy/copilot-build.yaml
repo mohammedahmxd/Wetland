@@ -6,7 +6,7 @@ substitutions:
 steps:
   - name: node:22-alpine
     entrypoint: sh
-    args: ['-c', 'apk add --no-cache python3 py3-reportlab py3-pypdf py3-pillow poppler-utils && npm ci --ignore-scripts --prefix packages/mcp-runtime && npm ci --ignore-scripts --prefix services/${_PACKAGE} && npm test --prefix packages/mcp-runtime && REPORT_RENDER_TESTS=true npm test --prefix services/${_PACKAGE}']
+    args: ['-c', 'apk add --no-cache python3 py3-reportlab py3-pypdf py3-pillow poppler-utils && npm ci --ignore-scripts --prefix packages/mcp-runtime && npm ci --ignore-scripts --prefix services/${_PACKAGE} && npm test --prefix packages/mcp-runtime && npm test --prefix packages/mcp-skills && REPORT_RENDER_TESTS=true npm test --prefix services/${_PACKAGE}']
   - name: gcr.io/cloud-builders/docker
     args: ['build', '-f', 'services/${_PACKAGE}/Dockerfile', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID', '.']
 images: ['${_REGION}-docker.pkg.dev/$PROJECT_ID/web/${_SERVICE}:$BUILD_ID']
