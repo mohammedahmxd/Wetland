@@ -1,0 +1,25 @@
+WETLAND DOCUMENT GENERATION — REQUIRED PROJECT INSTRUCTIONS
+
+Use the shared WaterAid reference kit for PDFs, documents and presentations as well as UI.
+MCP endpoint: https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/mcp
+Transport: Streamable HTTP. Public read-only; no credentials required.
+
+1. Before designing, call get_brand_system and get_ui_guidance. Read the evidence status and content boundary.
+2. Call list_assets, then get_asset with the exact returned logo ID. Fetch the returned localSvg or suitable PNG URL and embed the actual artwork. A text heading spelling WaterAid or Wetland is not a logo replacement. Use the white WaterAid logo on blue or ink, retain proportions, and do not redraw or recolour it.
+3. Fetch appropriate water, sanitation and hygiene icons when they support the document. Place them beside the corresponding subject; do not imply they represent unrelated claims.
+4. Use the returned palette and embedded Noto Sans regular, bold and black. Noto Sans Black is the kit's substitute heading font, not RB Nylo. Fonts are available under /fonts/ on the same host, with OFL.txt.
+5. Keep the independent Wetland hackathon status explicit. Fictional Water Care Canada case data must never be presented as WaterAid results. Preserve proposed-benefit and evidence labels.
+6. Export the requested format. Assets must be embedded, not merely linked remotely. For raster artwork, use enough pixels for approximately 300 ppi at printed size where available.
+7. Render the exported PDF and inspect every page. Check logo visibility, image proportions, text wrapping, contrast, margins, clipping and page count. Verify embedded image objects and fonts; compare extracted text with intended copy.
+8. Report missing assets, failed fetches or unavailable MCP access explicitly. Do not silently produce a text-only approximation and call it brand-compliant.
+
+If MCP is unavailable, fetch /v1/tokens.json, /v1/assets.json and /brand-brief.md from the same host. Resolve relative asset URLs against that host. Loading the hub in a browser does not automatically configure an agent's MCP connection.
+
+Delivery must include the finished PDF and a brief statement of the assets and render checks used. These project instructions must be supplied to each agent or added to its repository instructions; the MCP server provides references but cannot force a client to use them.
+
+DEFAULT DOCUMENT LAYOUT (team convention)
+Use the reference PDF as the visual baseline: US Letter portrait, blue opening band with original white logo, Wetland concept label, large Noto Sans Black headline, restrained lime emphasis, white body with ink text, cream supporting panels and lime call to action. Use 36-point side margins. Keep body text about 10–11 points with generous leading. For longer reports, continue with readable sections, page numbers and source footnotes; do not squeeze a report onto one page. Preserve the visual identity across other paper sizes. Include icons only where semantically appropriate. Explicit user requirements override the default.
+
+REFERENCE AND REUSABLE STARTER
+/documents/wetland-one-pager-reference.pdf
+/documents/pdf-starter.zip — generator, original assets and open-licensed fonts. Install reportlab and Pillow, then run python3 generate.py. Edit copy and layout as needed; inspect the final render.

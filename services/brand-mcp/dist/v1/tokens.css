@@ -1,0 +1,5 @@
+/* WaterAid Canada observed colours; proposed Wetland use. Research release 0.2.0. */
+@font-face{font-family:"Noto Sans";font-style:normal;font-weight:400;font-display:swap;src:url("../fonts/noto-sans-regular.ttf") format("truetype")}
+@font-face{font-family:"Noto Sans";font-style:normal;font-weight:500 700;font-display:swap;src:url("../fonts/noto-sans-bold.ttf") format("truetype")}
+@font-face{font-family:"Noto Sans";font-style:normal;font-weight:800 950;font-display:swap;src:url("../fonts/noto-sans-black.ttf") format("truetype")}
+:root{--wa-blue:#006BD9;--wa-ink:#151435;--wa-lime:#D6FF00;--wa-cream:#F8F0E4;--wa-white:#FFFFFF;--wa-muted:#44435D;--font-body:"Noto Sans",Arial,sans-serif;--font-display:"Noto Sans",Arial,sans-serif}

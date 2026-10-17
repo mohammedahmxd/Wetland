@@ -1,0 +1,17 @@
+# Wetland WaterAid reference kit
+Research prototype v0.3.0, 2026-10-17. Not official WaterAid guidance.
+Read /brand-brief.md, /v1/tokens.json, /v1/assets.json and /v1/sources.json.
+Keep official statements, observed website styling and proposed Wetland conventions distinct.
+Do not infer font or logo permissions. Use fallback fonts until licensed.
+Never describe Water Care Canada or Kijana fictional challenge data as WaterAid facts.
+Read-only MCP endpoint: /mcp.
+
+- /guide.html — complete styled reading and print edition
+- /fonts/OFL.txt — bundled Noto Sans open font licence
+
+## Agent integration
+
+Read-only Streamable HTTP MCP: /mcp
+Before building, read the brand system and UI guidance, then select exact asset URLs from the catalogue. Preserve aspect ratios, backgrounds and source attribution. Dashboard pack: /assets/wateraid-dashboard-assets.zip
+
+PDFs and documents: call get_document_guidance before generation. Embed actual artwork, follow /v1/document-profile.json and render-check the export. Reference: /documents/wetland-one-pager-reference.pdf. Reusable generator: /documents/pdf-starter.zip.

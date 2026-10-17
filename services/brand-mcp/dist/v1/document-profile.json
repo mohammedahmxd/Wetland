@@ -1,0 +1,16 @@
+{
+  "version": "0.3.0",
+  "status": "Required Wetland team default; not official WaterAid guidance",
+  "referenceUrl": "/documents/wetland-one-pager-reference.pdf",
+  "starterUrl": "/documents/pdf-starter.zip",
+  "instructionsUrl": "/documents/agent-document-instructions.txt",
+  "requirements": [
+    "Fetch and embed original WaterAid logo on blue or ink",
+    "Use current palette and embedded Noto Sans fonts",
+    "Use reference layout adapted to content length",
+    "Preserve fictional-data and independent-project labels",
+    "Render and inspect every exported page",
+    "Verify logo/image embedding, fonts, page count and no clipped content"
+  ],
+  "enforcement": "Client agents must follow these instructions. This read-only MCP does not inspect or block external exports."
+}
