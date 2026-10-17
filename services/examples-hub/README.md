@@ -25,7 +25,7 @@ cd services/examples-hub
 MCP_AUTH_MODE=none MCP_DEMO_UI=true npm run start:http
 ```
 
-Open `http://localhost:8080/`. Select any capability and run its preset through the real scoped MCP endpoint. Inspect cited evidence and copy the example prompt for an already-connected approved agent. Pasting a URL in a Copilot message does not connect MCP tools. The presenter does not implement Microsoft sign-in.
+Open `http://localhost:8080/`. Link directly to an example with `/?capability=grants` (use any scope slug from the table). Select any capability and run its preset through the real scoped MCP endpoint. Inspect cited evidence and copy the example prompt for an already-connected approved agent. Pasting a URL in a Copilot message does not connect MCP tools. The presenter does not implement Microsoft sign-in.
 
 `npm start` serves the combined catalogue over stdio. `npm run studio` opens the shared local package editor for source/configuration drafts; fixture edits require passing contract tests and Git review. Curated source strings and structured programme/maintenance records in `config.json` must stay consistent; changing calculation/eligibility semantics requires a developer change. Package digest covers manifest, configuration and guidance.
 
