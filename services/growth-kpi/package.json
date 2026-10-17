@@ -9,7 +9,8 @@
     "check": "node --check model.mjs && node --check server.mjs && node --check workflow.mjs && node --check demo/demo.js",
     "demo": "node demo.mjs",
     "studio": "node ../../scripts/mcp-studio.mjs .",
-    "start:http": "node server.mjs --http"
+    "start:http": "node server.mjs --http",
+    "sync:excel-brand": "node scripts/sync-excel-brand.mjs"
   },
   "engines": {
     "node": ">=20"

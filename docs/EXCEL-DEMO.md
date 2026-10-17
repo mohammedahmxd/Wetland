@@ -39,3 +39,7 @@ For another run, reactivate **Gift export** rather than the generated results sh
 The supplied workbook has been authored, inspected and rendered as an `.xlsx`, with its source rows compared separately against the fixture. Native Excel add-in loading, Office.js worksheet access and the live write-back must still be acceptance-tested in the intended Excel client and tenant. A browser preview or successful MCP call alone does not prove native Excel integration. Do not bypass administrator restrictions or substitute a screenshot for that test.
 
 Installation guidance was checked against Microsoft's official documentation on 17 October 2026.
+
+## Brand styling
+
+The task pane uses a reviewed release-time snapshot fetched from the Brand MCP: actual logo, licensed Noto Sans fonts and validated palette. Refresh with `npm run sync:excel-brand --prefix services/growth-kpi`, review the resulting asset/provenance diff, then redeploy. `/brand/provenance.json` records the source endpoint, versions and hashes. A Brand outage does not remove the interface's styling; generated reports still require live Brand validation. The kit is a Wetland research reference, not official WaterAid approval.
