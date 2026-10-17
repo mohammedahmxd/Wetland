@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test test.mjs reports.test.mjs import-export.test.mjs workflow.test.mjs",
+    "test": "node --test test.mjs reports.test.mjs import-export.test.mjs workflow.test.mjs excel-data.test.mjs excel-pane.test.mjs excel-routes.test.mjs",
     "check": "node --check model.mjs && node --check server.mjs && node --check workflow.mjs && node --check demo/demo.js",
     "demo": "node demo.mjs",
     "studio": "node ../../scripts/mcp-studio.mjs .",

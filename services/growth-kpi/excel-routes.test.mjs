@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {excelRoutes} from './excel-routes.mjs';
+async function invoke(path,{enabled=true,method='GET'}={}){const result={};const res={writeHead(status,headers){Object.assign(result,{status,headers});},end(body){result.body=body;}};result.handled=await excelRoutes({enabled})({method},res,path);return result;}
+test('Excel demo routes are opt-in and only allow reads',async()=>{assert.equal((await invoke('/excel.html',{enabled:false})).status,404);assert.equal((await invoke('/excel-demo-data.json',{method:'POST'})).status,405);assert.equal((await invoke('/../server.mjs')).handled,false);});
+test('Demo metadata contains no workbook records and known synthetic row count',async()=>{const r=await invoke('/excel-demo-data.json');assert.equal(r.status,200);const data=JSON.parse(r.body);assert.deepEqual(Object.keys(data).sort(),['digest','rowCount']);assert.equal(data.rowCount,1083);assert.match(data.digest,/^[a-f0-9]{64}$/);assert.equal((await invoke('/excel-demo-data.json',{method:'HEAD'})).body,undefined);});
+test('Task pane and downloads have explicit content types and browser policy',async()=>{const page=await invoke('/excel.html');assert.match(page.headers['Content-Security-Policy'],/frame-ancestors/);assert.match(page.body.toString(),/not Microsoft Copilot/);const csv=await invoke('/excel-demo.csv');assert.match(csv.headers['Content-Disposition'],/attachment/);assert.equal((await invoke('/excel-manifest.xml')).status,200);});

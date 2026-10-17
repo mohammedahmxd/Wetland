@@ -1,3 +1,4 @@
+import {verifyExcelDemoInput} from './excel-data.mjs';
 import {createHash} from 'node:crypto';
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import {z} from 'zod';
@@ -24,6 +25,7 @@ export async function createServer({reportGenerator,identity,workflowSigningSecr
  const run=calculateGrowth;
  const generate=reportGenerator||((await import('./reports.mjs')).generateReport);
  const tool=(name,description,inputSchema,handler)=>registerReadOnlyTool(server,name,{description,inputSchema},handler,{exposeErrors:true});
+ tool('verify_excel_demo_input','Match a locally normalized workbook digest to the supported synthetic gift export. This is demo matching, not real-data ingestion; no cell contents are sent.',{digest:z.string().regex(/^[a-f0-9]{64}$/),rowCount:z.number().int().positive().max(2000)},verifyExcelDemoInput);
  tool('inspect_growth_dataset','Inspect the fixed synthetic export and complete-history assertion.',{},async()=> (await loadDataset()).manifest);
  tool('get_metric_definition','Read executable counting policy and configuration; guidance edits do not change calculations.',{},async()=>{const r=await run({start:'2026-07-01',end:'2026-09-30'});return {version:r.definitionVersion,definition:r.definition,configuration:pkg.config,packageDigest:pkg.digest};});
  tool('calculate_growth','Return structured Growth figures and evidence only, without generating a document. Available when Brand is unavailable.',schema,run);

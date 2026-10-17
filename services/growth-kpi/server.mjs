@@ -1,3 +1,4 @@
+import {excelRoutes} from './excel-routes.mjs';
 import {reportRoutes} from './reports.mjs';
 import {workflowSecret} from './workflow.mjs';
 import {fileURLToPath} from 'node:url';
@@ -10,5 +11,6 @@ if(process.argv.includes('--http')){
  if(process.env.MCP_DEMO_UI==='true'&&process.env.MCP_AUTH_MODE&&process.env.MCP_AUTH_MODE!=='none')throw Error('Public presenter requires demo authentication mode none');
  const authorize=authorizationFromEnv();
  const workflowSigningSecret=workflowSecret({http:true});
- startHttp({beforeRequest:reportRoutes(authorize),staticRoot:process.env.MCP_DEMO_UI==='true'?fileURLToPath(new URL('./demo',import.meta.url)):undefined,manifest:pkg.manifest,handler:createMcpHandler({authorize,createServer:options=>createServer({...options,workflowSigningSecret}),Transport:StreamableHTTPServerTransport,publicBaseUrl:url,dataClassification:pkg.manifest.dataClassification})});
+ const excel=excelRoutes({enabled:process.env.MCP_DEMO_UI==='true'}),reports=reportRoutes(authorize);
+ startHttp({beforeRequest:async(req,res,path)=>await excel(req,res,path)||await reports(req,res,path),staticRoot:process.env.MCP_DEMO_UI==='true'?fileURLToPath(new URL('./demo',import.meta.url)):undefined,manifest:pkg.manifest,handler:createMcpHandler({authorize,createServer:options=>createServer({...options,workflowSigningSecret}),Transport:StreamableHTTPServerTransport,publicBaseUrl:url,dataClassification:pkg.manifest.dataClassification})});
 }else await startStdio(createServer,StdioServerTransport);
