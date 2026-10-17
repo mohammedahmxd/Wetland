@@ -1,83 +1,79 @@
 export const BRAND_ENDPOINT = 'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/mcp';
 
+export const GROWTH_ENDPOINT = 'https://wetland-growth-kpi-demo-462504004653.northamerica-northeast2.run.app/mcp';
+// Bump when the seed list changes so browsers holding an older saved library pick up the new one.
+export const CATALOGUE_VERSION = 4;
+
 export const departments = [
-  {id:'fundraising', number:'01', title:'Fundraising & donor relations', description:'Better stewardship, stronger proposals and clearer evidence of impact.'},
-  {id:'it', number:'02', title:'IT, infrastructure & systems', description:'Practical support for the people keeping systems and data working.'},
-  {id:'support', number:'03', title:'Supporter care & community', description:'Useful answers, thoughtful communication and a human handoff when it matters.'},
-  {id:'brand', number:'04', title:'Brand, communications & media', description:'One consistent voice and visual language, with evidence close at hand.'}
+  {id:'live', number:'01', title:'Ready to use', description:'Working MCPs you can use in your AI assistant today.'},
+  {id:'examples', number:'02', title:'Demonstration examples', description:'Placeholders showing what future MCPs could do. They are not connected to a service yet.'}
 ];
 
-const concept = (id, department, title, description, methods, prompt, owner, data) => ({
-  id, department, title, description, methods, prompt, owner, data,
-  status:'Planned', endpoint:null, permissions:'Proposed read-only access. No service is connected.',
-  setup:'This is a capability concept. An owner, approved data sources, access controls and a deployed MCP are needed before connection.'
+const example = (id, title, description, methods, prompt, data) => ({
+  id, department:'examples', title, description, methods, prompt, data,
+  owner:'Demonstration placeholder', status:'Planned', endpoint:null, permissions:'Proposed read-only access. No service is connected.',
+  setup:'This is a demonstration placeholder. An owner, approved data sources, access controls and a deployed MCP are needed before connection.'
 });
 
 export const resources = [
-  concept('donor-crm','fundraising','Donor CRM & stewardship',
-    'Bring together giving history and stewardship tasks so staff can prepare relevant donor conversations.',
-    ['get_giving_summary','list_stewardship_tasks'],
-    'Using approved supporter records, prepare a donor conversation brief. Cite the source of each fact, respect communication preferences and leave relationship decisions to the fundraising team.',
-    'Fundraising & Partnerships','Confidential supporter data; exclude restricted relationship notes unless specifically approved.'),
-  concept('gift-matching','fundraising','Campaign & gift matching',
-    'Check a campaign’s matching conditions and help staff explain eligibility, limits and deadlines accurately.',
-    ['get_match_conditions','check_gift_eligibility'],
-    'Review this campaign’s approved matching terms. Explain the ratio, cap, eligible gifts and closing date. Flag missing terms; do not promise a match without evidence.',
-    'Fundraising & Partnerships','Approved campaign terms and synthetic gift examples.'),
-  concept('grant-impact','fundraising','Grants & impact reporting',
-    'Find funder requirements, assemble source-linked updates and flag figures that need a staff decision.',
-    ['get_reporting_requirements','find_impact_evidence'],
-    'Draft a funder update using approved programme evidence. Cite each claim, identify conflicting indicators and missing data, and list the checks a staff reviewer must complete.',
-    'International Programmes','Confidential reports; country-team permission required for programme data.'),
-  concept('access-directory','it','Access & systems directory',
-    'Find the right system owner and approved access-request process without exposing credentials.',
-    ['find_system_owner','get_access_process'],
-    'Find the owner and approved process for requesting access to this system. Link the relevant policy. Do not grant access, expose secrets or infer permissions.',
-    'IT & Operations','Internal system inventory and access guidance; no credentials.'),
-  concept('service-health','it','Service health & operations',
-    'Help IT teams interpret approved service-health summaries and identify what needs investigation.',
-    ['get_service_summary','find_known_issue'],
-    'Summarise the approved service-health report with its timestamp and scope. Separate confirmed failures from hypotheses, and suggest the relevant investigation runbook.',
-    'IT & Operations','Sanitised operational summaries; exclude secrets and personal information.'),
-  concept('runbooks','it','IT helpdesk & runbooks',
-    'Retrieve reviewed troubleshooting steps and route unresolved questions to the responsible person.',
-    ['search_runbooks','get_escalation_route'],
-    'Find a reviewed runbook for this IT issue. Cite the version, explain safe troubleshooting steps and indicate when to escalate. Do not change system settings.',
-    'IT & Operations','Internal runbooks and approved support routes.'),
-  concept('supporter-faq','support','Supporter questions & enquiries',
-    'Help staff answer routine donation and receipt questions while recognising sensitive conversations.',
-    ['search_supporter_faq','suggest_enquiry_route'],
-    'Draft a reply using the approved supporter FAQ. Cite the guidance, avoid requesting payment details, and route complaints, bereavement and legacy conversations to a person.',
-    'Supporter Care & Data','Reviewed FAQs; personal enquiries require an approved environment.'),
-  concept('community-feedback','support','Feedback & shared learning',
-    'Surface themes in anonymised feedback so teams can listen, learn and improve their service.',
-    ['get_feedback_themes','find_service_gaps'],
-    'Summarise themes in this anonymised feedback. Include the period and sample size, preserve minority concerns and avoid identifying individuals or claiming representative results.',
-    'Supporter Care & Data','Aggregated or anonymised feedback only.'),
-  concept('translation','support','English & French drafting',
-    'Prepare a first translation against reviewed terminology for a bilingual colleague to adapt and approve.',
-    ['get_approved_terms','draft_translation'],
-    'Prepare a Canadian French draft using the approved English source and terminology. Preserve figures and meaning, flag ambiguous phrases and require bilingual review before publication.',
-    'Communications & Brand','Approved source copy and bilingual terminology; sensitivity follows the source.'),
   {
-    id:'brand-system', department:'brand', title:'WaterAid brand reference',
-    description:'Read the shared visual reference: colour tokens, typography, original assets and document guidance.',
+    id:'branding', department:'live', title:'Branding',
+    description:'Gives your assistant the shared brand system: colour tokens, typography, approved logos and assets, and guidance for documents and interfaces.',
     methods:['get_brand_system','list_assets','get_asset','get_ui_guidance','get_document_guidance'],
-    prompt:'Read get_brand_system and get_ui_guidance before designing. Choose original artwork with list_assets and get_asset. For a PDF, read get_document_guidance. Use the exact colour tokens and Noto Sans; preserve logo proportions. Label proposed or fictional content and check the finished layout.',
+    prompt:'Retrieve the document guidance and approved brand assets for a quarterly fundraising report. Summarise the typography, colours and logo requirements and cite the guidance used.',
     owner:'Wetland brand reference project', data:'Public reference material only. Independent research kit; not official WaterAid brand approval.',
-    status:'Available', endpoint:BRAND_ENDPOINT, referenceUrl:'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/#agents',transport:'Streamable HTTP',authentication:'No authentication required.',permissions:'Read-only public reference. No authentication required.',
-    setup:'Add this URL as a remote MCP server using Streamable HTTP in a compatible agent. Discover its tools, then use the example prompt. Client setup varies; this service does not provide access to donor or programme records.'
+    status:'Available', endpoint:BRAND_ENDPOINT, referenceUrl:'https://wateraid-brand-hub-462504004653.northamerica-northeast2.run.app/#agents', transport:'Streamable HTTP', authentication:'No authentication required.', permissions:'Read-only public reference. No authentication required.',
+    setup:'Paste the MCP URL into your prompt. This service does not provide access to donor or programme records.'
   },
-  concept('media-rights','brand','Media assets & usage rights',
-    'Help teams locate approved media and check consent, credits and permitted usage before publishing.',
-    ['find_approved_assets','get_usage_conditions'],
-    'Find an approved asset for this communication. Return its source, credit, consent scope and usage restrictions. Flag missing permissions and do not treat an available file as permission to publish.',
-    'Communications & Brand','Approved asset metadata and usage conditions; no participant-level consent records.'),
-  concept('editorial','brand','Editorial voice & press',
-    'Retrieve reviewed messaging and prepare clear first drafts that keep evidence and approval requirements visible.',
-    ['get_reviewed_messaging','find_public_sources'],
-    'Draft this communication from reviewed messaging and public evidence. Cite factual claims, preserve approved quotations and mark the output as a draft for Communications review.',
-    'Communications & Brand','Reviewed public messaging, source references and editorial guidance.')
+  {
+    id:'growth-report', department:'live', title:'Growth Report',
+    description:'Counts first-time donors for a period, compares the result with a target and generates a branded PDF or HTML report with its definition and evidence. Uses synthetic data.',
+    methods:['get_metric_definition','inspect_growth_dataset','calculate_growth','explain_growth_result','generate_growth_report'],
+    prompt:'Generate a branded Growth report for 1 July–30 September 2026 against a target of 150 new donors. Use first-ever received qualifying donations, include the definition and evidence, and provide the PDF and HTML report links.',
+    owner:'Wetland growth reporting project', data:'Synthetic donor records only. Returns totals and trends, never names or contact details.',
+    status:'Available', endpoint:GROWTH_ENDPOINT, referenceUrl:'https://wetland-growth-kpi-demo-462504004653.northamerica-northeast2.run.app/', transport:'Streamable HTTP', authentication:'No authentication required.', permissions:'Read-only access to a synthetic dataset. No authentication required.',
+    setup:'Paste the MCP URL into your prompt. Reports use the Branding MCP for their styling.'
+  },
+  example('grant-applications','Grant applications',
+    'Supplies funder requirements, approved programme facts, budgets and past reviewer feedback so an agent can draft proposals, identify missing evidence and check eligibility.',
+    ['get_funder_requirements','find_programme_facts','get_reviewer_feedback','check_eligibility'],
+    'Draft a proposal outline for this funder using approved programme facts and budgets. Check eligibility against the funder requirements, list any missing evidence and note past reviewer feedback that applies.',
+    'Funder requirements, approved programme facts, budgets and past reviewer feedback.'),
+  example('programme-reporting','Programme reporting',
+    'Supplies indicator definitions, reporting templates and validated results so an agent can produce consistent reports and flag conflicting figures.',
+    ['get_indicator_definition','get_reporting_template','get_validated_results'],
+    'Produce a programme report for this period using the standard template and validated results. Use the agreed indicator definitions and flag any figures that conflict.',
+    'Indicator definitions, reporting templates and validated results.'),
+  example('governance-approvals','Governance and approvals',
+    'Supplies policies, decision rights and approval thresholds so an agent can identify who must approve a pilot, purchase or release.',
+    ['find_policy','get_decision_rights','get_approval_threshold'],
+    'Who needs to approve this pilot? Check the relevant policy, decision rights and approval thresholds, and list the approvers in order with the policy each one comes from.',
+    'Policies, decision rights and approval thresholds.'),
+  example('tool-maintenance','Tool maintenance',
+    'Supplies tool owners, versions, known issues, tests and support documentation so an agent can diagnose problems, propose fixes and prepare handovers.',
+    ['get_tool_owner','list_known_issues','get_test_results','get_support_docs'],
+    'This tool is returning an error. Check its version, known issues and test results, suggest a likely cause and a fix, and tell me who owns it.',
+    'Tool owners, versions, known issues, tests and support documentation.'),
+  example('staff-onboarding','Staff onboarding',
+    'Supplies role guides, procedures, terminology and training resources so an agent can answer practical questions and create role-specific learning plans.',
+    ['get_role_guide','find_procedure','define_term','list_training'],
+    'I am starting as a Supporter Care Officer. Create a two-week learning plan from my role guide and training resources, and explain the terms I will hear most often.',
+    'Role guides, procedures, terminology and training resources.'),
+  example('communications','Communications',
+    'Supplies approved claims, messaging, terminology and English/French conventions so an agent can draft consistent updates with traceable sources.',
+    ['find_approved_claims','get_messaging','get_terminology','get_language_conventions'],
+    'Draft a short supporter update in English and French about our clean water work. Use only approved claims and messaging, and cite the source of each claim.',
+    'Approved claims, messaging, terminology and English/French conventions.'),
+  example('developer-standards','Developer standards',
+    'Supplies API contracts, architecture decisions, security requirements and reusable components so an agent can build features that fit the existing platform.',
+    ['get_api_contract','find_architecture_decision','get_security_requirements','list_components'],
+    'I need to add a donation export feature. Which API contracts, architecture decisions, security requirements and reusable components apply?',
+    'API contracts, architecture decisions, security requirements and reusable components.'),
+  example('organisational-learning','Organisational learning',
+    'Supplies evaluated pilots, lessons learned and retired approaches so an agent can find relevant experience before anyone proposes another tool.',
+    ['find_evaluated_pilots','get_lessons_learned','list_retired_approaches'],
+    'Before I propose a chatbot for supporter questions, have we tried anything similar? Summarise relevant pilots, lessons learned and retired approaches.',
+    'Evaluated pilots, lessons learned and retired approaches.')
 ];
 
 export function matchingResources(query='', status='All', catalogue=resources, groups=departments) {
@@ -90,7 +86,7 @@ export function connectionConfig(resource) {
   return resource.status==='Available' && resource.endpoint ? {mcpServers:{[resource.id]:{type:resource.transport==='SSE'?'sse':'http',url:resource.endpoint}}} : null;
 }
 
-export function seedCatalogue(){return {items:structuredClone(resources),deleted:[],departments:structuredClone(departments)};}
+export function seedCatalogue(){return {version:CATALOGUE_VERSION,items:structuredClone(resources),deleted:[],departments:structuredClone(departments)};}
 
 export function catalogueDepartments(catalogue){return catalogue.departments??(catalogue.departments=structuredClone(departments));}
 

@@ -98,6 +98,7 @@ h3{font-size:20px}
 .resource-detail h3{font-size:16px;margin:24px 0 12px}
 .resource-code{background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:16px;overflow-wrap:anywhere;white-space:pre-wrap;font:12px/1.8 monospace}
 .resource-code.prompt-example{font-family:Noto,Arial,sans-serif;font-size:14px}
+.resource-url-field{display:flex;gap:8px;align-items:stretch}.resource-url-field input{flex:1;min-width:0;background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:13px/1.4 monospace}
 .resource-pending{background:var(--cream);padding:16px;font-size:14px;line-height:1.6;border-radius:6px}
 .resource-detail-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:28px 0 16px}.resource-detail-heading h3{margin:0}
 .resource-detail .btn{font-size:12px}.resource-detail .resource-methods{margin-bottom:24px}
@@ -314,3 +315,4 @@ dialog:has(.project-review) .modal-head{position:sticky;top:0;background:white;z
 .capability-card a,.capability-card pre{overflow-wrap:anywhere;white-space:pre-wrap}
 .catalogue-prompt{padding:16px;background:#F8F0E4;border-radius:8px;line-height:1.65}
 .btn:disabled{opacity:.55;cursor:not-allowed}
+.overview-list{margin:0 0 16px;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.7}.overview-list li+li{margin-top:6px}
